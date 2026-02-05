@@ -1,0 +1,171 @@
+'use server'
+
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import { OpenAI } from 'openai'
+import { getConfig } from './settings'
+
+/**
+ * Gets the configured AI provider settings from the database.
+ */
+async function getAISettings() {
+    const provider = await getConfig('AI_PROVIDER') || 'gemini'
+    const model = await getConfig('AI_MODEL')
+    const apiKey = await getConfig('AI_API_KEY')
+    const baseUrl = await getConfig('AI_BASE_URL')
+
+    return { provider, model, apiKey, baseUrl }
+}
+
+/**
+ * Normalizes local URLs for Ollama/LMStudio compatibility.
+ */
+function getFinalBaseUrl(baseUrl: string | null, provider: string) {
+    if (provider !== 'openai') return undefined
+
+    let url = baseUrl || 'https://api.openai.com/v1'
+    if (url.includes('localhost') || url.includes('127.0.0.1')) {
+        if (!url.endsWith('/v1') && !url.endsWith('/v1/')) {
+            url = url.replace(/\/+$/, '') + '/v1'
+        }
+    }
+    return url
+}
+
+/**
+ * Tests the AI connection by sending a simple prompt.
+ */
+export async function testAIConnection() {
+    const settings = await getAISettings()
+
+    if (!settings.apiKey) {
+        throw new Error('API Key is missing.')
+    }
+
+    const prompt = "Respond with exactly the word 'OK' and nothing else."
+
+    try {
+        if (settings.provider === 'gemini') {
+            const genAI = new GoogleGenerativeAI(settings.apiKey)
+            const model = genAI.getGenerativeModel({ model: settings.model || 'gemini-1.5-flash' })
+            const result = await model.generateContent(prompt)
+            const text = result.response.text().trim()
+            return { success: true, message: `Connected to Gemini! Response: ${text}` }
+        } else {
+            const finalBaseUrl = getFinalBaseUrl(settings.baseUrl, 'openai')!
+            const client = new OpenAI({
+                apiKey: settings.apiKey,
+                baseURL: finalBaseUrl,
+            })
+            const response = await client.chat.completions.create({
+                model: settings.model || 'gpt-3.5-turbo',
+                messages: [{ role: 'user', content: prompt }],
+                max_tokens: 5,
+            })
+            if (!response.choices?.[0]) {
+                const modelName = settings.model || 'gpt-3.5-turbo'
+                return {
+                    success: false,
+                    message: `AI provider returned an empty response (URL: ${finalBaseUrl}, Model: ${modelName}). Check your local server.`
+                }
+            }
+            const text = response.choices[0].message?.content?.trim() || ''
+            return { success: true, message: `Connected! Response: ${text}` }
+        }
+    } catch (err: any) {
+        console.error('AI Test Connection Error:', err)
+        // Check for specific error types to give better advice
+        let advice = ''
+        if (err.message?.includes('fetch failed')) {
+            advice = ' (Connection refused. Is your local LLM server running?)'
+        } else if (err.status === 404) {
+            advice = ' (404 Not Found. Check if the Base URL and Model Name are correct.)'
+        }
+        return { success: false, message: (err.message || 'Connection failed') + advice }
+    }
+}
+
+/**
+ * Common interface for generating text alternatives across different providers.
+ */
+export async function generateSocialPostAlternatives(content: string, platform: string) {
+    const settings = await getAISettings()
+
+    if (!settings.apiKey) {
+        throw new Error('AI API Key not found. Please configure it in the Settings page.')
+    }
+
+    const prompt = `
+        You are a social media expert. 
+        Generate 3 engaging alternatives for the following social media post on ${platform}.
+        The alternatives should vary in tone (e.g., professional, enthusiastic, concise).
+        Return only the 3 alternatives, separated by a unique delimiter: "---ALTERNATIVE---".
+        Do not include any other text or explanations.
+
+        Original Content:
+        ${content}
+    `
+
+    if (settings.provider === 'gemini') {
+        return callGemini(prompt, settings.model || 'gemini-1.5-flash', settings.apiKey)
+    } else if (settings.provider === 'openai') {
+        return callOpenAI(prompt, settings.model || 'gpt-3.5-turbo', settings.apiKey, settings.baseUrl || undefined)
+    } else {
+        throw new Error(`Unsupported AI provider: ${settings.provider}`)
+    }
+}
+
+/**
+ * Helper to call Google Gemini API
+ */
+async function callGemini(prompt: string, modelName: string, apiKey: string) {
+    try {
+        const genAI = new GoogleGenerativeAI(apiKey)
+        const model = genAI.getGenerativeModel({ model: modelName })
+        const result = await model.generateContent(prompt)
+        const text = result.response.text()
+
+        return parseAlternatives(text)
+    } catch (err: any) {
+        console.error('Gemini API Error:', err)
+        throw new Error(`Gemini Error: ${err.message || 'Unknown error'}`)
+    }
+}
+
+/**
+ * Helper to call OpenAI-compatible API (including local models)
+ */
+async function callOpenAI(prompt: string, modelName: string, apiKey: string, baseUrl?: string) {
+    try {
+        const finalBaseUrl = getFinalBaseUrl(baseUrl || null, 'openai')
+        const client = new OpenAI({
+            apiKey: apiKey,
+            baseURL: finalBaseUrl,
+        })
+
+        const response = await client.chat.completions.create({
+            model: modelName,
+            messages: [{ role: 'user', content: prompt }],
+            temperature: 0.7,
+        })
+
+        if (!response.choices?.[0]) {
+            throw new Error(`AI provider returned an empty response. (URL: ${finalBaseUrl}, Model: ${modelName})`)
+        }
+        const text = response.choices[0].message?.content || ''
+        return parseAlternatives(text)
+    } catch (err: any) {
+        console.error('OpenAI-compatible API Error:', err)
+        throw new Error(`AI Error: ${err.message || 'Unknown error'}`)
+    }
+}
+
+/**
+ * Parses the delimited string into an array of alternatives.
+ */
+function parseAlternatives(text: string): string[] {
+    return text
+        .split('---ALTERNATIVE---')
+        .map(a => a.trim())
+        .filter(a => a.length > 0)
+        .slice(0, 3)
+}
