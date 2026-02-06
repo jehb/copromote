@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Check, Sparkles, Globe, Key, Cpu, Loader2 } from 'lucide-react'
 import { getConfig, updateConfig } from '@/app/actions/settings'
-import { testAIConnection } from '@/app/actions/ai'
+import { testAIConnection, fetchLocalModels } from '@/app/actions/ai'
 import {
     Select,
     SelectContent,
@@ -213,13 +213,19 @@ function AIConfig() {
                         <Globe className="h-4 w-4 text-slate-400" />
                         AI Provider
                     </Label>
-                    <Select value={provider} onValueChange={setProvider}>
+                    <Select value={provider} onValueChange={(val) => {
+                        setProvider(val)
+                        if (val === 'local') {
+                            setBaseUrl('http://127.0.0.1:1234')
+                        }
+                    }}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select provider" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="gemini">Google Gemini</SelectItem>
-                            <SelectItem value="openai">Other (OpenAI Compatible)</SelectItem>
+                            <SelectItem value="openai">OpenAI (Original)</SelectItem>
+                            <SelectItem value="local">Local LLM (Ollama, LM Studio)</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -229,25 +235,36 @@ function AIConfig() {
                         <Cpu className="h-4 w-4 text-slate-400" />
                         Model Name
                     </Label>
-                    <Input
-                        placeholder={provider === 'gemini' ? 'gemini-1.5-flash' : 'llama3'}
-                        value={model}
-                        onChange={(e) => setModel(e.target.value)}
-                    />
+                    <div className="flex gap-2">
+                        {provider === 'local' ? (
+                            <ModelSelector
+                                baseUrl={baseUrl || 'http://127.0.0.1:1234'}
+                                value={model}
+                                onChange={setModel}
+                            />
+                        ) : (
+                            <Input
+                                placeholder={provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-3.5-turbo'}
+                                value={model}
+                                onChange={(e) => setModel(e.target.value)}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
 
             <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                     <Key className="h-4 w-4 text-slate-400" />
-                    API Key
+                    API Key {provider === 'local' && <span className="text-xs font-normal text-muted-foreground">(Optional for Local)</span>}
                 </Label>
                 <Input
                     type="password"
-                    placeholder="Enter API Key"
+                    placeholder={provider === 'local' ? "Optional" : "Enter API Key"}
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     className="font-mono"
+                    required={provider !== 'local'}
                 />
                 {provider === 'gemini' && (
                     <p className="text-[10px] text-muted-foreground">
@@ -256,7 +273,7 @@ function AIConfig() {
                 )}
             </div>
 
-            {provider === 'openai' && (
+            {(provider === 'openai' || provider === 'local') && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
                     <Label className="flex items-center gap-2">
                         <Globe className="h-4 w-4 text-slate-400" />
@@ -269,7 +286,9 @@ function AIConfig() {
                         className="font-mono text-sm"
                     />
                     <p className="text-[10px] text-muted-foreground">
-                        Use this for local models like Ollama, LocalAI, or custom OpenAI endpoints.
+                        {provider === 'local'
+                            ? "Point this to your local server (e.g. http://127.0.0.1:1234 for LM Studio or http://localhost:11434 for Ollama)."
+                            : "Use this for custom OpenAI-compatible endpoints."}
                     </p>
                 </div>
             )}
@@ -288,8 +307,8 @@ function AIConfig() {
 
                 {status && (
                     <div className={`p-3 rounded-lg text-sm flex items-start gap-2 animate-in fade-in slide-in-from-top-2 ${status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' :
-                            status.type === 'testing' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
-                                'bg-red-50 text-red-700 border border-red-100'
+                        status.type === 'testing' ? 'bg-blue-50 text-blue-700 border border-blue-100' :
+                            'bg-red-50 text-red-700 border border-red-100'
                         }`}>
                         {status.type === 'success' ? <Check className="h-4 w-4 mt-0.5 shrink-0" /> :
                             status.type === 'testing' ? <Loader2 className="h-4 w-4 mt-0.5 shrink-0 animate-spin" /> :
@@ -302,5 +321,63 @@ function AIConfig() {
                 )}
             </div>
         </form>
+    )
+}
+
+function ModelSelector({ baseUrl, value, onChange }: { baseUrl: string, value: string, onChange: (v: string) => void }) {
+    const [models, setModels] = useState<string[]>([])
+    const [loading, setLoading] = useState(false)
+    const [fetched, setFetched] = useState(false)
+
+    const handleFetch = async () => {
+        setLoading(true)
+        try {
+            const list = await fetchLocalModels(baseUrl)
+            setModels(list)
+            setFetched(true)
+            if (list.length > 0 && !value) {
+                onChange(list[0])
+            }
+        } catch (err) {
+            console.error('Failed to fetch models', err)
+            // Fallback to manual input if fetch fails
+            setFetched(false)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    if (!fetched && models.length === 0) {
+        return (
+            <div className="flex gap-2 w-full">
+                <Input
+                    placeholder="e.g. llama3"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="flex-1"
+                />
+                <Button type="button" variant="outline" onClick={handleFetch} disabled={loading}>
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Fetch Models'}
+                </Button>
+            </div>
+        )
+    }
+
+    return (
+        <div className="flex gap-2 w-full">
+            <Select value={value} onValueChange={onChange}>
+                <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select a model" />
+                </SelectTrigger>
+                <SelectContent>
+                    {models.map(m => (
+                        <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <Button type="button" variant="ghost" size="icon" onClick={handleFetch} disabled={loading} title="Refresh Models">
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <div className="text-xs font-bold">↻</div>}
+            </Button>
+        </div>
     )
 }

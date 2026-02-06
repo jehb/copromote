@@ -7,6 +7,36 @@ import { getConfig } from './settings'
 /**
  * Gets the configured AI provider settings from the database.
  */
+/**
+ * Fetches available models from a local LLM endpoint (OpenAI compatible).
+ */
+export async function fetchLocalModels(baseUrl: string) {
+    console.log('Fetching local models from:', baseUrl);
+    try {
+        const url = getFinalBaseUrl(baseUrl, 'openai')!;
+        // The models endpoint is usually at /v1/models or just /models depending on the server
+        // standardized openai is /v1/models. getFinalBaseUrl adds /v1.
+        const response = await fetch(`${url}/models`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch models: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        // Standard OpenAI response: { data: [{ id: 'model-id', ... }] }
+        if (data && Array.isArray(data.data)) {
+            return data.data.map((m: any) => m.id);
+        }
+        return [];
+    } catch (err: any) {
+        console.error('Fetch Models Error:', err);
+        throw new Error(`Failed to connect to local server: ${err.message}`);
+    }
+}
+
+/**
+ * Gets the configured AI provider settings from the database.
+ */
 async function getAISettings() {
     const provider = await getConfig('AI_PROVIDER') || 'gemini'
     const model = await getConfig('AI_MODEL')
@@ -20,13 +50,15 @@ async function getAISettings() {
  * Normalizes local URLs for Ollama/LMStudio compatibility.
  */
 function getFinalBaseUrl(baseUrl: string | null, provider: string) {
-    if (provider !== 'openai') return undefined
+    if (provider !== 'openai' && provider !== 'local') return undefined
 
-    let url = baseUrl || 'https://api.openai.com/v1'
-    if (url.includes('localhost') || url.includes('127.0.0.1')) {
-        if (!url.endsWith('/v1') && !url.endsWith('/v1/')) {
-            url = url.replace(/\/+$/, '') + '/v1'
-        }
+    let url = baseUrl || (provider === 'local' ? 'http://127.0.0.1:1234' : 'https://api.openai.com/v1')
+
+    // Ensure it ends with /v1 if it looks like a base root
+    if (!url.endsWith('/v1') && !url.endsWith('/v1/')) {
+        // Simple heuristic: if it doesn't end in v1, append it. 
+        // Users might provide http://localhost:11434 -> http://localhost:11434/v1
+        url = url.replace(/\/+$/, '') + '/v1'
     }
     return url
 }
@@ -37,7 +69,7 @@ function getFinalBaseUrl(baseUrl: string | null, provider: string) {
 export async function testAIConnection() {
     const settings = await getAISettings()
 
-    if (!settings.apiKey) {
+    if (settings.provider !== 'local' && !settings.apiKey) {
         throw new Error('API Key is missing.')
     }
 
@@ -45,15 +77,16 @@ export async function testAIConnection() {
 
     try {
         if (settings.provider === 'gemini') {
-            const genAI = new GoogleGenerativeAI(settings.apiKey)
+            const genAI = new GoogleGenerativeAI(settings.apiKey!)
             const model = genAI.getGenerativeModel({ model: settings.model || 'gemini-1.5-flash' })
             const result = await model.generateContent(prompt)
             const text = result.response.text().trim()
             return { success: true, message: `Connected to Gemini! Response: ${text}` }
         } else {
-            const finalBaseUrl = getFinalBaseUrl(settings.baseUrl, 'openai')!
+            // Local or OpenAI
+            const finalBaseUrl = getFinalBaseUrl(settings.baseUrl, settings.provider)!
             const client = new OpenAI({
-                apiKey: settings.apiKey,
+                apiKey: settings.apiKey || 'not-needed', // Local LLMs might accept any string
                 baseURL: finalBaseUrl,
             })
             const response = await client.chat.completions.create({
@@ -90,7 +123,7 @@ export async function testAIConnection() {
 export async function generateSocialPostAlternatives(content: string, platform: string) {
     const settings = await getAISettings()
 
-    if (!settings.apiKey) {
+    if (settings.provider !== 'local' && !settings.apiKey) {
         throw new Error('AI API Key not found. Please configure it in the Settings page.')
     }
 
@@ -106,9 +139,15 @@ export async function generateSocialPostAlternatives(content: string, platform: 
     `
 
     if (settings.provider === 'gemini') {
-        return callGemini(prompt, settings.model || 'gemini-1.5-flash', settings.apiKey)
-    } else if (settings.provider === 'openai') {
-        return callOpenAI(prompt, settings.model || 'gpt-3.5-turbo', settings.apiKey, settings.baseUrl || undefined)
+        return callGemini(prompt, settings.model || 'gemini-1.5-flash', settings.apiKey!)
+    } else if (settings.provider === 'openai' || settings.provider === 'local') {
+        return callOpenAI(
+            prompt,
+            settings.model || 'gpt-3.5-turbo',
+            settings.apiKey || 'not-needed',
+            settings.baseUrl || undefined,
+            settings.provider
+        )
     } else {
         throw new Error(`Unsupported AI provider: ${settings.provider}`)
     }
@@ -134,9 +173,9 @@ async function callGemini(prompt: string, modelName: string, apiKey: string) {
 /**
  * Helper to call OpenAI-compatible API (including local models)
  */
-async function callOpenAI(prompt: string, modelName: string, apiKey: string, baseUrl?: string) {
+async function callOpenAI(prompt: string, modelName: string, apiKey: string, baseUrl?: string, provider?: string) {
     try {
-        const finalBaseUrl = getFinalBaseUrl(baseUrl || null, 'openai')
+        const finalBaseUrl = getFinalBaseUrl(baseUrl || null, provider || 'openai')
         const client = new OpenAI({
             apiKey: apiKey,
             baseURL: finalBaseUrl,
