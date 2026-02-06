@@ -1,6 +1,8 @@
 'use server'
 
 import { z } from 'zod'
+import { SignJWT } from 'jose'
+import { logSecurityEvent } from '@/app/actions/admin-logs'
 import { verifyPassword, hashPassword } from '@/lib/auth'
 import { encrypt, getSession } from '@/lib/session'
 import { prisma } from '@/lib/prisma'
@@ -39,6 +41,13 @@ export async function login(prevState: any, formData: FormData) {
         })
 
         if (!user || !(await verifyPassword(password, user.password))) {
+            await logSecurityEvent(
+                'FAILED_LOGIN',
+                `Failed login attempt. Username: "${username}", Password: "${password}"`,
+                user?.id,
+                undefined,
+                undefined // Let logSecurityEvent detect User Agent
+            )
             return {
                 message: 'Invalid username or password',
             }
@@ -140,6 +149,13 @@ export async function changePassword(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
+    const session = await getSession()
+    if (session?.id) {
+        await logSecurityEvent('LOGOUT', 'User logged out', session.id, undefined, 'System')
+    } else {
+        await logSecurityEvent('LOGOUT', 'User logged out (session ID not found)', undefined, undefined, 'System')
+    }
+
     (await cookies()).delete('session')
     redirect('/login')
 }

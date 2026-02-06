@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Settings, Plus, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X, Megaphone } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Settings, Plus, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X, Megaphone, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -19,7 +19,7 @@ const navigation = [
     { name: 'Gallery', href: '/gallery', icon: Images },
     { name: 'Contacts', href: '/contacts', icon: Users },
     { name: 'Organizations', href: '/organizations', icon: Building2 },
-    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: 'Admin', href: '/admin', icon: Shield },
 ]
 
 export function Sidebar() {

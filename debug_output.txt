@@ -1,0 +1,14 @@
+Attempting to create user...
+Password hashed.
+User created successfully: {
+  id: 'f692ecaf-584a-4161-b5e1-4206d3c63045',
+  name: 'Debug User',
+  email: 'debug_1770343311799@example.com',
+  username: 'debuguser_1770343311799',
+  password: '$2b$10$.eMaaSGei9H/FM80DcsaSeB5u685dsxLGWMR/CI4RWC5Vo1aLdrJa',
+  role: 'USER',
+  mustChangePassword: true,
+  avatar: null,
+  createdAt: 2026-02-06T02:01:51.809Z,
+  updatedAt: 2026-02-06T02:01:51.809Z
+}

@@ -1,0 +1,88 @@
+import { getUsers, deleteUser } from '@/app/actions/admin-users'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Trash2, Shield, User as UserIcon } from 'lucide-react'
+import { NewUserDialog } from './new-user-dialog'
+
+export const dynamic = 'force-dynamic'
+
+export default async function UsersPage() {
+    const users = await getUsers()
+
+    return (
+        <div className="p-8 space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold">User Management</h1>
+                    <p className="text-muted-foreground">Manage system access and user accounts.</p>
+                </div>
+                <NewUserDialog />
+            </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>System Users</CardTitle>
+                    <CardDescription>
+                        A list of all users with access to the system.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[50px]"></TableHead>
+                                <TableHead>User</TableHead>
+                                <TableHead>Role</TableHead>
+                                <TableHead>Joined</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {users.map((user) => (
+                                <TableRow key={user.id}>
+                                    <TableCell>
+                                        <Avatar className="h-9 w-9">
+                                            <AvatarImage src={user.avatar || ''} alt={user.name} />
+                                            <AvatarFallback>{user.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                                        </Avatar>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{user.name}</span>
+                                            <span className="text-sm text-muted-foreground">{user.email}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-1.5">
+                                            {user.role === 'ADMIN' ? <Shield className="h-3.5 w-3.5 text-indigo-600" /> : <UserIcon className="h-3.5 w-3.5 text-slate-500" />}
+                                            <span className="text-sm font-medium capitalize">{user.role?.toLowerCase() || 'user'}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell className="text-right">
+                                        <form action={async () => {
+                                            'use server'
+                                            await deleteUser(user.id)
+                                        }}>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                disabled={user.username === 'admin'}
+                                                title={user.username === 'admin' ? "Cannot delete admin user" : "Delete user"}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </form>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}

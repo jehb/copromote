@@ -16,5 +16,5 @@ export async function updateConfig(key: string, value: string) {
         update: { value },
         create: { key, value }
     })
-    revalidatePath('/settings')
+    revalidatePath('/admin/settings')
 }

@@ -7,6 +7,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  // Forced reload for Prisma
   /* config options here */
   reactCompiler: true,
   turbopack: {},
