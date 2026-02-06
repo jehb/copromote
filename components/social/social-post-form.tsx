@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -158,7 +158,7 @@ export function SocialPostForm({ post, promotions, users, events, action }: Soci
                         <ImagesIcon className="h-4 w-4 text-slate-500" /> Attached Media
                     </Label>
                     <PhotoSelectionModal
-                        selectedPhotoIds={selectedPhotos.map(p => p.id)}
+                        selectedPhotoIds={useMemo(() => selectedPhotos.map(p => p.id), [selectedPhotos])}
                         onSelect={async (ids) => {
                             // This depends on getPhotos but for simplicity we could refetch or trust the modal
                             // Since the modal already has the data, but we only return IDs

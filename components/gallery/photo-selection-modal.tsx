@@ -23,9 +23,16 @@ export function PhotoSelectionModal({ selectedPhotoIds, onSelect }: PhotoSelecti
     const [tempSelectedIds, setTempSelectedIds] = useState<string[]>(selectedPhotoIds)
     const [loading, setLoading] = useState(false)
 
+    // Load data only when opening
     useEffect(() => {
         if (open) {
             loadData()
+        }
+    }, [open])
+
+    // Sync props to temp state when opening or when props change
+    useEffect(() => {
+        if (open) {
             setTempSelectedIds(selectedPhotoIds)
         }
     }, [open, selectedPhotoIds])
