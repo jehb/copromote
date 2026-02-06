@@ -1,0 +1,173 @@
+FAIL __tests__/components/layout/connection-status.test.tsx
+  ● ConnectionStatus Component › should show online status when connected
+
+    TestingLibraryElementError: Unable to find an element with the text: Online. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div />[39m
+    [36m</body>[39m
+
+      21 |         render(<ConnectionStatus />)
+      22 |
+    > 23 |         expect(screen.getByText('Online')).toBeInTheDocument()
+         |                       ^
+      24 |         expect(screen.queryByText('Offline')).not.toBeInTheDocument()
+      25 |     })
+      26 |
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByText (__tests__/components/layout/connection-status.test.tsx:23:23)
+
+  ● ConnectionStatus Component › should show offline status when disconnected
+
+    TestingLibraryElementError: Unable to find an element with the text: Offline. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"fixed top-4 right-4 z-[9999]"[39m
+          [33mstyle[39m=[32m"opacity: 0; transform: translateY(-100px);"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex items-center gap-2 px-4 py-2 rounded-full shadow-lg border backdrop-blur-sm bg-amber-50/90 border-amber-200 text-amber-700"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-wifi-off h-4 w-4"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M12 20h.01"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M8.5 16.429a5 5 0 0 1 7 0"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M5 12.859a10 10 0 0 1 5.17-2.69"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M19 12.859a10 10 0 0 0-2.007-1.523"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M2 8.82a15 15 0 0 1 4.177-2.643"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M22 8.82a15 15 0 0 0-11.288-3.764"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m2 2 20 20"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-xs font-bold uppercase tracking-wider"[39m
+            [36m>[39m
+              [0mWorking Offline[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+      35 |         render(<ConnectionStatus />)
+      36 |
+    > 37 |         expect(screen.getByText('Offline')).toBeInTheDocument()
+         |                       ^
+      38 |         expect(screen.queryByText('Online')).not.toBeInTheDocument()
+      39 |     })
+      40 |
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByText (__tests__/components/layout/connection-status.test.tsx:37:23)
+
+PASS __tests__/components/social/social-filter-bar.test.tsx
+PASS __tests__/unit/utils.test.ts
+FAIL __tests__/unit/offline/action-registry.test.ts
+  ● Test suite failed to run
+
+    ReferenceError: TextEncoder is not defined
+
+      31 |     const company = formData.get('company') as string
+      32 |     const jobTitle = formData.get('jobTitle') as string
+    > 33 |     const notes = formData.get('notes') as string
+         |                ^
+      34 |     const type = formData.get('type') as string
+      35 |     const organizationId = formData.get('organizationId') as string
+      36 |
+
+      at Object.<anonymous> (node_modules/next/src/server/stream-utils/node-web-streams-helper.ts:35:17)
+      at Object.<anonymous> (node_modules/next/dist/server/render-result.js:11:31)
+      at Object.<anonymous> (node_modules/next/dist/server/response-cache/utils.js:28:62)
+      at Object.<anonymous> (node_modules/next/dist/server/response-cache/index.js:16:16)
+      at Object.<anonymous> (node_modules/next/dist/server/lib/patch-fetch.js:42:24)
+      at Object.<anonymous> (node_modules/next/dist/server/web/spec-extension/unstable-cache.js:12:21)
+      at Object.<anonymous> (node_modules/next/cache.js:2:19)
+      at Object.<anonymous> (app/actions/contacts.ts:33:16)
+      at Object.<anonymous> (lib/offline/action-registry.ts:19:19)
+      at Object.<anonymous> (__tests__/unit/offline/action-registry.test.ts:5:25)
+
+FAIL __tests__/components/layout/sidebar.test.tsx
+  ● Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     • If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     • If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     • To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     • If you need a custom transformation, specify a "transform" option in your config.
+     • If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    /home/jehb/projects/promoty/node_modules/jose/dist/webapi/index.js:1
+    export { compactDecrypt } from './jwe/compact/decrypt.js';
+    ^^^^^^
+
+    SyntaxError: Unexpected token 'export'
+
+      26 |
+      27 | export async function getSession() {
+    > 28 |     const session = (await cookies()).get('session')?.value
+         |               ^
+      29 |     if (!session) return null
+      30 |     return await decrypt(session)
+      31 | }
+
+      at Runtime.createScriptFromCode (node_modules/jest-runtime/build/index.js:1318:40)
+      at Object.<anonymous> (lib/session.ts:28:15)
+      at Object.<anonymous> (app/actions/auth.ts:25:18)
+      at Object.<anonymous> (components/layout/sidebar.tsx:19:15)
+      at Object.<anonymous> (__tests__/components/layout/sidebar.test.tsx:16:18)
+
+Test Suites: 3 failed, 2 passed, 5 total
+Tests:       2 failed, 16 passed, 18 total
+Snapshots:   0 total
+Time:        0.924 s, estimated 1 s
+Ran all test suites.

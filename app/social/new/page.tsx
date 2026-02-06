@@ -1,5 +1,5 @@
 import { createSocialPost } from '@/app/actions/social'
-import { getPromotionPeriods } from '@/app/actions/promotion-select'
+import { getPromotions } from '@/app/actions/promotions'
 import { getUsers, getEvents } from '@/app/actions/events'
 import { SocialPostForm } from '@/components/social/social-post-form'
 import Link from 'next/link'
@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function NewPostPage() {
-    const promotions = await getPromotionPeriods()
+    const promotions = await getPromotions()
     const users = await getUsers()
     const events = await getEvents()
 

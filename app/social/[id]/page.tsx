@@ -1,5 +1,5 @@
 import { getSocialPost, updateSocialPost, addAssetToSocialPost, deleteSocialPostAsset } from '@/app/actions/social'
-import { getPromotionPeriods } from '@/app/actions/promotions'
+import { getPromotions } from '@/app/actions/promotions'
 import { getUsers, getEvents } from '@/app/actions/events'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -33,7 +33,7 @@ export default async function SocialPostDetailPage({
     const isEditing = edit === 'true'
 
     const post = await getSocialPost(id)
-    const promotions = await getPromotionPeriods()
+    const promotions = await getPromotions()
     const users = await getUsers()
     const events = await getEvents()
 

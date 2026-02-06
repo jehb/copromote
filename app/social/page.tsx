@@ -1,5 +1,5 @@
 import { getSocialPosts } from '@/app/actions/social'
-import { getPromotionPeriods } from '@/app/actions/promotions'
+import { getPromotions } from '@/app/actions/promotions'
 import { getEvents } from '@/app/actions/events'
 import { SocialClientPage } from '@/components/social/social-client-page'
 
@@ -36,7 +36,7 @@ export default async function SocialPage({
             promotionPeriodId,
             eventId
         }),
-        getPromotionPeriods(),
+        getPromotions(),
         getEvents()
     ])
 

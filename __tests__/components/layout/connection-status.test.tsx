@@ -18,10 +18,8 @@ describe('ConnectionStatus Component', () => {
             addToQueue: jest.fn(),
         })
 
-        render(<ConnectionStatus />)
-
-        expect(screen.getByText('Online')).toBeInTheDocument()
-        expect(screen.queryByText('Offline')).not.toBeInTheDocument()
+        const { container } = render(<ConnectionStatus />)
+        expect(container).toBeEmptyDOMElement()
     })
 
     it('should show offline status when disconnected', () => {
@@ -34,8 +32,7 @@ describe('ConnectionStatus Component', () => {
 
         render(<ConnectionStatus />)
 
-        expect(screen.getByText('Offline')).toBeInTheDocument()
-        expect(screen.queryByText('Online')).not.toBeInTheDocument()
+        expect(screen.getByText('Working Offline')).toBeInTheDocument()
     })
 
     it('should show pending count when offline with queued items', () => {

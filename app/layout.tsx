@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { OfflineSyncProvider } from "@/components/providers/offline-sync-provider";
 import { ConnectionStatus } from "@/components/layout/connection-status";
+import { HelpDrawer } from "@/components/help/help-drawer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -64,6 +65,7 @@ export default function RootLayout({
                 {children}
               </main>
             </div>
+            <HelpDrawer />
           </QueryProvider>
         </OfflineSyncProvider>
       </body>

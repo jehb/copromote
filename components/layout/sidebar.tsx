@@ -2,16 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Settings, Plus, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Settings, Plus, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X, Megaphone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
+import { logout } from '@/app/actions/auth'
 
 const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Projects', href: '/projects', icon: FolderKanban },
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
     { name: 'Calendar', href: '/calendar', icon: Calendar },
+    { name: 'Promotions', href: '/promotions', icon: Megaphone },
     { name: 'Social Media', href: '/social', icon: MessageSquare },
     { name: 'Events', href: '/events', icon: CalendarIcon },
     { name: 'Gallery', href: '/gallery', icon: Images },
@@ -23,6 +25,11 @@ const navigation = [
 export function Sidebar() {
     const pathname = usePathname()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+    // Hide sidebar on auth pages
+    if (pathname === '/login' || pathname === '/change-password') {
+        return null
+    }
 
     return (
         <>
@@ -75,12 +82,24 @@ export function Sidebar() {
                     })}
                 </div>
                 <div className="p-4">
-                    <Button className="w-full gap-2" asChild>
-                        <Link href="/projects/new" onClick={() => setIsMobileMenuOpen(false)}>
-                            <Plus className="h-4 w-4" />
-                            New Project
-                        </Link>
-                    </Button>
+                    <div className="flex flex-col gap-2">
+                        <Button className="w-full gap-2" asChild>
+                            <Link href="/projects/new" onClick={() => setIsMobileMenuOpen(false)}>
+                                <Plus className="h-4 w-4" />
+                                New Project
+                            </Link>
+                        </Button>
+                        <form action={logout}>
+                            <Button
+                                variant="ghost"
+                                className="w-full gap-2 text-slate-400 hover:text-white hover:bg-slate-800 justify-start"
+                                type="submit"
+                            >
+                                <Users className="h-4 w-4" />
+                                Sign Out
+                            </Button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </>

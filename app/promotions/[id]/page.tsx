@@ -28,8 +28,8 @@ export default async function PromotionDetailPage({ params }: { params: { id: st
         <div className="p-8 space-y-8">
             {/* Header */}
             <div className="flex flex-col gap-4">
-                <Link href="/calendar" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
-                    <ArrowLeft className="h-4 w-4" /> Back to Calendar
+                <Link href="/promotions" className="text-muted-foreground hover:text-foreground flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" /> Back to Promotions
                 </Link>
                 <div className="flex justify-between items-start">
                     <div>
@@ -38,11 +38,16 @@ export default async function PromotionDetailPage({ params }: { params: { id: st
                         </Badge>
                         <h1 className="text-4xl font-bold">{promotion.name}</h1>
                     </div>
-                    <div className="text-right text-sm text-muted-foreground bg-slate-100 p-3 rounded-md">
-                        <div className="font-semibold text-slate-700">Duration</div>
-                        <div>{format(promotion.startDate, 'PPP')}</div>
-                        <div className="text-center font-bold text-slate-400">to</div>
-                        <div>{format(promotion.endDate, 'PPP')}</div>
+                    <div className="flex flex-col items-end gap-2">
+                        <div className="text-right text-sm text-muted-foreground bg-slate-100 p-3 rounded-md">
+                            <div className="font-semibold text-slate-700">Duration</div>
+                            <div>{format(promotion.startDate, 'PPP')}</div>
+                            <div className="text-center font-bold text-slate-400">to</div>
+                            <div>{format(promotion.endDate, 'PPP')}</div>
+                        </div>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href={`/promotions/${id}/edit`}>Edit Details</Link>
+                        </Button>
                     </div>
                 </div>
             </div>

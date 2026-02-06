@@ -104,10 +104,14 @@ model Photo {
   updatedAt  DateTime      @updatedAt
 }
 
+
 model User {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
+  username  String   @unique @default("admin") // Temporary default for migration
+  password  String   @default("$2a$10$......................") // Temporary hash
+  mustChangePassword Boolean @default(true)
   avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
