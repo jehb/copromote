@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Trash2, Shield, User as UserIcon } from 'lucide-react'
 import { NewUserDialog } from './new-user-dialog'
+import { DeleteUserDialog } from './delete-user-dialog'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,20 +63,19 @@ export default async function UsersPage() {
                                     </TableCell>
                                     <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-right">
-                                        <form action={async () => {
-                                            'use server'
-                                            await deleteUser(user.id)
-                                        }}>
+                                        {user.username === 'admin' ? (
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                disabled={user.username === 'admin'}
-                                                title={user.username === 'admin' ? "Cannot delete admin user" : "Delete user"}
+                                                className="text-muted-foreground opacity-50 cursor-not-allowed"
+                                                disabled
+                                                title="Cannot delete admin user"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
-                                        </form>
+                                        ) : (
+                                            <DeleteUserDialog userId={user.id} username={user.username} />
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}

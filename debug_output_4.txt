@@ -1,0 +1,28 @@
+Reading configuration...
+Raw Config: {
+  url: 'wsm-prod.database.windows.net',
+  user: 'weaveruser@wsm-prod',
+  password: '******',
+  type: 'mssql',
+  databaseName: 'WSM'
+}
+Resolved Connection Config: {
+  user: 'weaveruser@wsm-prod',
+  password: '******',
+  server: 'wsm-prod.database.windows.net',
+  database: 'WSM',
+  options: { encrypt: true, trustServerCertificate: false }
+}
+Attempting connection...
+Connection successful!
+Testing new products query...
+New product query successful! Row: {
+  id: '0000000000041',
+  name: 'TEST 4 PK',
+  price: 12.99,
+  stock: 12,
+  category: 'Beer',
+  description: 'BEER 4 & 6  PACK CANS'
+}
+Querying items table...
+items query failed: Invalid object name 'items'.

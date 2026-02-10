@@ -114,6 +114,18 @@ export default function SettingsPage() {
 
                 <Card>
                     <CardHeader>
+                        <CardTitle>External Product Database</CardTitle>
+                        <CardDescription>
+                            Configure the connection to your external product database (JDBC compatible).
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <DatabaseConfig />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
                         <CardTitle>Profile Settings</CardTitle>
                         <CardDescription>Manage your user profile information.</CardDescription>
                     </CardHeader>
@@ -379,5 +391,138 @@ function ModelSelector({ baseUrl, value, onChange }: { baseUrl: string, value: s
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <div className="text-xs font-bold">↻</div>}
             </Button>
         </div>
+    )
+}
+
+function DatabaseConfig() {
+    const [dbType, setDbType] = useState('postgresql')
+    const [dbUrl, setDbUrl] = useState('')
+    const [dbName, setDbName] = useState('')
+    const [dbUser, setDbUser] = useState('')
+    const [dbPassword, setDbPassword] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
+    const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+
+    useEffect(() => {
+        async function loadConfig() {
+            try {
+                const type = await getConfig('EXTERNAL_DB_TYPE')
+                const url = await getConfig('EXTERNAL_DB_URL')
+                const name = await getConfig('EXTERNAL_DB_NAME')
+                const user = await getConfig('EXTERNAL_DB_USER')
+                const pass = await getConfig('EXTERNAL_DB_PASSWORD')
+
+                if (type) setDbType(type)
+                if (url) setDbUrl(url)
+                if (name) setDbName(name)
+                if (user) setDbUser(user)
+                if (pass) setDbPassword(pass)
+            } catch (err) {
+                console.error('Failed to load DB config:', err)
+            } finally {
+                setLoading(false)
+            }
+        }
+        loadConfig()
+    }, [])
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setSaving(true)
+        setStatus(null)
+        try {
+            await updateConfig('EXTERNAL_DB_TYPE', dbType)
+            await updateConfig('EXTERNAL_DB_URL', dbUrl)
+            await updateConfig('EXTERNAL_DB_NAME', dbName)
+            await updateConfig('EXTERNAL_DB_USER', dbUser)
+            await updateConfig('EXTERNAL_DB_PASSWORD', dbPassword)
+            setStatus({ type: 'success', message: 'Database configuration saved.' })
+        } catch (err) {
+            setStatus({ type: 'error', message: 'Failed to save configuration.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    const handleTest = async () => {
+        setSaving(true)
+        try {
+            const { testExternalConnection } = await import('@/app/actions/external-db')
+            const res = await testExternalConnection()
+            setStatus({ type: res.success ? 'success' : 'error', message: res.message })
+        } catch (err) {
+            setStatus({ type: 'error', message: 'Failed to run test.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    if (loading) return null
+
+    return (
+        <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Database Type</Label>
+                    <Select value={dbType} onValueChange={setDbType}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="mssql">Azure SQL / MSSQL</SelectItem>
+                            <SelectItem value="postgresql">PostgreSQL</SelectItem>
+                            <SelectItem value="mysql">MySQL</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="space-y-2">
+                    <Label>Server Name / URL</Label>
+                    <Input
+                        placeholder="your-server.database.windows.net"
+                        value={dbUrl}
+                        onChange={(e) => setDbUrl(e.target.value)}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Database Name</Label>
+                    <Input
+                        placeholder="WSM"
+                        value={dbName}
+                        onChange={(e) => setDbName(e.target.value)}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Username</Label>
+                    <Input
+                        placeholder="db_user"
+                        value={dbUser}
+                        onChange={(e) => setDbUser(e.target.value)}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Password</Label>
+                    <Input
+                        type="password"
+                        placeholder="••••••••"
+                        value={dbPassword}
+                        onChange={(e) => setDbPassword(e.target.value)}
+                    />
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <Button type="submit" disabled={saving}>
+                    {saving ? 'Saving...' : 'Save Database Settings'}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleTest} disabled={saving}>
+                    Test Connection
+                </Button>
+                {status && (
+                    <span className={`text-sm ${status.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                        {status.message}
+                    </span>
+                )}
+            </div>
+        </form>
     )
 }

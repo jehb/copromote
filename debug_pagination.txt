@@ -1,0 +1,23 @@
+Reading configuration...
+Raw Config: {
+  url: 'wsm-prod.database.windows.net',
+  user: 'weaveruser@wsm-prod',
+  password: '******',
+  type: 'mssql',
+  databaseName: 'WSM'
+}
+Resolved Connection Config: {
+  user: 'weaveruser@wsm-prod',
+  password: '******',
+  server: 'wsm-prod.database.windows.net',
+  database: 'WSM',
+  options: { encrypt: true, trustServerCertificate: false }
+}
+Attempting connection...
+Connection successful!
+Testing pagination...
+Fetching Page 1 (size 2)...
+Page 1 items: [ '', ' ENERGIZER BLONDIE CANS 4 PK' ]
+Fetching Page 2 (size 2)...
+Page 2 items: [ ' ROTATING PREMIUM BEER CANS 4 PK', '"SANGUA DI GIUDA" 750ML' ]
+Total items: 18321
