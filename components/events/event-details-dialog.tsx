@@ -29,9 +29,10 @@ interface EventDetailsDialogProps {
     users: any[]
     contacts: any[]
     organizations: any[]
+    eventSeries: any[]
 }
 
-export function EventDetailsDialog({ event, isOpen, onClose, locations, users, contacts, organizations }: EventDetailsDialogProps) {
+export function EventDetailsDialog({ event, isOpen, onClose, locations, users, contacts, organizations, eventSeries }: EventDetailsDialogProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -110,6 +111,18 @@ export function EventDetailsDialog({ event, isOpen, onClose, locations, users, c
                             </div>
                         </div>
 
+                        {event.series && (
+                            <div className="grid grid-cols-[20px_1fr] items-center gap-3">
+                                <div className="h-5 w-5 flex items-center justify-center">
+                                    <div className="w-2 h-2 rounded-full bg-primary" />
+                                </div>
+                                <div>
+                                    <div className="text-xs uppercase font-bold text-slate-500">Part of Series</div>
+                                    <div className="font-medium text-primary">{event.series.title}</div>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-[20px_1fr] items-center gap-3">
                             <MapPin className="h-5 w-5 text-slate-400" />
                             <div className="font-medium">{event.location?.name || 'No Location'}</div>
@@ -185,6 +198,7 @@ export function EventDetailsDialog({ event, isOpen, onClose, locations, users, c
                             users={users}
                             contacts={contacts}
                             organizations={organizations}
+                            eventSeries={eventSeries}
                             action={async (formData) => {
                                 await updateEvent(event.id, formData)
                                 setIsEditing(false)

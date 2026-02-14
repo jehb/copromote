@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getEvents, getLocations, getUsers } from '@/app/actions/events'
 import { getContacts } from '@/app/actions/contacts'
 import { getOrganizations } from '@/app/actions/organizations'
+import { getEventSeries } from '@/app/actions/event-series'
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/events/event-card'
 import Link from 'next/link'
@@ -16,6 +17,7 @@ interface EventsClientPageProps {
         users: any[]
         contacts: any[]
         organizations: any[]
+        eventSeries: any[]
     }
 }
 
@@ -51,6 +53,12 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
         initialData: initialData.organizations,
     })
 
+    const { data: eventSeries = initialData.eventSeries } = useQuery({
+        queryKey: ['eventSeries'],
+        queryFn: () => getEventSeries(),
+        initialData: initialData.eventSeries,
+    })
+
     const isLoadingAny = isLoadingEvents
 
     return (
@@ -77,6 +85,7 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
                         users={users}
                         contacts={contacts}
                         organizations={organizations}
+                        eventSeries={eventSeries}
                     />
                 ))}
 

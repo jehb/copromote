@@ -29,8 +29,10 @@ import {
     Info,
     Plus,
     UserPlus,
-    Building
+    Building,
+    Library
 } from 'lucide-react'
+import { createEventSeries } from '@/app/actions/event-series'
 
 interface EventFormProps {
     event?: any
@@ -38,10 +40,11 @@ interface EventFormProps {
     users: any[]
     contacts: any[]
     organizations: any[]
+    eventSeries?: any[]
     action: (formData: FormData) => Promise<void>
 }
 
-export function EventForm({ event, locations, users, contacts, organizations, action }: EventFormProps) {
+export function EventForm({ event, locations, users, contacts, organizations, eventSeries = [], action }: EventFormProps) {
     const [isSaving, setIsSaving] = useState(false)
     const [selectedContacts, setSelectedContacts] = useState<string[]>(
         event?.contacts?.map((c: any) => c.id) || []
@@ -49,6 +52,13 @@ export function EventForm({ event, locations, users, contacts, organizations, ac
     const [selectedOrgs, setSelectedOrgs] = useState<string[]>(
         event?.organizations?.map((o: any) => o.id) || []
     )
+
+    // Series state
+    const [localEventSeries, setLocalEventSeries] = useState(eventSeries)
+    const [selectedSeriesId, setSelectedSeriesId] = useState<string>(event?.seriesId || '')
+    const [isCreatingSeries, setIsCreatingSeries] = useState(false)
+    const [newSeriesTitle, setNewSeriesTitle] = useState('')
+    const [isCreatingSeriesLoading, setIsCreatingSeriesLoading] = useState(false)
 
     // Search states for modals
     const [contactSearch, setContactSearch] = useState('')
@@ -64,6 +74,27 @@ export function EventForm({ event, locations, users, contacts, organizations, ac
         setSelectedOrgs(prev =>
             prev.includes(id) ? prev.filter(o => o !== id) : [...prev, id]
         )
+    }
+
+    const handleCreateSeries = async () => {
+        if (!newSeriesTitle.trim()) return
+
+        setIsCreatingSeriesLoading(true)
+        try {
+            const result = await createEventSeries(newSeriesTitle)
+            if (result.success && result.series) {
+                setLocalEventSeries(prev => [...prev, result.series].sort((a, b) => a.title.localeCompare(b.title)))
+                setSelectedSeriesId(result.series.id)
+                setNewSeriesTitle('')
+                setIsCreatingSeries(false)
+            } else {
+                console.error(result.message || 'Failed to create series')
+            }
+        } catch (error) {
+            console.error('Failed to create series:', error)
+        } finally {
+            setIsCreatingSeriesLoading(false)
+        }
     }
 
     const filteredContacts = useMemo(() =>
@@ -171,6 +202,77 @@ export function EventForm({ event, locations, users, contacts, organizations, ac
                                     ))}
                                 </SelectContent>
                             </Select>
+                        </div>
+                    </section>
+
+                    <section className="space-y-4">
+                        <div className="flex items-center gap-2 text-slate-900 font-bold border-b pb-2">
+                            <Library className="h-4 w-4 text-primary" /> Event Series
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="seriesId">Series (Optional)</Label>
+                            <div className="flex gap-2">
+                                <div className="flex-1">
+                                    <Select
+                                        name="seriesId"
+                                        value={selectedSeriesId}
+                                        onValueChange={setSelectedSeriesId}
+                                    >
+                                        <SelectTrigger className="bg-slate-50/50 border-slate-200">
+                                            <SelectValue placeholder="Select a series..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">None</SelectItem> {/* Handle unselect in action if "none" passed or use undefined */}
+                                            {localEventSeries.map((series: any) => (
+                                                <SelectItem key={series.id} value={series.id}>
+                                                    {series.title}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {/* Select doesn't support "none" clearing easily if "none" isn't a valid ID. 
+                                        Logic: If "none" is selected, we should submit empty string or handle it in action.
+                                        I'll make sure the hidden input (if used) handles it, but here the name="seriesId" is on Select.
+                                        If "none" is the value, the server action will see "none". 
+                                        I should update action to handle "none" or just use a clearable approach.
+                                        Actually, simpler: use a hidden input for the real value and let Select control it.
+                                    */}
+                                    <input type="hidden" name="seriesId" value={selectedSeriesId === 'none' ? '' : selectedSeriesId} />
+                                </div>
+                                <Dialog open={isCreatingSeries} onOpenChange={setIsCreatingSeries}>
+                                    <DialogTrigger asChild>
+                                        <Button type="button" variant="outline" size="icon" title="Create New Series">
+                                            <Plus className="h-4 w-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[425px]">
+                                        <DialogHeader>
+                                            <DialogTitle>Create Event Series</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="seriesName">Series Title</Label>
+                                                <Input
+                                                    id="seriesName"
+                                                    value={newSeriesTitle}
+                                                    onChange={(e) => setNewSeriesTitle(e.target.value)}
+                                                    placeholder="e.g., Summer Concert Series 2024"
+                                                />
+                                            </div>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button variant="outline" onClick={() => setIsCreatingSeries(false)}>Cancel</Button>
+                                            <Button onClick={handleCreateSeries} disabled={isCreatingSeriesLoading || !newSeriesTitle.trim()}>
+                                                {isCreatingSeriesLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                Create Series
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground">
+                                Link this event to a series to group related events together.
+                            </p>
                         </div>
                     </section>
 

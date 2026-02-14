@@ -321,3 +321,830 @@ prisma:query SELECT `main`.`Contact`.`id`, `main`.`Contact`.`firstName`, `main`.
  GET /admin/users 500 in 770ms (compile: 48ms, proxy.ts: 29ms, render: 693ms)
  GET / 200 in 225ms (compile: 80ms, proxy.ts: 7ms, render: 139ms)
  GET /tasks 200 in 24ms (compile: 3ms, proxy.ts: 5ms, render: 17ms)
+ GET /events 200 in 101ms (compile: 71ms, proxy.ts: 6ms, render: 24ms)
+ GET /gallery 200 in 27ms (compile: 8ms, proxy.ts: 5ms, render: 14ms)
+ GET /social 200 in 98ms (compile: 66ms, proxy.ts: 5ms, render: 28ms)
+ GET /tasks 200 in 28ms (compile: 3ms, proxy.ts: 4ms, render: 21ms)
+ GET /products 200 in 407ms (compile: 291ms, proxy.ts: 7ms, render: 109ms)
+ GET /projects 200 in 83ms (compile: 57ms, proxy.ts: 6ms, render: 20ms)
+ GET / 200 in 29ms (compile: 3ms, proxy.ts: 4ms, render: 21ms)
+ GET /projects 200 in 28ms (compile: 4ms, proxy.ts: 5ms, render: 19ms)
+ GET /products 200 in 32ms (compile: 6ms, proxy.ts: 4ms, render: 22ms)
+ GET /projects 200 in 23ms (compile: 5ms, proxy.ts: 4ms, render: 15ms)
+ GET /products 200 in 30ms (compile: 3ms, proxy.ts: 4ms, render: 23ms)
+ GET / 200 in 29ms (compile: 3ms, proxy.ts: 4ms, render: 22ms)
+ GET /calendar 200 in 29ms (compile: 4ms, proxy.ts: 4ms, render: 21ms)
+ GET /promotions 200 in 121ms (compile: 78ms, proxy.ts: 7ms, render: 36ms)
+ GET /social 200 in 24ms (compile: 3ms, proxy.ts: 6ms, render: 15ms)
+ GET /events 200 in 25ms (compile: 3ms, proxy.ts: 4ms, render: 18ms)
+ GET /gallery 200 in 22ms (compile: 3ms, proxy.ts: 4ms, render: 15ms)
+ GET /gallery 200 in 23ms (compile: 3ms, proxy.ts: 4ms, render: 16ms)
+ GET /contacts 200 in 202ms (compile: 183ms, proxy.ts: 4ms, render: 15ms)
+ GET /admin 200 in 96ms (compile: 66ms, proxy.ts: 5ms, render: 25ms)
+prisma:query SELECT 1
+prisma:query SELECT `main`.`ActivityLog`.`id`, `main`.`ActivityLog`.`action`, `main`.`ActivityLog`.`entityType`, `main`.`ActivityLog`.`entityId`, `main`.`ActivityLog`.`details`, `main`.`ActivityLog`.`userId`, `main`.`ActivityLog`.`createdAt` FROM `main`.`ActivityLog` WHERE 1=1 ORDER BY `main`.`ActivityLog`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`User`.`id`, `main`.`User`.`username`, `main`.`User`.`email`, `main`.`User`.`avatar` FROM `main`.`User` WHERE `main`.`User`.`id` IN (?) LIMIT ? OFFSET ?
+ GET /admin/activity 200 in 123ms (compile: 68ms, proxy.ts: 4ms, render: 51ms)
+ GET / 200 in 25ms (compile: 4ms, proxy.ts: 3ms, render: 18ms)
+ GET / 200 in 28ms (compile: 3ms, proxy.ts: 4ms, render: 22ms)
+ GET /tasks 200 in 22ms (compile: 3ms, proxy.ts: 4ms, render: 15ms)
+ GET /events 200 in 24ms (compile: 3ms, proxy.ts: 3ms, render: 17ms)
+ POST /events 200 in 23ms (compile: 3ms, proxy.ts: 5ms, render: 15ms)
+ GET /events 200 in 28ms (compile: 2ms, proxy.ts: 6ms, render: 19ms)
+ POST /events 200 in 14ms (compile: 4ms, proxy.ts: 3ms, render: 7ms)
+ GET /events 200 in 25ms (compile: 3ms, proxy.ts: 4ms, render: 18ms)
+ POST /events 200 in 15ms (compile: 2ms, proxy.ts: 6ms, render: 6ms)
+ GET /events 200 in 26ms (compile: 2ms, proxy.ts: 3ms, render: 21ms)
+ POST /events 200 in 18ms (compile: 3ms, proxy.ts: 4ms, render: 12ms)
+ GET /events 200 in 33ms (compile: 3ms, proxy.ts: 4ms, render: 26ms)
+ POST /events 200 in 17ms (compile: 3ms, proxy.ts: 4ms, render: 10ms)
+ GET /events 200 in 56ms (compile: 3ms, proxy.ts: 4ms, render: 49ms)
+✓ Compiled in 49ms
+ GET /gallery 200 in 339ms (compile: 33ms, proxy.ts: 18ms, render: 288ms)
+ GET /tasks 200 in 360ms (compile: 100ms, proxy.ts: 18ms, render: 242ms)
+ GET /events 200 in 353ms (compile: 190ms, proxy.ts: 16ms, render: 146ms)
+ GET /calendar 200 in 362ms (compile: 135ms, proxy.ts: 19ms, render: 208ms)
+ GET /gallery 200 in 147ms (compile: 19ms, proxy.ts: 22ms, render: 106ms)
+ GET /tasks 200 in 206ms (compile: 42ms, proxy.ts: 12ms, render: 152ms)
+ GET / 200 in 548ms (compile: 14ms, proxy.ts: 18ms, render: 516ms)
+ GET /calendar 200 in 239ms (compile: 6ms, proxy.ts: 22ms, render: 211ms)
+ GET /gallery 200 in 221ms (compile: 33ms, proxy.ts: 23ms, render: 165ms)
+ GET /events 200 in 224ms (compile: 23ms, proxy.ts: 23ms, render: 179ms)
+ GET / 200 in 422ms (compile: 6ms, proxy.ts: 94ms, render: 322ms)
+ GET /tasks 200 in 227ms (compile: 54ms, proxy.ts: 24ms, render: 149ms)
+ GET /calendar 200 in 223ms (compile: 7ms, proxy.ts: 71ms, render: 145ms)
+ GET / 200 in 321ms (compile: 5ms, proxy.ts: 10ms, render: 306ms)
+ GET /events 200 in 171ms (compile: 14ms, proxy.ts: 55ms, render: 101ms)
+ GET / 200 in 339ms (compile: 19ms, proxy.ts: 17ms, render: 302ms)
+ GET /gallery 200 in 108ms (compile: 5ms, proxy.ts: 8ms, render: 96ms)
+ GET /tasks 200 in 113ms (compile: 18ms, proxy.ts: 8ms, render: 87ms)
+ GET /calendar 200 in 112ms (compile: 16ms, proxy.ts: 20ms, render: 76ms)
+ GET / 200 in 264ms (compile: 35ms, proxy.ts: 35ms, render: 193ms)
+ GET /events 200 in 112ms (compile: 7ms, proxy.ts: 41ms, render: 63ms)
+ GET /gallery 200 in 94ms (compile: 4ms, proxy.ts: 26ms, render: 64ms)
+ GET /tasks 200 in 96ms (compile: 14ms, proxy.ts: 7ms, render: 75ms)
+ GET /calendar 200 in 60ms (compile: 6ms, proxy.ts: 7ms, render: 47ms)
+ GET /events 200 in 55ms (compile: 9ms, proxy.ts: 29ms, render: 17ms)
+✓ Compiled in 33ms
+ GET /gallery 200 in 229ms (compile: 14ms, proxy.ts: 13ms, render: 201ms)
+ GET /events 200 in 248ms (compile: 124ms, proxy.ts: 13ms, render: 112ms)
+ GET /calendar 200 in 250ms (compile: 78ms, proxy.ts: 13ms, render: 160ms)
+ GET /tasks 200 in 253ms (compile: 58ms, proxy.ts: 13ms, render: 181ms)
+ GET /gallery 200 in 127ms (compile: 19ms, proxy.ts: 15ms, render: 94ms)
+ GET /tasks 200 in 145ms (compile: 30ms, proxy.ts: 14ms, render: 101ms)
+ GET / 200 in 399ms (compile: 5ms, proxy.ts: 18ms, render: 376ms)
+ GET /calendar 200 in 156ms (compile: 7ms, proxy.ts: 15ms, render: 135ms)
+ GET /gallery 200 in 145ms (compile: 30ms, proxy.ts: 39ms, render: 76ms)
+ GET /events 200 in 147ms (compile: 20ms, proxy.ts: 33ms, render: 93ms)
+ GET / 200 in 306ms (compile: 4ms, proxy.ts: 64ms, render: 238ms)
+ GET /tasks 200 in 169ms (compile: 42ms, proxy.ts: 40ms, render: 86ms)
+ GET /calendar 200 in 135ms (compile: 22ms, proxy.ts: 55ms, render: 58ms)
+ GET / 200 in 263ms (compile: 3ms, proxy.ts: 7ms, render: 253ms)
+ GET / 200 in 283ms (compile: 17ms, proxy.ts: 15ms, render: 251ms)
+ GET /events 200 in 133ms (compile: 4ms, proxy.ts: 4ms, render: 125ms)
+ GET /gallery 200 in 118ms (compile: 5ms, proxy.ts: 14ms, render: 99ms)
+ GET / 200 in 262ms (compile: 7ms, proxy.ts: 57ms, render: 198ms)
+ GET /calendar 200 in 140ms (compile: 27ms, proxy.ts: 14ms, render: 100ms)
+ GET /tasks 200 in 141ms (compile: 17ms, proxy.ts: 13ms, render: 111ms)
+ GET /events 200 in 139ms (compile: 15ms, proxy.ts: 50ms, render: 74ms)
+ GET /gallery 200 in 112ms (compile: 3ms, proxy.ts: 35ms, render: 74ms)
+ GET /tasks 200 in 83ms (compile: 4ms, proxy.ts: 5ms, render: 75ms)
+ GET /calendar 200 in 79ms (compile: 5ms, proxy.ts: 32ms, render: 43ms)
+ GET /events 200 in 53ms (compile: 5ms, proxy.ts: 26ms, render: 22ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+    at async EventsPage (app/events/page.tsx:7:65)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0',
+  digest: '2749668794'
+}
+ GET /gallery 200 in 231ms (compile: 16ms, proxy.ts: 12ms, render: 204ms)
+ GET /calendar 200 in 246ms (compile: 75ms, proxy.ts: 11ms, render: 160ms)
+ GET /tasks 200 in 247ms (compile: 57ms, proxy.ts: 11ms, render: 179ms)
+ GET /events 200 in 245ms (compile: 128ms, proxy.ts: 10ms, render: 107ms)
+ GET /gallery 200 in 150ms (compile: 12ms, proxy.ts: 76ms, render: 62ms)
+ GET /tasks 200 in 201ms (compile: 20ms, proxy.ts: 76ms, render: 104ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+    at async EventsPage (app/events/page.tsx:7:65)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0',
+  digest: '2749668794'
+}
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+    at async EventsPage (app/events/page.tsx:7:65)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0',
+  digest: '2749668794'
+}
+ GET / 200 in 408ms (compile: 5ms, proxy.ts: 12ms, render: 391ms)
+ GET /gallery 200 in 157ms (compile: 36ms, proxy.ts: 25ms, render: 96ms)
+ GET /calendar 200 in 164ms (compile: 6ms, proxy.ts: 10ms, render: 148ms)
+ GET /events 200 in 159ms (compile: 39ms, proxy.ts: 9ms, render: 111ms)
+ GET / 200 in 305ms (compile: 3ms, proxy.ts: 77ms, render: 225ms)
+ GET /tasks 200 in 161ms (compile: 45ms, proxy.ts: 37ms, render: 79ms)
+ GET /calendar 200 in 133ms (compile: 6ms, proxy.ts: 61ms, render: 65ms)
+ GET /events 200 in 117ms (compile: 22ms, proxy.ts: 20ms, render: 75ms)
+ GET / 200 in 253ms (compile: 3ms, proxy.ts: 10ms, render: 241ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+    at async EventsPage (app/events/page.tsx:7:65)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0',
+  digest: '2749668794'
+}
+ GET / 200 in 280ms (compile: 21ms, proxy.ts: 11ms, render: 247ms)
+ GET /gallery 200 in 117ms (compile: 6ms, proxy.ts: 8ms, render: 103ms)
+ GET / 200 in 234ms (compile: 15ms, proxy.ts: 57ms, render: 161ms)
+ GET /tasks 200 in 120ms (compile: 16ms, proxy.ts: 8ms, render: 96ms)
+ GET /calendar 200 in 120ms (compile: 31ms, proxy.ts: 8ms, render: 81ms)
+ GET /events 200 in 118ms (compile: 11ms, proxy.ts: 47ms, render: 60ms)
+ GET /gallery 200 in 85ms (compile: 7ms, proxy.ts: 28ms, render: 50ms)
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+    at async EventsPage (app/events/page.tsx:7:65)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0',
+  digest: '2749668794'
+}
+ GET /tasks 200 in 105ms (compile: 13ms, proxy.ts: 28ms, render: 64ms)
+ GET /calendar 200 in 48ms (compile: 4ms, proxy.ts: 7ms, render: 37ms)
+ GET /events 200 in 45ms (compile: 15ms, proxy.ts: 5ms, render: 24ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+    at async EventsPage (app/events/page.tsx:7:65)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0',
+  digest: '2749668794'
+}
+ GET /gallery 200 in 414ms (compile: 19ms, proxy.ts: 9ms, render: 387ms)
+ GET /calendar 200 in 419ms (compile: 76ms, proxy.ts: 8ms, render: 335ms)
+ GET /tasks 200 in 420ms (compile: 55ms, proxy.ts: 8ms, render: 356ms)
+ GET /gallery 200 in 331ms (compile: 21ms, proxy.ts: 202ms, render: 109ms)
+ GET /events 500 in 448ms (compile: 135ms, proxy.ts: 8ms, render: 306ms)
+ GET /tasks 200 in 244ms (compile: 7ms, proxy.ts: 46ms, render: 190ms)
+ GET / 200 in 612ms (compile: 5ms, proxy.ts: 12ms, render: 596ms)
+ GET /gallery 200 in 205ms (compile: 27ms, proxy.ts: 29ms, render: 150ms)
+ GET / 200 in 532ms (compile: 7ms, proxy.ts: 216ms, render: 310ms)
+ GET /calendar 200 in 208ms (compile: 8ms, proxy.ts: 28ms, render: 173ms)
+ GET /tasks 200 in 185ms (compile: 24ms, proxy.ts: 104ms, render: 57ms)
+ GET / 200 in 293ms (compile: 6ms, proxy.ts: 24ms, render: 263ms)
+ GET /calendar 200 in 110ms (compile: 5ms, proxy.ts: 35ms, render: 71ms)
+ GET /gallery 200 in 89ms (compile: 4ms, proxy.ts: 27ms, render: 58ms)
+ GET / 200 in 285ms (compile: 6ms, proxy.ts: 8ms, render: 270ms)
+ GET / 200 in 278ms (compile: 69ms, proxy.ts: 43ms, render: 165ms)
+ GET /calendar 200 in 102ms (compile: 15ms, proxy.ts: 5ms, render: 82ms)
+ GET /tasks 200 in 105ms (compile: 4ms, proxy.ts: 5ms, render: 95ms)
+ GET /gallery 200 in 88ms (compile: 5ms, proxy.ts: 30ms, render: 52ms)
+ GET /calendar 200 in 69ms (compile: 14ms, proxy.ts: 26ms, render: 29ms)
+ GET /tasks 200 in 71ms (compile: 5ms, proxy.ts: 26ms, render: 40ms)
+ GET /projects 200 in 31ms (compile: 5ms, proxy.ts: 7ms, render: 19ms)
+✓ Compiled in 38ms
+⨯ ReferenceError: getEventSeries is not defined
+    at EventsPage (app/events/page.tsx:12:25)
+  10 |         getUsers(),
+  11 |         getContacts(),
+> 12 |         getOrganizations(),
+     |                         ^
+  13 |         getEventSeries()
+  14 |     ])
+  15 | {
+  digest: '510130421'
+}
+Error [PrismaClientValidationError]: 
+Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0'
+}
+⨯ unhandledRejection: Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0'
+}
+⨯ unhandledRejection:  Error [PrismaClientValidationError]: 
+Invalid `{imported module ./lib/db.ts}["prisma"].event.findMany()` invocation in
+/home/jehb/projects/promoty/.next/dev/server/chunks/ssr/[root-of-the-server]__c3c57f2b._.js:731:140
+
+  728 ;
+  729 ;
+  730 async function getEvents() {
+→ 731     return await {imported module ./lib/db.ts}["prisma"].event.findMany({
+            orderBy: {
+              startTime: "asc"
+            },
+            include: {
+              location: true,
+              primaryContact: true,
+              series: true,
+              ~~~~~~
+              contacts: true,
+              organizations: true,
+              socialPosts: {
+                orderBy: {
+                  scheduledDate: "asc"
+                }
+              }
+            }
+          })
+
+Unknown field `series` for include statement on model `Event`. Available options are marked with ?.
+    at <unknown> (app/actions/events.ts:9:31)
+    at async getEvents (app/actions/events.ts:9:12)
+   7 |
+   8 | export async function getEvents() {
+>  9 |     return await prisma.event.findMany({
+     |                               ^
+  10 |         orderBy: { startTime: 'asc' },
+  11 |         include: {
+  12 |             location: true, {
+  clientVersion: '5.22.0'
+}
+ GET /projects 200 in 392ms (compile: 14ms, proxy.ts: 8ms, render: 371ms)
+ GET /gallery 200 in 356ms (compile: 297ms, proxy.ts: 14ms, render: 44ms)
+ GET /events 500 in 389ms (compile: 55ms, proxy.ts: 41ms, render: 293ms)
+ GET /tasks 200 in 385ms (compile: 282ms, proxy.ts: 38ms, render: 65ms)
+ GET /calendar 200 in 391ms (compile: 252ms, proxy.ts: 41ms, render: 98ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /projects 200 in 378ms (compile: 6ms, proxy.ts: 11ms, render: 361ms)
+ GET /gallery 200 in 374ms (compile: 24ms, proxy.ts: 10ms, render: 340ms)
+ GET /tasks 200 in 375ms (compile: 36ms, proxy.ts: 10ms, render: 329ms)
+ GET /calendar 200 in 375ms (compile: 32ms, proxy.ts: 28ms, render: 315ms)
+ GET /events 500 in 379ms (compile: 114ms, proxy.ts: 12ms, render: 253ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 200 in 21ms (compile: 3ms, proxy.ts: 5ms, render: 14ms)
+ GET / 200 in 35ms (compile: 4ms, proxy.ts: 4ms, render: 28ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+✓ Compiled in 44ms
+ GET /events 500 in 270ms (compile: 84ms, proxy.ts: 5ms, render: 181ms)
+ GET / 200 in 311ms (compile: 3ms, proxy.ts: 6ms, render: 301ms)
+✓ Compiled in 57ms
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /gallery 200 in 310ms (compile: 12ms, proxy.ts: 31ms, render: 267ms)
+ GET /calendar 200 in 317ms (compile: 22ms, proxy.ts: 37ms, render: 258ms)
+ GET /tasks 200 in 318ms (compile: 34ms, proxy.ts: 37ms, render: 246ms)
+ GET /events 500 in 320ms (compile: 104ms, proxy.ts: 32ms, render: 185ms)
+ GET / 200 in 337ms (compile: 6ms, proxy.ts: 9ms, render: 322ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 500 in 53ms (compile: 6ms, proxy.ts: 4ms, render: 44ms)
+⨯ ./components/events/event-form.tsx:36:1
+Module not found: Can't resolve 'sonner'
+[0m [90m 34 |[39m } [36mfrom[39m [32m'lucide-react'[39m
+ [90m 35 |[39m [36mimport[39m { createEventSeries } [36mfrom[39m [32m'@/app/actions/event-series'[39m
+[31m[1m>[22m[39m[90m 36 |[39m [36mimport[39m { toast } [36mfrom[39m [32m'sonner'[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 37 |[39m
+ [90m 38 |[39m [36minterface[39m [33mEventFormProps[39m {
+ [90m 39 |[39m     event[33m?[39m[33m:[39m any[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./components/events/event-form.tsx [Client Component Browser]
+    ./components/events/event-details-dialog.tsx [Client Component Browser]
+    ./components/events/event-card.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/events/event-form.tsx [Client Component SSR]
+    ./components/events/event-details-dialog.tsx [Client Component SSR]
+    ./components/events/event-card.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/events/event-form.tsx:36:1
+Module not found: Can't resolve 'sonner'
+[0m [90m 34 |[39m } [36mfrom[39m [32m'lucide-react'[39m
+ [90m 35 |[39m [36mimport[39m { createEventSeries } [36mfrom[39m [32m'@/app/actions/event-series'[39m
+[31m[1m>[22m[39m[90m 36 |[39m [36mimport[39m { toast } [36mfrom[39m [32m'sonner'[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 37 |[39m
+ [90m 38 |[39m [36minterface[39m [33mEventFormProps[39m {
+ [90m 39 |[39m     event[33m?[39m[33m:[39m any[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./components/events/event-form.tsx [Client Component Browser]
+    ./components/events/event-details-dialog.tsx [Client Component Browser]
+    ./components/events/event-card.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/events/event-form.tsx [Client Component SSR]
+    ./components/events/event-details-dialog.tsx [Client Component SSR]
+    ./components/events/event-card.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/events/event-form.tsx:36:1
+Module not found: Can't resolve 'sonner'
+[0m [90m 34 |[39m } [36mfrom[39m [32m'lucide-react'[39m
+ [90m 35 |[39m [36mimport[39m { createEventSeries } [36mfrom[39m [32m'@/app/actions/event-series'[39m
+[31m[1m>[22m[39m[90m 36 |[39m [36mimport[39m { toast } [36mfrom[39m [32m'sonner'[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 37 |[39m
+ [90m 38 |[39m [36minterface[39m [33mEventFormProps[39m {
+ [90m 39 |[39m     event[33m?[39m[33m:[39m any[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./components/events/event-form.tsx [Client Component Browser]
+    ./components/events/event-details-dialog.tsx [Client Component Browser]
+    ./components/events/event-card.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/events/event-form.tsx [Client Component SSR]
+    ./components/events/event-details-dialog.tsx [Client Component SSR]
+    ./components/events/event-card.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./components/events/event-form.tsx:36:1
+Module not found: Can't resolve 'sonner'
+[0m [90m 34 |[39m } [36mfrom[39m [32m'lucide-react'[39m
+ [90m 35 |[39m [36mimport[39m { createEventSeries } [36mfrom[39m [32m'@/app/actions/event-series'[39m
+[31m[1m>[22m[39m[90m 36 |[39m [36mimport[39m { toast } [36mfrom[39m [32m'sonner'[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 37 |[39m
+ [90m 38 |[39m [36minterface[39m [33mEventFormProps[39m {
+ [90m 39 |[39m     event[33m?[39m[33m:[39m any[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./components/events/event-form.tsx [Client Component Browser]
+    ./components/events/event-details-dialog.tsx [Client Component Browser]
+    ./components/events/event-card.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Client Component Browser]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./components/events/event-form.tsx [Client Component SSR]
+    ./components/events/event-details-dialog.tsx [Client Component SSR]
+    ./components/events/event-card.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Client Component SSR]
+    ./components/events/events-client-page.tsx [Server Component]
+    ./app/events/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 139ms
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /gallery 200 in 379ms (compile: 18ms, proxy.ts: 33ms, render: 329ms)
+ GET /calendar 200 in 381ms (compile: 31ms, proxy.ts: 42ms, render: 308ms)
+ GET /events 500 in 385ms (compile: 122ms, proxy.ts: 34ms, render: 230ms)
+ GET /tasks 200 in 381ms (compile: 46ms, proxy.ts: 38ms, render: 297ms)
+ GET / 200 in 408ms (compile: 10ms, proxy.ts: 14ms, render: 385ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 500 in 262ms (compile: 54ms, proxy.ts: 4ms, render: 204ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 500 in 59ms (compile: 3ms, proxy.ts: 4ms, render: 52ms)
+ GET / 200 in 68ms (compile: 3ms, proxy.ts: 4ms, render: 62ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at NewEventPage (app/events/new/page.tsx:21:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '3675014903'
+}
+ GET /events/new 500 in 505ms (compile: 438ms, proxy.ts: 5ms, render: 62ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 500 in 71ms (compile: 3ms, proxy.ts: 9ms, render: 59ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 200 in 32ms (compile: 4ms, proxy.ts: 8ms, render: 21ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 500 in 64ms (compile: 5ms, proxy.ts: 4ms, render: 55ms)
+⨯ TypeError: Cannot read properties of undefined (reading 'findMany')
+    at getEventSeries (app/actions/event-series.ts:8:37)
+    at EventsPage (app/events/page.tsx:14:23)
+   6 |
+   7 | export async function getEventSeries() {
+>  8 |     return await prisma.eventSeries.findMany({
+     |                                     ^
+   9 |         orderBy: { title: 'asc' },
+  10 |         include: {
+  11 |             events: { {
+  digest: '647367239'
+}
+ GET /events 500 in 61ms (compile: 3ms, proxy.ts: 4ms, render: 54ms)

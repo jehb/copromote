@@ -11,6 +11,7 @@ export async function getEvents() {
         include: {
             location: true,
             primaryContact: true,
+            series: true,
             contacts: true,
             organizations: true,
             socialPosts: {
@@ -26,6 +27,7 @@ export async function getEvent(id: string) {
         include: {
             location: true,
             primaryContact: true,
+            series: true,
             contacts: true,
             organizations: true,
             socialPosts: {
@@ -42,6 +44,7 @@ export async function createEvent(formData: FormData) {
     const endTimeStr = formData.get('endTime') as string
     const locationId = formData.get('locationId') as string
     const primaryContactId = formData.get('primaryContactId') as string
+    const seriesId = formData.get('seriesId') as string
 
     // Multi-select values as JSON string or multiple fields
     const contactIds = formData.getAll('contactIds') as string[]
@@ -55,6 +58,7 @@ export async function createEvent(formData: FormData) {
             endTime: new Date(endTimeStr),
             locationId,
             primaryContactId: primaryContactId || undefined,
+            seriesId: seriesId || undefined,
             contacts: {
                 connect: contactIds.map(id => ({ id }))
             },
@@ -78,6 +82,7 @@ export async function updateEvent(id: string, formData: FormData) {
     const endTimeStr = formData.get('endTime') as string
     const locationId = formData.get('locationId') as string
     const primaryContactId = formData.get('primaryContactId') as string
+    const seriesId = formData.get('seriesId') as string
 
     const contactIds = formData.getAll('contactIds') as string[]
     const organizationIds = formData.getAll('organizationIds') as string[]
@@ -91,6 +96,7 @@ export async function updateEvent(id: string, formData: FormData) {
             endTime: new Date(endTimeStr),
             locationId,
             primaryContactId: primaryContactId || null,
+            seriesId: seriesId || null,
             contacts: {
                 set: contactIds.map(id => ({ id }))
             },

@@ -1,4 +1,5 @@
 import { createEvent, getLocations, getUsers } from '@/app/actions/events'
+import { getEventSeries } from '@/app/actions/event-series'
 import { getContacts } from '@/app/actions/contacts'
 import { getOrganizations } from '@/app/actions/organizations'
 import { EventForm } from '@/components/events/event-form'
@@ -12,11 +13,12 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 export default async function NewEventPage() {
-    const [locations, users, contacts, organizations] = await Promise.all([
+    const [locations, users, contacts, organizations, eventSeries] = await Promise.all([
         getLocations(),
         getUsers(),
         getContacts(),
-        getOrganizations()
+        getOrganizations(),
+        getEventSeries()
     ])
 
     return (
@@ -43,6 +45,7 @@ export default async function NewEventPage() {
                         users={users}
                         contacts={contacts}
                         organizations={organizations}
+                        eventSeries={eventSeries}
                         action={createEvent}
                     />
                 </CardContent>

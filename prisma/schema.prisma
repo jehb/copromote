@@ -134,11 +134,22 @@ model Event {
   location         Location       @relation(fields: [locationId], references: [id])
   primaryContactId String?
   primaryContact   User?          @relation(fields: [primaryContactId], references: [id])
+  seriesId         String?
+  series           EventSeries?   @relation(fields: [seriesId], references: [id])
   socialPosts      SocialPost[]
   contacts         Contact[]      @relation("EventContacts")
   organizations    Organization[] @relation("EventOrganizations")
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+}
+
+model EventSeries {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  events      Event[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Task {

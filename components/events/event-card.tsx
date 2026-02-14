@@ -15,9 +15,10 @@ interface EventCardProps {
     users: any[]
     contacts: any[]
     organizations: any[]
+    eventSeries: any[]
 }
 
-export function EventCard({ event, locations, users, contacts, organizations }: EventCardProps) {
+export function EventCard({ event, locations, users, contacts, organizations, eventSeries }: EventCardProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     return (
@@ -28,9 +29,16 @@ export function EventCard({ event, locations, users, contacts, organizations }: 
             >
                 <CardContent className="p-5 space-y-4">
                     <div className="flex justify-between items-start">
-                        <Badge variant="secondary" className="group-hover:bg-slate-200 transition-colors">
-                            {event.location?.name || 'No Location'}
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                            <Badge variant="secondary" className="group-hover:bg-slate-200 transition-colors w-fit">
+                                {event.location?.name || 'No Location'}
+                            </Badge>
+                            {event.series && (
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                                    {event.series.title}
+                                </span>
+                            )}
+                        </div>
                         <form action={deleteEvent.bind(null, event.id)} onClick={(e) => e.stopPropagation()}>
                             <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50">
                                 <Trash2 className="h-3 w-3" />
@@ -67,7 +75,7 @@ export function EventCard({ event, locations, users, contacts, organizations }: 
                                                 platform === 'LinkedIn' ? Linkedin :
                                                     platform === 'Twitter' ? Twitter : MessageSquare
                                         return (
-                                            <div key={platform} className="p-1 bg-slate-100 rounded-full border border-white">
+                                            <div key={platform as string} className="p-1 bg-slate-100 rounded-full border border-white">
                                                 <Icon className="h-3 w-3 text-slate-500" />
                                             </div>
                                         )
@@ -90,6 +98,7 @@ export function EventCard({ event, locations, users, contacts, organizations }: 
                 users={users}
                 contacts={contacts}
                 organizations={organizations}
+                eventSeries={eventSeries}
             />
         </>
     )
