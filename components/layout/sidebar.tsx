@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 import { logout } from '@/app/actions/auth'
+import { CommandMenu } from '@/components/search/command-menu'
 
 const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -66,6 +67,9 @@ export function Sidebar() {
                     Promoty
                 </div>
                 <div className="flex-1 flex flex-col gap-1 px-3 py-4 overflow-y-auto">
+                    <div className="px-3 mb-4">
+                        <CommandMenu />
+                    </div>
                     {navigation.map((item) => {
                         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
                         return (

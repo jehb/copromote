@@ -59,3 +59,5 @@ export async function updateSession(request: any) {
 export async function logout() {
     (await cookies()).delete('session')
 }
+
+export const verifySession = getSession

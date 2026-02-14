@@ -14,6 +14,8 @@ const CreateUserSchema = z.object({
     role: z.string().default('USER'),
 })
 
+import { Prisma } from '@prisma/client'
+
 export async function getUsers() {
     try {
         const users = await prisma.user.findMany({
@@ -45,7 +47,31 @@ export async function getUsers() {
         return users
     } catch (error) {
         console.error('Failed to fetch users:', error)
-        return []
+        return [] as Prisma.UserGetPayload<{
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                role: true,
+                avatar: true,
+                createdAt: true,
+                contactId: true,
+                contact: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true
+                    }
+                },
+                _count: {
+                    select: {
+                        events: true,
+                        tasks: true
+                    }
+                }
+            }
+        }>[]
     }
 }
 
