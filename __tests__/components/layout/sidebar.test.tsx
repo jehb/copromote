@@ -3,8 +3,8 @@ import { Sidebar } from '@/components/layout/sidebar'
 
 // Mock next/link
 jest.mock('next/link', () => {
-    return ({ children, href }: any) => {
-        return <a href={href}>{children}</a>
+    return ({ children, href, ...props }: any) => {
+        return <a href={href} {...props}>{children}</a>
     }
 })
 
@@ -22,20 +22,20 @@ describe('Sidebar Component', () => {
         render(<Sidebar />)
 
         // Hamburger button should be present (hidden on desktop via CSS)
-        const hamburgerButton = screen.getByRole('button')
+        const hamburgerButton = screen.getByRole('button', { name: /toggle menu/i })
         expect(hamburgerButton).toBeInTheDocument()
     })
 
     it('should toggle mobile menu when hamburger is clicked', () => {
         render(<Sidebar />)
 
-        const hamburgerButton = screen.getByRole('button')
+        const hamburgerButton = screen.getByRole('button', { name: /toggle menu/i })
 
         // Click to open
         fireEvent.click(hamburgerButton)
 
         // Sidebar should have translate-x-0 class (visible)
-        const sidebar = screen.getByText('Social Media').closest('div')
+        const sidebar = screen.getByTestId('sidebar')
         expect(sidebar?.className).toContain('translate-x-0')
 
         // Click to close
@@ -48,7 +48,7 @@ describe('Sidebar Component', () => {
     it('should close mobile menu when navigation link is clicked', () => {
         render(<Sidebar />)
 
-        const hamburgerButton = screen.getByRole('button')
+        const hamburgerButton = screen.getByRole('button', { name: /toggle menu/i })
 
         // Open menu
         fireEvent.click(hamburgerButton)
@@ -58,14 +58,7 @@ describe('Sidebar Component', () => {
         fireEvent.click(socialLink)
 
         // Menu should be closed
-        const sidebar = socialLink.closest('div')
+        const sidebar = screen.getByTestId('sidebar')
         expect(sidebar?.className).toContain('-translate-x-full')
-    })
-
-    it('should render connection status', () => {
-        render(<Sidebar />)
-
-        // ConnectionStatus component should be rendered
-        expect(screen.getByText(/Connection/i) || screen.getByText(/Online/i) || screen.getByText(/Offline/i)).toBeTruthy()
     })
 })

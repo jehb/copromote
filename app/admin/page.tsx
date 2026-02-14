@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Settings, Users, Shield } from 'lucide-react'
+import { Settings, Users, Shield, Database, Activity } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AdminPage() {
@@ -26,11 +26,39 @@ export default function AdminPage() {
                     <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <Users className="h-5 w-5 text-slate-500" />
+                                <Users className="h-5 w-5 text-indigo-600" />
                                 User Management
                             </CardTitle>
                             <CardDescription>
                                 Manage users and permissions.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                </Link>
+
+                <Link href="/admin/data">
+                    <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"> {/* Database icon needs import if not globally available, but likely is or will use Lucide */}
+                                <Database className="h-5 w-5 text-emerald-600" />
+                                Data Hub
+                            </CardTitle>
+                            <CardDescription>
+                                Export system data and manage records.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                </Link>
+
+                <Link href="/admin/activity">
+                    <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Activity className="h-5 w-5 text-amber-600" />
+                                Activity Logs
+                            </CardTitle>
+                            <CardDescription>
+                                Track business actions and entity changes.
                             </CardDescription>
                         </CardHeader>
                     </Card>

@@ -96,20 +96,22 @@ export function TaskDialog({ users, task, trigger, defaultStatus = 'todo', proje
                         </div>
                     </div>
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="assignee">Assignee</Label>
-                        <Select name="assigneeId" defaultValue={task?.assigneeId || 'none'}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Unassigned" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="none">Unassigned</SelectItem>
-                                {users.map((user: any) => (
-                                    <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    {isEditing && (
+                        <div className="grid gap-2">
+                            <Label htmlFor="assignee">Assignee</Label>
+                            <Select name="assigneeId" defaultValue={task?.assigneeId || 'none'}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Unassigned" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">Unassigned</SelectItem>
+                                    {users.map((user: any) => (
+                                        <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     {!projectId && projects.length > 0 && (
                         <div className="grid gap-2">

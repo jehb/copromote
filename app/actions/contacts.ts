@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logActivity } from '@/app/actions/activity-logs'
 
 export async function getContacts() {
     return await prisma.contact.findMany({
@@ -48,6 +49,8 @@ export async function createContact(formData: FormData) {
         }
     })
 
+    await logActivity('CREATE', 'Contact', contact.id, `Created contact: ${firstName} ${lastName}`)
+
     revalidatePath('/contacts')
     redirect('/contacts')
 }
@@ -79,6 +82,8 @@ export async function updateContact(formData: FormData) {
         }
     })
 
+    await logActivity('UPDATE', 'Contact', id, `Updated contact: ${firstName} ${lastName}`)
+
     revalidatePath('/contacts')
     revalidatePath(`/contacts/${id}`)
     redirect('/contacts')
@@ -88,6 +93,7 @@ export async function deleteContact(id: string) {
     await prisma.contact.delete({
         where: { id }
     })
+    await logActivity('DELETE', 'Contact', id, 'Deleted contact')
     revalidatePath('/contacts')
     redirect('/contacts')
 }
@@ -96,7 +102,10 @@ export async function linkContactToOrganization(contactId: string, organizationI
     await prisma.contact.update({
         where: { id: contactId },
         data: { organizationId }
+
     })
+
+    await logActivity('UPDATE', 'Contact', contactId, `Linked to organization: ${organizationId}`)
 
     revalidatePath(`/organizations/${organizationId}`)
     revalidatePath('/contacts')

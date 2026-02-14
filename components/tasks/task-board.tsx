@@ -4,7 +4,8 @@ import { TaskDialog } from './task-dialog'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
-import { User as UserIcon, Calendar, MoreHorizontal, Trash2 } from 'lucide-react'
+import { Calendar, MoreHorizontal, Trash2 } from 'lucide-react'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { deleteTask, updateTaskStatus } from '@/app/actions/tasks'
 import { Button } from '@/components/ui/button'
 import {
@@ -89,7 +90,12 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                         )}
                         {task.assignee && (
                             <div className="flex items-center" title={task.assignee.name}>
-                                <UserIcon className="h-3 w-3 mr-1" />
+                                <UserAvatar
+                                    name={task.assignee.name}
+                                    email={task.assignee.email}
+                                    size={40}
+                                    className="h-4 w-4 mr-1.5"
+                                />
                                 <span className="max-w-[60px] truncate">{task.assignee.name.split(' ')[0]}</span>
                             </div>
                         )}

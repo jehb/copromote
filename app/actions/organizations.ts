@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logActivity } from '@/app/actions/activity-logs'
 
 export async function getOrganizations() {
     return await prisma.organization.findMany({
@@ -43,6 +44,8 @@ export async function createOrganization(formData: FormData) {
         }
     })
 
+    await logActivity('CREATE', 'Organization', org.id, `Created organization: ${name}`)
+
     revalidatePath('/organizations')
     redirect('/organizations')
 }
@@ -66,6 +69,8 @@ export async function updateOrganization(formData: FormData) {
         }
     })
 
+    await logActivity('UPDATE', 'Organization', id, `Updated organization: ${name}`)
+
     revalidatePath('/organizations')
     revalidatePath(`/organizations/${id}`)
     redirect('/organizations')
@@ -75,6 +80,7 @@ export async function deleteOrganization(id: string) {
     await prisma.organization.delete({
         where: { id }
     })
+    await logActivity('DELETE', 'Organization', id, 'Deleted organization')
     revalidatePath('/organizations')
     redirect('/organizations')
 }

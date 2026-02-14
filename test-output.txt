@@ -1,0 +1,19 @@
+Testing ActivityLog access...
+(node:41571) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/jehb/projects/promoty/scripts/test-db.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/jehb/projects/promoty/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Error accessing ActivityLog: PrismaClientKnownRequestError: 
+Invalid `prisma.activityLog.count()` invocation:
+
+
+The table `main.ActivityLog` does not exist in the current database.
+    at $n.handleRequestError (/home/jehb/projects/promoty/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/home/jehb/projects/promoty/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/home/jehb/projects/promoty/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/home/jehb/projects/promoty/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async main (file:///home/jehb/projects/promoty/scripts/test-db.ts:11:22) {
+  code: 'P2021',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'ActivityLog', table: 'main.ActivityLog' }
+}

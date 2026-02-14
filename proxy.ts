@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { decrypt, updateSession } from './lib/session'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const currentUser = request.cookies.get('session')?.value
 
     // If trying to access protected routes

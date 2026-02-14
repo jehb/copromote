@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logActivity } from '@/app/actions/activity-logs'
 
 export async function getSocialPosts(filters: {
     platform?: string,
@@ -168,6 +169,8 @@ export async function createSocialPost(formData: FormData) {
         }
     })
 
+    await logActivity('CREATE', 'SocialPost', post.id, `Created ${platform} post`)
+
     if (status === 'ready-for-review' && reviewerId && reviewerId !== 'none') {
         await syncReviewerTask(reviewerId)
     }
@@ -228,6 +231,8 @@ export async function updateSocialPost(formData: FormData) {
         }
     })
 
+    await logActivity('UPDATE', 'SocialPost', id, `Updated ${platform} post`)
+
     // Sync tasks for relevant reviewers
     if (oldPost?.reviewerId) {
         await syncReviewerTask(oldPost.reviewerId)
@@ -247,6 +252,7 @@ export async function updateSocialPost(formData: FormData) {
 
 export async function deleteSocialPost(id: string) {
     await prisma.socialPost.delete({ where: { id } })
+    await logActivity('DELETE', 'SocialPost', id, 'Deleted social post')
     revalidatePath('/social')
 }
 

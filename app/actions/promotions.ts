@@ -1,11 +1,10 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
-
-const prisma = new PrismaClient()
+import { logActivity } from '@/app/actions/activity-logs'
 
 const PromotionSchema = z.object({
     name: z.string().min(1, 'Name is required'),
@@ -50,9 +49,11 @@ export async function createPromotion(formData: FormData) {
         return { error: 'Invalid data' }
     }
 
-    await prisma.promotionPeriod.create({
+    const promotion = await prisma.promotionPeriod.create({
         data: result.data,
     })
+
+    await logActivity('CREATE', 'Promotion', promotion.id, `Created promotion: ${result.data.name}`)
 
     revalidatePath('/promotions')
     redirect('/promotions')
@@ -76,6 +77,8 @@ export async function updatePromotion(id: string, formData: FormData) {
         data: result.data,
     })
 
+    await logActivity('UPDATE', 'Promotion', id, `Updated promotion: ${result.data.name}`)
+
     revalidatePath(`/promotions/${id}`)
     revalidatePath('/promotions')
 }
@@ -84,6 +87,8 @@ export async function deletePromotion(id: string) {
     await prisma.promotionPeriod.delete({
         where: { id },
     })
+
+    await logActivity('DELETE', 'Promotion', id, 'Deleted promotion')
 
     revalidatePath('/promotions')
     redirect('/promotions')

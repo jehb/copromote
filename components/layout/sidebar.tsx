@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Settings, Plus, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X, Megaphone, Shield, Database, Package } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Settings, Plus, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X, Megaphone, Shield, Database, Package, Activity } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
@@ -20,10 +20,7 @@ const navigation = [
     { name: 'Gallery', href: '/gallery', icon: Images },
     { name: 'Contacts', href: '/contacts', icon: Users },
     { name: 'Organizations', href: '/organizations', icon: Building2 },
-    { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Data Hub', href: '/admin/data', icon: Database },
     { name: 'Admin', href: '/admin', icon: Shield },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
 ]
 
 export function Sidebar() {
@@ -55,14 +52,16 @@ export function Sidebar() {
             )}
 
             {/* Sidebar */}
-            <div className={cn(
-                "flex h-full w-64 flex-col bg-slate-900 text-white transition-transform duration-300 ease-in-out",
-                // Desktop: always visible
-                "lg:translate-x-0",
-                // Mobile: slide in/out
-                "fixed lg:relative z-40",
-                isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-            )}>
+            <div
+                data-testid="sidebar"
+                className={cn(
+                    "flex h-full w-64 flex-col bg-slate-900 text-white transition-transform duration-300 ease-in-out",
+                    // Desktop: always visible
+                    "lg:translate-x-0",
+                    // Mobile: slide in/out
+                    "fixed lg:relative z-40",
+                    isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                )}>
                 <div className="flex h-16 items-center px-6 font-bold text-xl">
                     Promoty
                 </div>

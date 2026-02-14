@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getContacts, deleteContact } from '@/app/actions/contacts'
 import { useOfflineMutation } from '@/hooks/use-offline-mutation'
 import { Button } from '@/components/ui/button'
+import { UserAvatar } from '@/components/ui/user-avatar'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
@@ -119,9 +120,12 @@ export function ContactsClientPage({ initialContacts }: ContactsClientPageProps)
                                     <TableRow key={contact.id} className="group hover:bg-slate-50/50 transition-colors border-slate-100">
                                         <TableCell className="pl-6 py-4">
                                             <Link href={`/contacts/${contact.id}`} className="flex items-center gap-3 group/link w-fit">
-                                                <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold group-hover/link:bg-blue-100 group-hover/link:text-blue-600 transition-all shadow-sm border border-white">
-                                                    {contact.firstName[0]}{contact.lastName[0]}
-                                                </div>
+                                                <UserAvatar
+                                                    name={`${contact.firstName} ${contact.lastName}`}
+                                                    email={contact.email}
+                                                    size={40}
+                                                    className="h-10 w-10 border border-white shadow-sm"
+                                                />
                                                 <div>
                                                     <div className="font-bold text-slate-900 leading-none mb-1 group-hover/link:text-blue-600 transition-colors">
                                                         {contact.firstName} {contact.lastName}

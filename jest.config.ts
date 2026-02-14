@@ -23,7 +23,7 @@ const config: Config = {
         '**/?(*.)+(spec|test).[jt]s?(x)'
     ],
     transformIgnorePatterns: [
-        '/node_modules/(?!(jose)/)',
+        '/node_modules/(?!jose/)',
     ],
     collectCoverageFrom: [
         'app/**/*.{js,jsx,ts,tsx}',

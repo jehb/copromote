@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { logActivity } from '@/app/actions/activity-logs'
 
 export async function getEvents() {
     return await prisma.event.findMany({
@@ -63,6 +64,8 @@ export async function createEvent(formData: FormData) {
         }
     })
 
+    await logActivity('CREATE', 'Event', undefined, `Created event: ${title}`)
+
     revalidatePath('/calendar')
     revalidatePath('/events')
     redirect('/events')
@@ -97,6 +100,8 @@ export async function updateEvent(id: string, formData: FormData) {
         }
     })
 
+    await logActivity('UPDATE', 'Event', id, `Updated event: ${title}`)
+
     revalidatePath('/events')
     revalidatePath('/calendar')
     revalidatePath(`/events/${id}`)
@@ -106,6 +111,7 @@ export async function deleteEvent(id: string) {
     await prisma.event.delete({
         where: { id }
     })
+    await logActivity('DELETE', 'Event', id, `Deleted event`)
     revalidatePath('/events')
     revalidatePath('/calendar')
 }
