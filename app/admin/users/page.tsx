@@ -9,6 +9,7 @@ import { NewUserDialog } from './new-user-dialog'
 import { DeleteUserDialog } from './delete-user-dialog'
 import { EditUserDialog } from './edit-user-dialog'
 
+// Forces dynamic rendering
 export const dynamic = 'force-dynamic'
 
 export default async function UsersPage() {

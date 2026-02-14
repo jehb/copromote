@@ -61,8 +61,10 @@ export function CommandMenu() {
 
         async function fetchResults() {
             setLoading(true)
+            console.log("Fetching results for:", debouncedQuery)
             try {
                 const data = await search(debouncedQuery)
+                console.log("Received data:", data)
                 setResults(data)
             } catch (error) {
                 console.error("Search failed:", error)
@@ -84,17 +86,17 @@ export function CommandMenu() {
     return (
         <>
             <Button
-                variant="outline"
-                className="relative w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
+                variant="secondary"
+                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
                 onClick={() => setOpen(true)}
             >
-                <span className="hidden lg:inline-flex">Search...</span>
-                <span className="inline-flex lg:hidden">Search...</span>
-                <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                <Search className="h-4 w-4" />
+                <span>Search...</span>
+                <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
                     <span className="text-xs">⌘</span>K
                 </kbd>
             </Button>
-            <CommandDialog open={open} onOpenChange={setOpen}>
+            <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
                 <CommandInput
                     placeholder="Type a command or search..."
                     value={query}

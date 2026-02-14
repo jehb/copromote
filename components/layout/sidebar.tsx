@@ -90,12 +90,6 @@ export function Sidebar() {
                 </div>
                 <div className="p-4">
                     <div className="flex flex-col gap-2">
-                        <Button className="w-full gap-2" asChild>
-                            <Link href="/projects/new" onClick={() => setIsMobileMenuOpen(false)}>
-                                <Plus className="h-4 w-4" />
-                                New Project
-                            </Link>
-                        </Button>
                         <form action={logout}>
                             <Button
                                 variant="ghost"
