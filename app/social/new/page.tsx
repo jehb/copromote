@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { createSocialPost } from '@/app/actions/social'
 import { getPromotions } from '@/app/actions/promotions'
 import { getUsers, getEvents } from '@/app/actions/events'

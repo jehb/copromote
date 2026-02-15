@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   // Forced reload for Prisma
   /* config options here */
   reactCompiler: true,
+  output: "standalone",
   turbopack: {},
   experimental: {
     serverActions: {

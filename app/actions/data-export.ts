@@ -50,7 +50,7 @@ export async function getExportData(entities: string[]) {
             'Start Time': e.startTime.toISOString(),
             'End Time': e.endTime.toISOString(),
             Location: e.location.name,
-            'Primary Contact': e.primaryContact ? `${e.primaryContact.firstName} ${e.primaryContact.lastName}` : '',
+            'Primary Contact': e.primaryContact ? e.primaryContact.name : '',
             'Created At': e.createdAt.toISOString()
         }))
     }

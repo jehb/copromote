@@ -64,6 +64,28 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
     const [contactSearch, setContactSearch] = useState('')
     const [orgSearch, setOrgSearch] = useState('')
 
+    // WordPress state
+    const [wordpressId, setWordPressId] = useState<number | undefined>(event?.wordpressId || undefined)
+    const [wordpressUrl, setWordPressUrl] = useState<string | undefined>(event?.wordpressUrl || undefined)
+    const [wpSearchQuery, setWpSearchQuery] = useState('')
+    const [wpSearchResults, setWpSearchResults] = useState<any[]>([])
+    const [isSearchingWP, setIsSearchingWP] = useState(false)
+
+    const handleWpSearch = async () => {
+        if (!wpSearchQuery) return
+        setIsSearchingWP(true)
+        try {
+            const { searchWordPressEvents } = await import('@/app/actions/wordpress')
+            const results = await searchWordPressEvents(wpSearchQuery)
+            setWpSearchResults(results)
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setIsSearchingWP(false)
+        }
+    }
+
+
     const toggleContact = (id: string) => {
         setSelectedContacts(prev =>
             prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
@@ -470,6 +492,88 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                             )}
                         </div>
                     </section>
+                </div>
+
+                {/* WordPress Association */}
+                <div className="md:col-span-2 space-y-4 pt-4 border-t">
+                    <div className="flex items-center gap-2 text-slate-900 font-bold border-b pb-2">
+                        <Building className="h-4 w-4 text-primary" /> WordPress Association
+                    </div>
+
+                    <input type="hidden" name="wordpressId" value={wordpressId || ''} />
+                    <input type="hidden" name="wordpressUrl" value={wordpressUrl || ''} />
+
+                    {wordpressId ? (
+                        <div className="flex items-center gap-4 p-4 border rounded-md bg-slate-50">
+                            <div className="flex-1">
+                                <p className="font-medium">Linked to WordPress Event #{wordpressId}</p>
+                                <a href={wordpressUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline truncate block">
+                                    {wordpressUrl}
+                                </a>
+                            </div>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    setWordPressId(undefined)
+                                    setWordPressUrl(undefined)
+                                }}
+                            >
+                                Unlink
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="space-y-4 max-w-xl">
+                            <div className="space-y-2">
+                                <Label>Search WordPress Events</Label>
+                                <div className="flex gap-2">
+                                    <Input
+                                        placeholder="Search events by title..."
+                                        value={wpSearchQuery}
+                                        onChange={(e) => setWpSearchQuery(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault()
+                                                handleWpSearch()
+                                            }
+                                        }}
+                                    />
+                                    <Button type="button" onClick={handleWpSearch} disabled={isSearchingWP}>
+                                        {isSearchingWP ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {wpSearchResults.length > 0 && (
+                                <div className="max-h-60 overflow-y-auto border rounded-md divide-y bg-white shadow-sm">
+                                    {wpSearchResults.map((post) => (
+                                        <button
+                                            key={post.id}
+                                            type="button"
+                                            className="w-full text-left p-3 hover:bg-slate-50 flex flex-col gap-1 transition-colors"
+                                            onClick={() => {
+                                                setWordPressId(post.id)
+                                                setWordPressUrl(post.url)
+                                                setWpSearchResults([])
+                                                setWpSearchQuery('')
+                                            }}
+                                        >
+                                            <span className="font-medium text-sm">{post.title}</span>
+                                            <div className="flex justify-between items-center text-xs text-muted-foreground">
+                                                <span className="truncate">{post.url}</span>
+                                                {post.start_date && <span>{new Date(post.start_date).toLocaleDateString()}</span>}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
+                            {wpSearchQuery && wpSearchResults.length === 0 && !isSearchingWP && (
+                                <p className="text-sm text-muted-foreground">No results found.</p>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 

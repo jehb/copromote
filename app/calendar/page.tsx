@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { getCalendarEvents } from '@/app/actions/calendar'
 import { CalendarView } from '@/components/calendar/calendar-view'
 

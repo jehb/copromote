@@ -126,6 +126,18 @@ export default function SettingsPage() {
 
                 <Card>
                     <CardHeader>
+                        <CardTitle>WordPress Integration</CardTitle>
+                        <CardDescription>
+                            Connect your WordPress site to enable content syncing.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <WordPressConfig />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
                         <CardTitle>Profile Settings</CardTitle>
                         <CardDescription>Manage your user profile information.</CardDescription>
                     </CardHeader>
@@ -513,6 +525,115 @@ function DatabaseConfig() {
             <div className="flex items-center gap-4">
                 <Button type="submit" disabled={saving}>
                     {saving ? 'Saving...' : 'Save Database Settings'}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleTest} disabled={saving}>
+                    Test Connection
+                </Button>
+            </div>
+        </form>
+    )
+}
+
+function WordPressConfig() {
+    const [url, setUrl] = useState('')
+    const [username, setUsername] = useState('')
+    const [appPassword, setAppPassword] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
+    const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+    const [hasPasswordBytes, setHasPasswordBytes] = useState(false)
+
+    useEffect(() => {
+        // Dynamically import to avoid server-side issues if any
+        import('@/app/actions/wordpress').then(async ({ getWordPressConfig }) => {
+            try {
+                const config = await getWordPressConfig()
+                setUrl(config.url)
+                setUsername(config.username)
+                setHasPasswordBytes(config.hasPassword)
+            } catch (err) {
+                console.error('Failed to load WordPress config', err)
+            } finally {
+                setLoading(false)
+            }
+        })
+    }, [])
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setSaving(true)
+        setStatus(null)
+        try {
+            const { saveWordPressConfig } = await import('@/app/actions/wordpress')
+            await saveWordPressConfig({ url, username, appPassword })
+            setStatus({ type: 'success', message: 'WordPress configuration saved.' })
+            if (appPassword) setHasPasswordBytes(true)
+            setAppPassword('') // Clear password field after save
+        } catch (err) {
+            setStatus({ type: 'error', message: 'Failed to save configuration.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    const handleTest = async () => {
+        setSaving(true)
+        setStatus(null)
+        try {
+            const { testWordPressConnection } = await import('@/app/actions/wordpress')
+            const res = await testWordPressConnection()
+            setStatus({ type: res.success ? 'success' : 'error', message: res.message })
+        } catch (err) {
+            setStatus({ type: 'error', message: 'Failed to run test.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    if (loading) return (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading WordPress configuration...
+        </div>
+    )
+
+    return (
+        <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>WordPress Site URL</Label>
+                    <Input
+                        placeholder="https://example.com"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground">The root URL of your WordPress site.</p>
+                </div>
+                <div className="space-y-2">
+                    <Label>Username</Label>
+                    <Input
+                        placeholder="wp_user"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                    <Label>Application Password</Label>
+                    <Input
+                        type="password"
+                        placeholder={hasPasswordBytes ? "•••••••• (Saved)" : "Enter Application Password"}
+                        value={appPassword}
+                        onChange={(e) => setAppPassword(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                        Generate this in your WordPress User Profile. Do not use your login password.
+                    </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <Button type="submit" disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {saving ? 'Saving...' : 'Save Settings'}
                 </Button>
                 <Button type="button" variant="outline" onClick={handleTest} disabled={saving}>
                     Test Connection

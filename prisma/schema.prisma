@@ -139,6 +139,8 @@ model Event {
   socialPosts      SocialPost[]
   contacts         Contact[]      @relation("EventContacts")
   organizations    Organization[] @relation("EventOrganizations")
+  wordpressId      Int?
+  wordpressUrl     String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }

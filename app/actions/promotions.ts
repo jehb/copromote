@@ -46,7 +46,7 @@ export async function createPromotion(formData: FormData) {
     const result = PromotionSchema.safeParse(rawData)
 
     if (!result.success) {
-        return { error: 'Invalid data' }
+        throw new Error('Invalid data')
     }
 
     const promotion = await prisma.promotionPeriod.create({
@@ -69,7 +69,7 @@ export async function updatePromotion(id: string, formData: FormData) {
     const result = PromotionSchema.safeParse(rawData)
 
     if (!result.success) {
-        return { error: 'Invalid data' }
+        throw new Error('Invalid data')
     }
 
     await prisma.promotionPeriod.update({

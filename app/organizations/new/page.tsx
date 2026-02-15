@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { createOrganization } from '@/app/actions/organizations'
 import { getContacts } from '@/app/actions/contacts'
 import { OrganizationForm } from '@/components/organizations/organization-form'

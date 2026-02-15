@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { getTasks } from '@/app/actions/tasks'
 import { getUsers } from '@/app/actions/events'
 import { getProjects } from '@/app/actions/projects'

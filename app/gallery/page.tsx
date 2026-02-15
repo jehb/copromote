@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { getPhotos, getPhotoCategories } from '@/app/actions/photos'
 import { GalleryClient } from '@/components/gallery/gallery-client'
 

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createContact } from '@/app/actions/contacts'
 import { getOrganizations } from '@/app/actions/organizations'
 import { ContactForm } from '@/components/contacts/contact-form'

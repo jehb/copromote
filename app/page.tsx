@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 import { getProjects } from '@/app/actions/projects'
 import { getHyperlinks } from '@/app/actions/hyperlinks'
 import { QuickLinks } from '@/components/dashboard/quick-links'
