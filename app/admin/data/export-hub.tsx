@@ -21,6 +21,8 @@ const ENTITIES = [
     { id: 'projects', label: 'Projects', description: 'Marketing campaigns and status' },
     { id: 'events', label: 'Events', description: 'Calendar items and locations' },
     { id: 'tasks', label: 'Tasks', description: 'To-do items and assignments' },
+    { id: 'hyperlinks', label: 'Hyperlinks', description: 'Quick access external links' },
+    { id: 'social-posts', label: 'Social Posts', description: 'Social media content and schedule' },
 ]
 
 export function ExportHub() {
@@ -75,8 +77,8 @@ export function ExportHub() {
                         <div
                             key={entity.id}
                             className={`flex items-start space-x-3 p-3 rounded-lg border transition-all cursor-pointer ${selectedEntities.includes(entity.id)
-                                    ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200'
-                                    : 'bg-white border-slate-200 hover:border-indigo-100'
+                                ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200'
+                                : 'bg-white border-slate-200 hover:border-indigo-100'
                                 }`}
                             onClick={() => toggleEntity(entity.id)}
                         >

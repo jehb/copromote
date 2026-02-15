@@ -102,6 +102,29 @@ export function CommandMenu() {
                     placeholder="Type a command or search..."
                     value={query}
                     onValueChange={setQuery}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && results) {
+                            // Find the first available result
+                            const firstResult =
+                                results.projects[0] ||
+                                results.tasks[0] ||
+                                results.contacts[0] ||
+                                results.organizations[0] ||
+                                results.events[0] ||
+                                results.posts[0] ||
+                                results.hyperlinks[0]
+
+                            if (firstResult) {
+                                runCommand(() => {
+                                    if (firstResult.type === 'hyperlink') {
+                                        window.open(firstResult.url, '_blank')
+                                    } else {
+                                        router.push(firstResult.url)
+                                    }
+                                })
+                            }
+                        }
+                    }}
                 />
                 <CommandList>
                     <CommandEmpty>

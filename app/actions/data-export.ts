@@ -84,5 +84,29 @@ export async function getExportData(entities: string[]) {
         }))
     }
 
+    if (entities.includes('hyperlinks')) {
+        const hyperlinks = await prisma.hyperlink.findMany()
+        data.hyperlinks = hyperlinks.map(h => ({
+            ID: h.id,
+            Title: h.title,
+            URL: h.url,
+            Description: h.description || '',
+            Icon: h.icon || '',
+            'Created At': h.createdAt.toISOString()
+        }))
+    }
+
+    if (entities.includes('social-posts')) {
+        const socialPosts = await prisma.socialPost.findMany()
+        data['social-posts'] = socialPosts.map(p => ({
+            ID: p.id,
+            Content: p.content,
+            Platform: p.platform,
+            Status: p.status,
+            'Scheduled Date': p.scheduledDate ? p.scheduledDate.toISOString() : '',
+            'Created At': p.createdAt.toISOString()
+        }))
+    }
+
     return data
 }
