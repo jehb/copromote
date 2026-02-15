@@ -1,4 +1,6 @@
 import { getProjects } from '@/app/actions/projects'
+import { getHyperlinks } from '@/app/actions/hyperlinks'
+import { QuickLinks } from '@/components/dashboard/quick-links'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
@@ -6,11 +8,14 @@ import { ArrowRight, BarChart3, Clock, Layout } from 'lucide-react'
 
 export default async function DashboardPage() {
   const projects = await getProjects()
+  const hyperlinks = await getHyperlinks()
   const activeProjects = projects.filter(p => p.status === 'active')
 
   return (
     <div className="p-8 space-y-8">
       <h1 className="text-3xl font-bold">Dashboard</h1>
+
+      <QuickLinks hyperlinks={hyperlinks} />
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-3">

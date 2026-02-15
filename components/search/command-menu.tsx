@@ -18,7 +18,8 @@ import {
     Building2,
     Calendar,
     MessageSquare,
-    Search
+    Search,
+    Link2
 } from "lucide-react"
 
 import {
@@ -214,6 +215,21 @@ export function CommandMenu() {
                                     <MessageSquare className="mr-2 h-4 w-4" />
                                     <span>{post.title}</span>
                                     <span className="ml-auto text-xs text-muted-foreground">{post.subtitle}</span>
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    ) : null}
+
+                    {results?.hyperlinks?.length ? (
+                        <CommandGroup heading="Hyperlinks">
+                            {results.hyperlinks.map((link) => (
+                                <CommandItem
+                                    key={link.id}
+                                    onSelect={() => runCommand(() => window.open(link.url, '_blank'))}
+                                >
+                                    <Link2 className="mr-2 h-4 w-4" />
+                                    <span>{link.title}</span>
+                                    <span className="ml-auto text-xs text-muted-foreground truncate max-w-[200px]">{link.url}</span>
                                 </CommandItem>
                             ))}
                         </CommandGroup>

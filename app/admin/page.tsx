@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Settings, Users, Shield, Database, Activity } from 'lucide-react'
+import { Settings, Users, Shield, Database, Activity, Link2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AdminPage() {
@@ -59,6 +59,20 @@ export default function AdminPage() {
                             </CardTitle>
                             <CardDescription>
                                 Track business actions and entity changes.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                </Link>
+
+                <Link href="/admin/hyperlinks">
+                    <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Link2 className="h-5 w-5 text-blue-600" />
+                                Hyperlinks
+                            </CardTitle>
+                            <CardDescription>
+                                Manage external resources and shortcuts.
                             </CardDescription>
                         </CardHeader>
                     </Card>

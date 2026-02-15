@@ -5,7 +5,7 @@ import { verifySession } from '@/lib/session'
 
 export type SearchResult = {
     id: string
-    type: 'project' | 'task' | 'contact' | 'organization' | 'event' | 'post' | 'user'
+    type: 'project' | 'task' | 'contact' | 'organization' | 'event' | 'post' | 'user' | 'hyperlink'
     title: string
     subtitle?: string
     url: string
@@ -19,6 +19,7 @@ export type SearchResults = {
     events: SearchResult[]
     posts: SearchResult[]
     users: SearchResult[]
+    hyperlinks: SearchResult[]
 }
 
 export async function search(query: string): Promise<SearchResults> {
@@ -30,7 +31,8 @@ export async function search(query: string): Promise<SearchResults> {
             organizations: [],
             events: [],
             posts: [],
-            users: []
+            users: [],
+            hyperlinks: []
         }
     }
 
@@ -40,7 +42,7 @@ export async function search(query: string): Promise<SearchResults> {
     }
 
     try {
-        const [projects, tasks, contacts, organizations, events, posts, users] = await Promise.all([
+        const [projects, tasks, contacts, organizations, events, posts, users, hyperlinks] = await Promise.all([
             // Projects
             prisma.project.findMany({
                 where: {
@@ -114,6 +116,17 @@ export async function search(query: string): Promise<SearchResults> {
                 },
                 take: 5,
                 select: { id: true, name: true, email: true }
+            }),
+            // Hyperlinks
+            prisma.hyperlink.findMany({
+                where: {
+                    OR: [
+                        { title: { contains: query } },
+                        { url: { contains: query } }
+                    ]
+                },
+                take: 5,
+                select: { id: true, title: true, url: true, description: true }
             })
         ])
 
@@ -166,6 +179,13 @@ export async function search(query: string): Promise<SearchResults> {
                 title: u.name,
                 subtitle: u.email,
                 url: `/admin/users`
+            })),
+            hyperlinks: hyperlinks.map(h => ({
+                id: h.id,
+                type: 'hyperlink',
+                title: h.title,
+                subtitle: h.description || '',
+                url: h.url
             }))
         }
     } catch (error) {
