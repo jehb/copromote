@@ -4,13 +4,28 @@ import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { logActivity } from '@/app/actions/activity-logs'
 import { getSession } from '@/lib/session'
+import { getCurrentUserId } from '@/lib/user-util'
 
 export async function getTasks() {
     return await prisma.task.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
             assignee: true,
-            project: true
+            project: true,
+            createdBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            },
+            updatedBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            }
         }
     })
 }
@@ -34,18 +49,20 @@ export async function createTask(formData: FormData) {
         }
     }
 
-    await prisma.task.create({
+    const task = await prisma.task.create({
         data: {
             title,
             description,
             status,
             dueDate: dueDateStr ? new Date(dueDateStr) : null,
             assigneeId,
-            projectId: (formData.get('projectId') as string) || null
+            projectId: (formData.get('projectId') as string) === 'none' ? null : (formData.get('projectId') as string) || null,
+            createdById: session?.id,
+            updatedById: session?.id
         }
     })
 
-    await logActivity('CREATE', 'Task', undefined, `Created task: ${title}`)
+    await logActivity('CREATE', 'Task', task.id, `Created task: ${title}`)
 
     revalidatePath('/tasks')
 }
@@ -65,7 +82,8 @@ export async function updateTask(id: string, formData: FormData) {
             status,
             dueDate: dueDateStr ? new Date(dueDateStr) : null,
             assigneeId: assigneeId === 'none' ? null : assigneeId,
-            projectId: formData.get('projectId') as string || null
+            projectId: (formData.get('projectId') as string) === 'none' ? null : (formData.get('projectId') as string) || null,
+            updatedById: await getCurrentUserId()
         }
     })
 
