@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { Package, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/ui/page-header'
 import { ProductToolbar } from '@/components/products/product-toolbar'
 import { ProductsPagination } from '@/components/products/products-pagination'
 import { PageSizeSelector } from '@/components/products/page-size-selector'
@@ -25,22 +26,22 @@ export default async function ProductsPage(props: ProductsPageProps) {
     const totalPages = Math.ceil(totalCount / pageSize)
 
     return (
-        <div className="p-8 space-y-8 bg-slate-50/30 min-h-screen">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
-                        <Package className="h-8 w-8 text-indigo-600" />
+        <div className="p-4 md:p-8 space-y-8 bg-slate-50/30 min-h-screen">
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-3">
+                        <Package className="h-6 w-6" />
                         External Products
-                    </h1>
-                    <p className="text-muted-foreground mt-1">Products synced from your external JDBC-compatible database.</p>
-                </div>
-                <div className="flex gap-3">
+                    </span>
+                }
+                description="Products synced from your external JDBC-compatible database."
+                actions={
                     <Button variant="outline" className="gap-2">
                         <ExternalLink className="h-4 w-4" />
                         External Dashboard
                     </Button>
-                </div>
-            </div>
+                }
+            />
 
             <ProductToolbar />
 

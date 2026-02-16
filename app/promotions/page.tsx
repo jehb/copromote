@@ -2,27 +2,33 @@ export const dynamic = "force-dynamic"
 import { getPromotions, deletePromotion } from '@/app/actions/promotions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Calendar, Trash2, ArrowRight } from 'lucide-react'
+import { Plus, Calendar, Trash2, ArrowRight, Megaphone } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default async function PromotionsPage() {
     const promotions = await getPromotions()
 
     return (
         <div className="p-8 space-y-8">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold">Promotions</h1>
-                    <p className="text-muted-foreground">Manage marketing campaigns and seasonal events.</p>
-                </div>
-                <Button asChild>
-                    <Link href="/promotions/new">
-                        <Plus className="mr-2 h-4 w-4" /> New Promotion
-                    </Link>
-                </Button>
-            </div>
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <Megaphone className="h-6 w-6" />
+                        Promotions
+                    </span>
+                }
+                description="Manage marketing campaigns and seasonal events."
+                actions={
+                    <Button asChild>
+                        <Link href="/promotions/new">
+                            <Plus className="mr-2 h-4 w-4" /> New Promotion
+                        </Link>
+                    </Button>
+                }
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {promotions.map((promo) => {

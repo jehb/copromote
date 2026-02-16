@@ -7,7 +7,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import Link from 'next/link'
-import { Plus, ArrowRight, Loader2, FolderOpen } from 'lucide-react'
+import { Plus, ArrowRight, Loader2, FolderOpen, FolderKanban } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 interface ProjectsClientPageProps {
     initialProjects: any[]
@@ -21,19 +22,25 @@ export function ProjectsClientPage({ initialProjects }: ProjectsClientPageProps)
     })
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4 md:mb-8">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">Projects</h1>
-                    <p className="text-muted-foreground text-sm md:text-base">Monitor your ongoing campaigns and active initiatives</p>
-                </div>
-                <Button asChild className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
-                    <Link href="/projects/new">
-                        <Plus className="h-4 w-4 md:mr-2" />
-                        <span className="md:inline">New Project</span>
-                    </Link>
-                </Button>
-            </div>
+        <div className="p-4 md:p-8 w-full">
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <FolderKanban className="h-6 w-6" />
+                        Projects
+                    </span>
+                }
+                description="Monitor your ongoing campaigns and active initiatives"
+                actions={
+                    <Button asChild className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
+                        <Link href="/projects/new">
+                            <Plus className="h-4 w-4 md:mr-2" />
+                            <span className="md:inline">New Project</span>
+                        </Link>
+                    </Button>
+                }
+                className="mb-4 md:mb-8"
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {projects.map((project: any) => (

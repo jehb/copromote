@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { Plus, Trash2, Building2, Globe, Users, MoreHorizontal, Pencil, Search, Eye } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 import {
     Table,
     TableBody,
@@ -24,18 +25,23 @@ export default async function OrganizationsPage() {
     const orgs = await getOrganizations()
 
     return (
-        <div className="p-8 space-y-8 max-w-7xl mx-auto">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold">Organizations</h1>
-                    <p className="text-muted-foreground">Manage partners, vendors, and community groups</p>
-                </div>
-                <Button asChild>
-                    <Link href="/organizations/new">
-                        <Plus className="mr-2 h-4 w-4" /> Add Organization
-                    </Link>
-                </Button>
-            </div>
+        <div className="p-8 space-y-8 w-full">
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <Building2 className="h-6 w-6" />
+                        Organizations
+                    </span>
+                }
+                description="Manage partners, vendors, and community groups"
+                actions={
+                    <Button asChild>
+                        <Link href="/organizations/new">
+                            <Plus className="mr-2 h-4 w-4" /> Add Organization
+                        </Link>
+                    </Button>
+                }
+            />
 
             <Card className="overflow-hidden border-slate-200">
                 <CardHeader className="bg-slate-50/50 border-b">

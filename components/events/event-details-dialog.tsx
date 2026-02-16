@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getMyRole } from '@/app/actions/user-role'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -20,6 +21,7 @@ import { format } from 'date-fns'
 import { Pencil, Calendar, MapPin, User, X, Clock, MessageSquare, Building2, UserCircle2 } from 'lucide-react'
 import { updateEvent } from '@/app/actions/events'
 import { EventForm } from './event-form'
+import { AuditInfo } from '@/components/common/audit-info'
 
 interface EventDetailsDialogProps {
     event: any
@@ -30,17 +32,37 @@ interface EventDetailsDialogProps {
     contacts: any[]
     organizations: any[]
     eventSeries: any[]
+    onEdit?: () => void
+    onDelete?: () => void
 }
 
-export function EventDetailsDialog({ event, isOpen, onClose, locations, users, contacts, organizations, eventSeries }: EventDetailsDialogProps) {
+export function EventDetailsDialog({
+    event,
+    isOpen,
+    onClose,
+    onEdit,
+    onDelete,
+    locations = [],
+    users = [],
+    contacts = [],
+    organizations = [],
+    eventSeries = []
+}: EventDetailsDialogProps) {
     const [isEditing, setIsEditing] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
+
+    useEffect(() => {
+        if (isOpen) {
+            getMyRole().then(role => setIsAdmin(role === 'ADMIN'))
+        }
+    }, [isOpen])
     const [isLoading, setIsLoading] = useState(false)
 
     // Form state
     // We can initialize state from props, assuming the dialog remounts or updates when event changes.
     // Actually, better to use the form action directly but for controlled inputs (if we need specific UI behavior like date pickers or strict validation) we might need state.
     // Ideally, use formData directly or controlled inputs. Given the plan mentioned "Edit Mode: Form inputs", let's use a form with `action` but validation/default values need care.
-    // For simplicity with server actions, we can just use `name` attributes for standard inputs, or hidden inputs for Select components if needed. 
+    // For simplicity with server actions, we can just use `name` attributes for standard inputs, or hidden inputs for Select components if needed.
     // However,shadcn Select doesn't expose a simple native select easily for FormData. We'll use controlled state for Selects or just hidden inputs.
 
     // Let's use controlled state for everything to be safe and responsive in "Edit Mode" toggling.
@@ -204,6 +226,17 @@ export function EventDetailsDialog({ event, isOpen, onClose, locations, users, c
                                 setIsEditing(false)
                                 onClose()
                             }}
+
+                        />
+                    </div>
+                )}
+                {!isEditing && isAdmin && (
+                    <div className="px-6 pb-6 pt-0 border-t-0 mt-0">
+                        <AuditInfo
+                            createdAt={event.createdAt}
+                            updatedAt={event.updatedAt}
+                            createdBy={event.createdBy}
+                            updatedBy={event.updatedBy}
                         />
                     </div>
                 )}

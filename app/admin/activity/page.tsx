@@ -70,9 +70,9 @@ export default async function ActivityLogsPage() {
                                     </TableCell>
                                     <TableCell>
                                         <span className={`font-medium text-xs border rounded px-1.5 py-0.5 ${log.action === 'CREATE' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                log.action === 'UPDATE' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                                    log.action === 'DELETE' ? 'bg-red-50 text-red-700 border-red-200' :
-                                                        'bg-slate-50 text-slate-700 border-slate-200'
+                                            log.action === 'UPDATE' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                log.action === 'DELETE' ? 'bg-red-50 text-red-700 border-red-200' :
+                                                    'bg-slate-50 text-slate-700 border-slate-200'
                                             }`}>
                                             {log.action}
                                         </span>
@@ -106,7 +106,29 @@ export default async function ActivityLogsPage() {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-sm text-slate-600">
-                                        {log.details || '-'}
+                                        <div className="space-y-1">
+                                            <div className="text-sm text-slate-600 font-medium">{log.details || '-'}</div>
+                                            {/* @ts-ignore */}
+                                            {log.metadata && (
+                                                <div className="text-xs space-y-1 mt-1 bg-slate-50 p-2 rounded border border-slate-100">
+                                                    {/* @ts-ignore */}
+                                                    {Object.entries(JSON.parse(log.metadata)).map(([field, change]: [string, any]) => (
+                                                        <div key={field} className="flex flex-col sm:flex-row sm:gap-2">
+                                                            <span className="font-semibold text-slate-700 capitalize w-24 shrink-0">{field}:</span>
+                                                            <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                                                                <span className="text-red-600 line-through truncate max-w-[120px]" title={String(change.from ?? 'null')}>
+                                                                    {change.from === null ? 'null' : String(change.from)}
+                                                                </span>
+                                                                <span className="text-slate-400">→</span>
+                                                                <span className="text-green-600 truncate max-w-[120px]" title={String(change.to ?? 'null')}>
+                                                                    {change.to === null ? 'null' : String(change.to)}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

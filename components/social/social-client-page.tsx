@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { Plus, Trash2, Instagram, Facebook, Linkedin, Twitter, MessageSquare, LayoutGrid, List, Loader2 } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 import { SocialTable } from '@/components/social/social-table'
 import { SocialFilterBar } from '@/components/social/social-filter-bar'
 import { useState, useMemo } from 'react'
@@ -40,39 +41,44 @@ export function SocialClientPage({ initialData, initialFilters }: SocialClientPa
     })
 
     return (
-        <div className="p-4 md:p-8 space-y-4 md:space-y-8 h-full flex flex-col max-w-7xl mx-auto w-full">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">Social Media</h1>
-                    <p className="text-muted-foreground text-sm md:text-base">Manage your social content pipeline</p>
-                </div>
-                <div className="flex items-center gap-2 md:gap-4">
-                    <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-sm">
-                        <Button
-                            variant={view === 'table' ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className={`h-8 w-8 p-0 rounded-lg transition-all ${view === 'table' ? 'bg-white shadow-sm' : ''}`}
-                            onClick={() => setView('table')}
-                        >
-                            <List className="h-4 w-4" />
+        <div className="p-4 md:p-8 space-y-4 md:space-y-8 h-full flex flex-col w-full">
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <MessageSquare className="h-6 w-6" />
+                        Social Media
+                    </span>
+                }
+                description="Manage your social content pipeline"
+                actions={
+                    <>
+                        <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-sm">
+                            <Button
+                                variant={view === 'table' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className={`h-8 w-8 p-0 rounded-lg transition-all ${view === 'table' ? 'bg-white shadow-sm' : ''}`}
+                                onClick={() => setView('table')}
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={view === 'grid' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className={`h-8 w-8 p-0 rounded-lg transition-all ${view === 'grid' ? 'bg-white shadow-sm' : ''}`}
+                                onClick={() => setView('grid')}
+                            >
+                                <LayoutGrid className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                            <Link href="/social/new">
+                                <Plus className="h-4 w-4 md:mr-2" />
+                                <span className="hidden md:inline">Create Post</span>
+                            </Link>
                         </Button>
-                        <Button
-                            variant={view === 'grid' ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className={`h-8 w-8 p-0 rounded-lg transition-all ${view === 'grid' ? 'bg-white shadow-sm' : ''}`}
-                            onClick={() => setView('grid')}
-                        >
-                            <LayoutGrid className="h-4 w-4" />
-                        </Button>
-                    </div>
-                    <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                        <Link href="/social/new">
-                            <Plus className="h-4 w-4 md:mr-2" />
-                            <span className="hidden md:inline">Create Post</span>
-                        </Link>
-                    </Button>
-                </div>
-            </div>
+                    </>
+                }
+            />
 
             <div className="flex gap-2 pb-4 border-b border-slate-100 overflow-x-auto pb-4 scrollbar-hide">
                 {['all', 'Instagram', 'Facebook', 'LinkedIn', 'Twitter'].map((p) => (

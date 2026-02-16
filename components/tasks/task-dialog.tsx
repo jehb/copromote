@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getMyRole } from '@/app/actions/user-role'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -17,19 +18,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { format } from 'date-fns'
 import { createTask, updateTask } from '@/app/actions/tasks'
 import { Plus } from 'lucide-react'
+import { AuditInfo } from '@/components/common/audit-info'
 
 interface TaskDialogProps {
     users: any[]
     task?: any
     trigger?: React.ReactNode
-    defaultStatus?: string
+    children?: React.ReactNode
+    onSave?: () => void
+    defaultProjectId?: string
     projectId?: string
+    defaultStatus?: string
     projects?: any[]
 }
 
-export function TaskDialog({ users, task, trigger, defaultStatus = 'todo', projectId, projects = [] }: TaskDialogProps) {
-    const [open, setOpen] = useState(false)
+export function TaskDialog({ users, children, task, trigger, onSave, defaultProjectId, projectId, defaultStatus = 'todo', projects = [] }: TaskDialogProps) {
+    const [isOpen, setIsOpen] = useState(false)
+    const [isAdmin, setIsAdmin] = useState(false)
     const isEditing = !!task
+
+    useEffect(() => {
+        if (isOpen) {
+            getMyRole().then(role => setIsAdmin(role === 'ADMIN'))
+        }
+    }, [isOpen])
 
     const handleSubmit = async (formData: FormData) => {
         if (isEditing) {
@@ -37,7 +49,7 @@ export function TaskDialog({ users, task, trigger, defaultStatus = 'todo', proje
         } else {
             await createTask(formData)
         }
-        setOpen(false)
+        setIsOpen(false)
     }
 
     const formatForInput = (date: Date) => {
@@ -45,7 +57,7 @@ export function TaskDialog({ users, task, trigger, defaultStatus = 'todo', proje
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 {trigger || (
                     <Button>
@@ -131,10 +143,18 @@ export function TaskDialog({ users, task, trigger, defaultStatus = 'todo', proje
                     )}
 
                     <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
                         <Button type="submit">Save</Button>
                     </DialogFooter>
                 </form>
+                {isEditing && isAdmin && (
+                    <AuditInfo
+                        createdAt={task.createdAt}
+                        updatedAt={task.updatedAt}
+                        createdBy={task.createdBy}
+                        updatedBy={task.updatedBy}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     )

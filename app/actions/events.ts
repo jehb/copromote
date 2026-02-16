@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logActivity } from '@/app/actions/activity-logs'
+import { getCurrentUserId } from '@/lib/user-util'
 
 export async function getEvents() {
     return await prisma.event.findMany({
@@ -53,7 +54,7 @@ export async function createEvent(formData: FormData) {
     const contactIds = formData.getAll('contactIds') as string[]
     const organizationIds = formData.getAll('organizationIds') as string[]
 
-    await prisma.event.create({
+    const event = await prisma.event.create({
         data: {
             title,
             description,
@@ -69,11 +70,13 @@ export async function createEvent(formData: FormData) {
             },
             organizations: {
                 connect: organizationIds.map(id => ({ id }))
-            }
+            },
+            createdById: await getCurrentUserId(),
+            updatedById: await getCurrentUserId()
         }
     })
 
-    await logActivity('CREATE', 'Event', undefined, `Created event: ${title}`)
+    await logActivity('CREATE', 'Event', event.id, `Created event: ${title}`)
 
     revalidatePath('/calendar')
     revalidatePath('/events')
@@ -112,7 +115,8 @@ export async function updateEvent(id: string, formData: FormData) {
             },
             organizations: {
                 set: organizationIds.map(id => ({ id }))
-            }
+            },
+            updatedById: await getCurrentUserId()
         }
     })
 

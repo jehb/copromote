@@ -1,11 +1,19 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Settings, Users, Shield, Database, Activity, Link2 } from 'lucide-react'
+import { Settings, Users, Shield, Database, Activity, Link2, MapPin } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 import Link from 'next/link'
 
 export default function AdminPage() {
     return (
         <div className="p-8 space-y-8">
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <Shield className="h-6 w-6" />
+                        Admin Dashboard
+                    </span>
+                }
+            />
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Link href="/admin/settings">
@@ -87,6 +95,20 @@ export default function AdminPage() {
                             </CardTitle>
                             <CardDescription>
                                 View system access logs and security events.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                </Link>
+
+                <Link href="/admin/locations">
+                    <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <MapPin className="h-5 w-5 text-red-600" />
+                                Locations
+                            </CardTitle>
+                            <CardDescription>
+                                Manage venues and event locations.
                             </CardDescription>
                         </CardHeader>
                     </Card>

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db' // Ensure you have this configured
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logActivity } from '@/app/actions/activity-logs'
+import { getCurrentUserId } from '@/lib/user-util'
 
 export async function getProjects() {
     return await prisma.project.findMany({
@@ -13,6 +14,20 @@ export async function getProjects() {
                 select: {
                     assets: true,
                     tasks: true
+                }
+            },
+            createdBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            },
+            updatedBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
                 }
             },
             tasks: {
@@ -30,10 +45,38 @@ export async function getProject(id: string) {
         include: {
             assets: true,
             events: true,
+            createdBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            },
+            updatedBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            },
             tasks: {
                 orderBy: { createdAt: 'desc' },
                 include: {
-                    assignee: true
+                    assignee: true,
+                    createdBy: {
+                        select: {
+                            id: true,
+                            name: true,
+                            username: true
+                        }
+                    },
+                    updatedBy: {
+                        select: {
+                            id: true,
+                            name: true,
+                            username: true
+                        }
+                    }
                 }
             }
         }
@@ -47,13 +90,17 @@ export async function createProject(formData: FormData) {
     const endDateStr = formData.get('endDate') as string
     const endDate = endDateStr ? new Date(endDateStr) : null
 
-    await prisma.project.create({
+    const userId = await getCurrentUserId()
+
+    const project = await prisma.project.create({
         data: {
             name,
             description,
             startDate,
             endDate,
-            status: 'active'
+            status: 'active',
+            createdById: userId,
+            updatedById: userId
         }
     })
 
@@ -70,7 +117,7 @@ export async function createProject(formData: FormData) {
     // Let's just log without ID for now or refactor slightly.
     // I'll refactor slightly in a separate chunk or this one if I target more lines.
     // I'll stick to targeted logging for now.
-    await logActivity('CREATE', 'Project', undefined, `Created project: ${name}`)
+    await logActivity('CREATE', 'Project', project.id, `Created project: ${name}`)
 
     revalidatePath('/projects')
     revalidatePath('/')
@@ -101,6 +148,8 @@ export async function updateProject(id: string, formData: FormData) {
     const endDate = endDateStr ? new Date(endDateStr) : null
     const status = formData.get('status') as string
 
+    const userId = await getCurrentUserId()
+
     await prisma.project.update({
         where: { id },
         data: {
@@ -108,7 +157,8 @@ export async function updateProject(id: string, formData: FormData) {
             description,
             startDate,
             endDate,
-            status
+            status,
+            updatedById: userId
         }
     })
 

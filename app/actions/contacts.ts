@@ -4,11 +4,26 @@ import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logActivity } from '@/app/actions/activity-logs'
+import { getCurrentUserId, getCurrentUser } from '@/lib/user-util'
 
 export async function getContacts() {
     return await prisma.contact.findMany({
         include: {
-            organization: true
+            organization: true,
+            createdBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            },
+            updatedBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            }
         },
         orderBy: { lastName: 'asc' }
     })
@@ -19,7 +34,21 @@ export async function getContact(id: string) {
         where: { id },
         include: {
             organization: true,
-            primaryFor: true
+            primaryFor: true,
+            createdBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            },
+            updatedBy: {
+                select: {
+                    id: true,
+                    name: true,
+                    username: true
+                }
+            }
         }
     })
 }
@@ -35,6 +64,9 @@ export async function createContact(formData: FormData) {
     const type = formData.get('type') as string
     const organizationId = formData.get('organizationId') as string
 
+    const user = await getCurrentUser()
+    const userId = user?.id ?? null
+
     const contact = await prisma.contact.create({
         data: {
             firstName,
@@ -45,7 +77,9 @@ export async function createContact(formData: FormData) {
             jobTitle,
             notes,
             type,
-            organizationId: (organizationId && organizationId !== 'none') ? organizationId : null
+            organizationId: (organizationId && organizationId !== 'none') ? organizationId : null,
+            createdById: userId,
+            updatedById: userId
         }
     })
 
@@ -67,6 +101,16 @@ export async function updateContact(formData: FormData) {
     const type = formData.get('type') as string
     const organizationId = formData.get('organizationId') as string
 
+    // Get current state for diffing
+    const currentContact = await prisma.contact.findUnique({
+        where: { id }
+    })
+
+    const newOrganizationId = (organizationId && organizationId !== 'none') ? organizationId : null
+
+    const user = await getCurrentUser()
+    const userId = user?.id ?? null
+
     await prisma.contact.update({
         where: { id },
         data: {
@@ -78,11 +122,31 @@ export async function updateContact(formData: FormData) {
             jobTitle,
             notes,
             type,
-            organizationId: (organizationId && organizationId !== 'none') ? organizationId : null
+            organizationId: newOrganizationId,
+            updatedById: userId
         }
     })
 
-    await logActivity('UPDATE', 'Contact', id, `Updated contact: ${firstName} ${lastName}`)
+    // Calculate diff
+    const changes: Record<string, { from: any, to: any }> = {}
+    if (currentContact) {
+        if (currentContact.firstName !== firstName) changes.firstName = { from: currentContact.firstName, to: firstName }
+        if (currentContact.lastName !== lastName) changes.lastName = { from: currentContact.lastName, to: lastName }
+        if (currentContact.email !== email) changes.email = { from: currentContact.email, to: email }
+        if (currentContact.phone !== phone) changes.phone = { from: currentContact.phone, to: phone }
+        if (currentContact.company !== company) changes.company = { from: currentContact.company, to: company }
+        if (currentContact.jobTitle !== jobTitle) changes.jobTitle = { from: currentContact.jobTitle, to: jobTitle }
+        if (currentContact.notes !== notes) changes.notes = { from: currentContact.notes, to: notes }
+        if (currentContact.type !== type) changes.type = { from: currentContact.type, to: type }
+        if (currentContact.organizationId !== newOrganizationId) {
+            changes.organizationId = {
+                from: currentContact.organizationId,
+                to: newOrganizationId
+            }
+        }
+    }
+
+    await logActivity('UPDATE', 'Contact', id, `Updated contact: ${firstName} ${lastName}`, changes)
 
     revalidatePath('/contacts')
     revalidatePath(`/contacts/${id}`)

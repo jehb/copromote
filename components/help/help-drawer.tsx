@@ -11,11 +11,19 @@ const helpContent: Record<string, string> = {}
 
 // Map routes to help files
 const routeToHelpFile: Record<string, string> = {
-    '/contacts': '/docs/help/contacts.md',
-    '/events': '/docs/help/events.md',
-    '/social': '/docs/help/social.md',
+    '/': '/docs/help/dashboard.md',
     '/projects': '/docs/help/projects.md',
+    '/products': '/docs/help/products.md',
+    '/tasks': '/docs/help/tasks.md',
+    '/calendar': '/docs/help/calendar.md',
+    '/promotions': '/docs/help/promotions.md',
+    '/social': '/docs/help/social.md',
+    '/events': '/docs/help/events.md',
+    '/gallery': '/docs/help/gallery.md',
+    '/contacts': '/docs/help/contacts.md',
+    '/organizations': '/docs/help/organizations.md',
     '/settings': '/docs/help/settings.md',
+    '/admin': '/docs/help/admin.md',
 }
 
 export function HelpDrawer() {
@@ -32,7 +40,25 @@ export function HelpDrawer() {
             setLoading(true)
 
             // Determine which help file to load
-            const helpFile = routeToHelpFile[pathname] || '/docs/help/general.md'
+            let helpFile = '/docs/help/general.md'
+
+            // Exact match
+            if (routeToHelpFile[pathname]) {
+                helpFile = routeToHelpFile[pathname]
+            } else {
+                // Check for sub-routes (e.g., /projects/123 -> /projects)
+                // We check fairly simply by looking for partial matches
+                // Longer keys first to handle specificity if needed, but for now exact or prefix
+                const matchedRoute = Object.keys(routeToHelpFile).find(route =>
+                    pathname !== '/' && route !== '/' && pathname.startsWith(route)
+                )
+
+                if (matchedRoute) {
+                    helpFile = routeToHelpFile[matchedRoute]
+                } else if (pathname.startsWith('/admin')) {
+                    helpFile = '/docs/help/admin.md'
+                }
+            }
 
             // Check if already cached
             if (helpContent[helpFile]) {

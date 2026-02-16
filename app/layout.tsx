@@ -6,6 +6,7 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { OfflineSyncProvider } from "@/components/providers/offline-sync-provider";
 import { ConnectionStatus } from "@/components/layout/connection-status";
 import { HelpDrawer } from "@/components/help/help-drawer";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -59,13 +60,14 @@ export default function RootLayout({
         <OfflineSyncProvider>
           <QueryProvider>
             <ConnectionStatus />
-            <div className="flex h-screen bg-slate-50">
+            <div className="flex h-screen bg-slate-50 flex-col lg:flex-row">
               <Sidebar />
-              <main className="flex-1 overflow-auto w-full lg:w-auto">
+              <main className="flex-1 overflow-auto w-full">
                 {children}
               </main>
             </div>
             <HelpDrawer />
+            <Toaster />
           </QueryProvider>
         </OfflineSyncProvider>
       </body>

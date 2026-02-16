@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { Plus, Trash2, User, Building2, Mail, Phone, MoreHorizontal, Pencil, Search, Users, Loader2 } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 import {
     Table,
     TableBody,
@@ -54,19 +55,24 @@ export function ContactsClientPage({ initialContacts }: ContactsClientPageProps)
     )
 
     return (
-        <div className="p-4 md:p-8 space-y-4 md:space-y-8 max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">Contacts</h1>
-                    <p className="text-muted-foreground text-sm md:text-base">Manage your relationships and professional network</p>
-                </div>
-                <Button asChild className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
-                    <Link href="/contacts/new">
-                        <Plus className="h-4 w-4 md:mr-2" />
-                        <span className="md:inline">Add Contact</span>
-                    </Link>
-                </Button>
-            </div>
+        <div className="p-4 md:p-8 space-y-4 md:space-y-8 h-full">
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <Users className="h-6 w-6" />
+                        Contacts
+                    </span>
+                }
+                description="Manage your relationships and professional network"
+                actions={
+                    <Button asChild className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
+                        <Link href="/contacts/new">
+                            <Plus className="h-4 w-4 md:mr-2" />
+                            <span className="md:inline">Add Contact</span>
+                        </Link>
+                    </Button>
+                }
+            />
 
             <div className="relative">
                 <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />

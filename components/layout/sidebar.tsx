@@ -36,13 +36,17 @@ export function Sidebar() {
     return (
         <>
             {/* Mobile hamburger button */}
-            <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-slate-900 text-white shadow-lg"
-                aria-label="Toggle menu"
-            >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            {/* Mobile Header */}
+            <div className="lg:hidden flex items-center justify-between p-4 bg-slate-900 text-white shrink-0">
+                <div className="font-bold text-xl">Promoty</div>
+                <button
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="p-1 rounded-md hover:bg-slate-800"
+                    aria-label="Toggle menu"
+                >
+                    {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                </button>
+            </div>
 
             {/* Mobile overlay */}
             {isMobileMenuOpen && (

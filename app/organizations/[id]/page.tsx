@@ -1,13 +1,15 @@
 import { getOrganization, deleteOrganization } from '@/app/actions/organizations'
 import { getContacts } from '@/app/actions/contacts'
+import { getCurrentUser } from '@/lib/user-util'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Pencil, Trash2, Building2, Globe, FileText, Users, User, ExternalLink, Eye } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2, Building2, Globe, FileText, Users, User, ExternalLink, Eye, MoreHorizontal, Mail, Phone, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { AddPersonChoice } from '@/components/organizations/add-person-choice'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
+import { AuditInfo } from '@/components/common/audit-info'
 import {
     Table,
     TableBody,
@@ -19,9 +21,11 @@ import {
 
 export default async function OrganizationDetailPage({ params }: { params: { id: string } }) {
     const { id } = await params
-    const [organization, allContacts] = await Promise.all([
+
+    const [organization, allContacts, currentUser] = await Promise.all([
         getOrganization(id),
-        getContacts()
+        getContacts(),
+        getCurrentUser()
     ])
 
     if (!organization) {
@@ -204,6 +208,14 @@ export default async function OrganizationDetailPage({ params }: { params: { id:
                                     </div>
                                 </div>
                             </div>
+                            {currentUser?.role === 'ADMIN' && (
+                                <AuditInfo
+                                    createdAt={organization.createdAt}
+                                    updatedAt={organization.updatedAt}
+                                    createdBy={organization.createdBy}
+                                    updatedBy={organization.updatedBy}
+                                />
+                            )}
                         </CardContent>
                     </Card>
 

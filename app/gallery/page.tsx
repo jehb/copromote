@@ -1,17 +1,24 @@
 export const dynamic = "force-dynamic"
 import { getPhotos, getPhotoCategories } from '@/app/actions/photos'
 import { GalleryClient } from '@/components/gallery/gallery-client'
+import { PageHeader } from '@/components/ui/page-header'
+import { Images } from 'lucide-react'
 
 export default async function GalleryPage() {
     const photos = await getPhotos()
     const categories = await getPhotoCategories()
 
     return (
-        <div className="p-8 space-y-8 max-w-7xl mx-auto">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold">Image Gallery</h1>
-                <p className="text-muted-foreground font-medium">Manage and organize your promotional photography.</p>
-            </div>
+        <div className="p-4 md:p-8 space-y-8 w-full">
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <Images className="h-6 w-6" />
+                        Image Gallery
+                    </span>
+                }
+                description="Manage and organize your promotional photography."
+            />
 
             <GalleryClient
                 initialPhotos={photos}

@@ -1,5 +1,6 @@
 import { getProject, updateProject } from '@/app/actions/projects'
 import { getUsers } from '@/app/actions/events'
+import { getCurrentUser } from '@/lib/user-util'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,12 +22,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, Link as LinkIcon, FileText, Image as ImageIcon, Video, CheckCircle2, Circle, Clock, User as UserIcon, Calendar, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { TaskDialog } from '@/components/tasks/task-dialog'
+import { AuditInfo } from '@/components/common/audit-info'
 import { Settings } from 'lucide-react'
 
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
     const { id } = await params
-    const project = await getProject(id)
-    const users = await getUsers()
+    const [project, users, currentUser] = await Promise.all([
+        getProject(id),
+        getUsers(),
+        getCurrentUser()
+    ])
 
     if (!project) notFound()
 
@@ -125,6 +130,15 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                                     />
                                 </div>
                             </div>
+
+                            {currentUser?.role === 'ADMIN' && (
+                                <AuditInfo
+                                    createdAt={project.createdAt}
+                                    updatedAt={project.updatedAt}
+                                    createdBy={project.createdBy}
+                                    updatedBy={project.updatedBy}
+                                />
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -285,6 +299,6 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

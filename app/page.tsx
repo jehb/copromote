@@ -5,7 +5,8 @@ import { QuickLinks } from '@/components/dashboard/quick-links'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
-import { ArrowRight, BarChart3, Clock, Layout } from 'lucide-react'
+import { ArrowRight, BarChart3, Clock, Layout, LayoutDashboard } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 export default async function DashboardPage() {
   const projects = await getProjects()
@@ -14,7 +15,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-8 space-y-8">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-2">
+            <LayoutDashboard className="h-6 w-6" />
+            Dashboard
+          </span>
+        }
+      />
 
       <QuickLinks hyperlinks={hyperlinks} />
 

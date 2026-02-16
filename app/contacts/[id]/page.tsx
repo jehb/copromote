@@ -1,19 +1,23 @@
 import { getContact, deleteContact } from '@/app/actions/contacts'
 import { getOrganizations } from '@/app/actions/organizations'
+import { getCurrentUser } from '@/lib/user-util'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Pencil, Trash2, Building2, Mail, Phone, Briefcase, FileText, Calendar, User } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2, Building2, Mail, Phone, Briefcase, FileText, Calendar, User, MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
 import { AddOrganizationChoice } from '@/components/contacts/add-organization-choice'
+import { AuditInfo } from '@/components/common/audit-info'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 
 export default async function ContactDetailPage({ params }: { params: { id: string } }) {
     const { id } = await params
-    const [contact, organizations] = await Promise.all([
+
+    const [contact, organizations, currentUser] = await Promise.all([
         getContact(id),
-        getOrganizations()
+        getOrganizations(),
+        getCurrentUser()
     ])
 
     if (!contact) {
@@ -160,6 +164,14 @@ export default async function ContactDetailPage({ params }: { params: { id: stri
                                     <span>Last Updated</span>
                                     <span>{format(contact.updatedAt, 'MMM d, yyyy')}</span>
                                 </div>
+                                {currentUser?.role === 'ADMIN' && (
+                                    <AuditInfo
+                                        createdAt={contact.createdAt}
+                                        updatedAt={contact.updatedAt}
+                                        createdBy={contact.createdBy}
+                                        updatedBy={contact.updatedBy}
+                                    />
+                                )}
                             </div>
                         </CardContent>
                     </Card>

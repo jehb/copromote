@@ -8,7 +8,8 @@ import { getEventSeries } from '@/app/actions/event-series'
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/events/event-card'
 import Link from 'next/link'
-import { Plus, MapPin, Loader2 } from 'lucide-react'
+import { Plus, MapPin, Loader2, Calendar } from 'lucide-react'
+import { PageHeader } from '@/components/ui/page-header'
 
 interface EventsClientPageProps {
     initialData: {
@@ -62,19 +63,24 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
     const isLoadingAny = isLoadingEvents
 
     return (
-        <div className="p-4 md:p-8 space-y-4 md:space-y-8 h-full flex flex-col max-w-7xl mx-auto w-full">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">Events</h1>
-                    <p className="text-muted-foreground text-sm md:text-base">Manage upcoming events and logistics</p>
-                </div>
-                <Button asChild className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
-                    <Link href="/events/new">
-                        <Plus className="h-4 w-4 md:mr-2" />
-                        <span className="md:inline">Create Event</span>
-                    </Link>
-                </Button>
-            </div>
+        <div className="p-4 md:p-8 space-y-4 md:space-y-8 h-full flex flex-col w-full">
+            <PageHeader
+                title={
+                    <span className="flex items-center gap-2">
+                        <Calendar className="h-6 w-6" />
+                        Events
+                    </span>
+                }
+                description="Manage upcoming events and logistics"
+                actions={
+                    <Button asChild className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto">
+                        <Link href="/events/new">
+                            <Plus className="h-4 w-4 md:mr-2" />
+                            <span className="md:inline">Create Event</span>
+                        </Link>
+                    </Button>
+                }
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {events.map((event: any) => (

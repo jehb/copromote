@@ -8,7 +8,8 @@ export async function logActivity(
     action: string,
     entityType: string,
     entityId?: string,
-    details?: string
+    details?: string,
+    metadata?: any
 ) {
     try {
         const session = await getSession()
@@ -20,6 +21,7 @@ export async function logActivity(
                 entityType,
                 entityId,
                 details,
+                metadata: metadata ? JSON.stringify(metadata) : undefined,
                 userId
             }
         })

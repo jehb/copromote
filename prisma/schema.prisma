@@ -16,6 +16,10 @@ model Project {
   endDate     DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+  createdById String?
+  createdBy   User?           @relation("ProjectCreator", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy   User?           @relation("ProjectUpdater", fields: [updatedById], references: [id])
   assets      Asset[]
   events      CalendarEvent[]
   tasks       Task[]
@@ -105,23 +109,33 @@ model Photo {
 }
 
 model User {
-  id                 String        @id @default(uuid())
-  name               String
-  email              String        @unique
-  username           String        @unique @default("admin") // Temporary default for migration
-  password           String        @default("$2a$10$......................") // Temporary hash
-  role               String        @default("USER") // ADMIN, USER, EDITOR
-  mustChangePassword Boolean       @default(true)
-  avatar             String?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-  events             Event[]
-  tasks              Task[]
-  reviewedPosts      SocialPost[]  @relation("PostReviewer")
-  SecurityLog        SecurityLog[]
-  contactId          String?       @unique
-  contact            Contact?      @relation(fields: [contactId], references: [id])
-  activityLogs       ActivityLog[]
+  id                    String         @id @default(uuid())
+  name                  String
+  email                 String         @unique
+  username              String         @unique @default("admin") // Temporary default for migration
+  password              String         @default("$2a$10$......................") // Temporary hash
+  role                  String         @default("USER") // ADMIN, USER, EDITOR
+  mustChangePassword    Boolean        @default(true)
+  avatar                String?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  events                Event[]
+  tasks                 Task[]
+  reviewedPosts         SocialPost[]   @relation("PostReviewer")
+  SecurityLog           SecurityLog[]
+  contactId             String?        @unique
+  contact               Contact?       @relation(fields: [contactId], references: [id])
+  activityLogs          ActivityLog[]
+  createdProjects       Project[]      @relation("ProjectCreator")
+  updatedProjects       Project[]      @relation("ProjectUpdater")
+  createdTasks          Task[]         @relation("TaskCreator")
+  updatedTasks          Task[]         @relation("TaskUpdater")
+  createdEvents         Event[]        @relation("EventCreator")
+  updatedEvents         Event[]        @relation("EventUpdater")
+  createdContacts       Contact[]      @relation("ContactCreator")
+  updatedContacts       Contact[]      @relation("ContactUpdater")
+  createdOrganizations  Organization[] @relation("OrganizationCreator")
+  updatedOrganizations  Organization[] @relation("OrganizationUpdater")
 }
 
 model Event {
@@ -143,6 +157,10 @@ model Event {
   wordpressUrl     String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
+  createdById      String?
+  createdBy        User?          @relation("EventCreator", fields: [createdById], references: [id])
+  updatedById      String?
+  updatedBy        User?          @relation("EventUpdater", fields: [updatedById], references: [id])
 }
 
 model EventSeries {
@@ -166,6 +184,10 @@ model Task {
   project     Project?  @relation(fields: [projectId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  createdById String?
+  createdBy   User?     @relation("TaskCreator", fields: [createdById], references: [id])
+  updatedById String?
+  updatedBy   User?     @relation("TaskUpdater", fields: [updatedById], references: [id])
 }
 
 model Location {
@@ -201,6 +223,10 @@ model Contact {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   user           User?
+  createdById    String?
+  createdBy      User?         @relation("ContactCreator", fields: [createdById], references: [id])
+  updatedById    String?
+  updatedBy      User?         @relation("ContactUpdater", fields: [updatedById], references: [id])
 }
 
 model Organization {
@@ -215,6 +241,10 @@ model Organization {
   events           Event[]   @relation("EventOrganizations")
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  createdById      String?
+  createdBy        User?     @relation("OrganizationCreator", fields: [createdById], references: [id])
+  updatedById      String?
+  updatedBy        User?     @relation("OrganizationUpdater", fields: [updatedById], references: [id])
 }
 
 model SecurityLog {
@@ -234,6 +264,7 @@ model ActivityLog {
   entityType String // Event, Task, Project, etc.
   entityId   String?
   details    String?
+  metadata   String? // JSON string for structured changes
   userId     String?
   user       User?    @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now())
