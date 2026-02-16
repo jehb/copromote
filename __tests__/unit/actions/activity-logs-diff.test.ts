@@ -39,6 +39,15 @@ describe('Activity Logs Diffing', () => {
     })
 
     it('should log detailed changes when organization is updated', async () => {
+        // Mock finding the original organization
+        ; (prisma.organization.findUnique as jest.Mock).mockResolvedValue({
+            id: orgId,
+            name: 'Test Org for Diff',
+            category: 'Vendor',
+            description: 'Original Description',
+            website: 'https://original.com'
+        })
+
         // Prepare FormData for update
         const formData = new FormData()
         formData.append('id', orgId)
@@ -52,19 +61,20 @@ describe('Activity Logs Diffing', () => {
         await updateOrganization(formData)
 
         // Verify Activity Log
-        const log = await prisma.activityLog.findFirst({
-            where: {
-                entityId: orgId,
-                action: 'UPDATE',
-                entityType: 'Organization'
-            },
-            orderBy: { createdAt: 'desc' }
-        })
+        // Since we are mocking Prisma, we check if create was called with expected data
+        expect(prisma.activityLog.create).toHaveBeenCalled()
 
-        expect(log).toBeDefined()
-        expect(log?.metadata).toBeDefined()
+        const createCall = (prisma.activityLog.create as jest.Mock).mock.calls.find(call =>
+            call[0].data.entityId === orgId &&
+            call[0].data.action === 'UPDATE' &&
+            call[0].data.entityType === 'Organization'
+        )
 
-        const metadata = JSON.parse(log!.metadata!)
+        expect(createCall).toBeDefined()
+        const logData = createCall[0].data
+        expect(logData.metadata).toBeDefined()
+
+        const metadata = JSON.parse(logData.metadata)
         expect(metadata).toHaveProperty('category')
         expect(metadata.category.from).toBe('Vendor')
         expect(metadata.category.to).toBe('Partner')

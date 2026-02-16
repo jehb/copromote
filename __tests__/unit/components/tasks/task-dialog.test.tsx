@@ -25,6 +25,8 @@ const mockTask = {
     description: 'Desc',
     status: 'in-progress',
     dueDate: new Date('2023-01-01T12:00:00Z'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     assigneeId: 'u1',
     projectId: 'p1',
 }

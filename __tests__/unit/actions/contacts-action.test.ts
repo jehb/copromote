@@ -6,17 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 // Mock dependencies
-jest.mock('@/lib/db', () => ({
-    prisma: {
-        contact: {
-            findMany: jest.fn(),
-            findUnique: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            delete: jest.fn(),
-        },
-    },
-}))
+
 
 jest.mock('@/app/actions/activity-logs', () => ({
     logActivity: jest.fn(),

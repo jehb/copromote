@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { writeFile, unlink, mkdir } from 'fs/promises'
+import { promises as fs } from 'fs'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { randomUUID } from 'crypto'
@@ -72,7 +72,7 @@ export async function uploadPhoto(formData: FormData) {
     // Ensure upload directory exists
     const uploadDir = join(process.cwd(), 'public', 'uploads')
     if (!existsSync(uploadDir)) {
-        await mkdir(uploadDir, { recursive: true })
+        await fs.mkdir(uploadDir, { recursive: true })
     }
 
     // Generate unique filename
@@ -84,7 +84,7 @@ export async function uploadPhoto(formData: FormData) {
     // Save file
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    await writeFile(filePath, buffer)
+    await fs.writeFile(filePath, buffer)
 
     // Handle tags: find or create
     const tagsConnect = []
@@ -125,7 +125,7 @@ export async function deletePhoto(id: string) {
     const filePath = join(process.cwd(), 'public', photo.url)
     try {
         if (existsSync(filePath)) {
-            await unlink(filePath)
+            await fs.unlink(filePath)
         }
     } catch (err) {
         console.error('Failed to delete file from disk:', err)

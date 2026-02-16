@@ -6,17 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 // Mock dependencies
-jest.mock('@/lib/db', () => ({
-    prisma: {
-        project: {
-            findMany: jest.fn(),
-            findUnique: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            delete: jest.fn(),
-        },
-    },
-}))
+
 
 jest.mock('@/app/actions/activity-logs', () => ({
     logActivity: jest.fn(),
@@ -70,7 +60,7 @@ describe('Project Actions', () => {
                     status: 'active',
                 }),
             })
-            expect(logActivity).toHaveBeenCalledWith('CREATE', 'Project', undefined, expect.any(String))
+            expect(logActivity).toHaveBeenCalledWith('CREATE', 'Project', 'mock_project_id', expect.any(String))
             expect(redirect).toHaveBeenCalledWith('/projects')
         })
     })

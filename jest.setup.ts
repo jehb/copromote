@@ -152,3 +152,124 @@ window.HTMLElement.prototype.scrollIntoView = jest.fn()
 
 // Mock window.scrollTo
 window.scrollTo = jest.fn()
+
+// GLOBAL PRISMA MOCK
+const mockPrisma = {
+    user: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_user_id', role: 'ADMIN' }),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_user_id' }),
+        create: jest.fn().mockResolvedValue({ id: 'mock_user_id' }),
+        update: jest.fn().mockResolvedValue({ id: 'mock_user_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_user_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+    },
+    event: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
+        update: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
+    },
+    task: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
+        update: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
+        count: jest.fn().mockResolvedValue(0),
+    },
+    project: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
+        update: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
+    },
+    organization: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
+        update: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
+    },
+    contact: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
+        update: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
+    },
+    securityLog: {
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'mock_security_log_id' }),
+    },
+    calendarEvent: {
+        findMany: jest.fn().mockResolvedValue([]),
+    },
+    location: {
+        findMany: jest.fn().mockResolvedValue([]),
+        create: jest.fn().mockResolvedValue({ id: 'mock_location_id' }),
+    },
+    activityLog: {
+        create: jest.fn().mockResolvedValue({ id: 'mock_log_id' }),
+        deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+        findMany: jest.fn().mockResolvedValue([]),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_log_id' }),
+    },
+    hyperlink: {
+        findMany: jest.fn().mockResolvedValue([]),
+    },
+    promotionPeriod: {
+        create: jest.fn().mockResolvedValue({ id: 'mock_promo_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+    },
+    photo: {
+        create: jest.fn().mockResolvedValue({ id: 'mock_photo_id' }),
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_photo_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_photo_id' }),
+        findMany: jest.fn().mockResolvedValue([]),
+    },
+    socialPost: {
+        findMany: jest.fn().mockResolvedValue([]),
+    },
+    asset: {
+        create: jest.fn().mockResolvedValue({ id: 'mock_asset_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_asset_id' }),
+    },
+    photoCategory: {
+        findMany: jest.fn().mockResolvedValue([]),
+        upsert: jest.fn().mockResolvedValue({ id: 'mock_cat_id' }),
+    },
+    tag: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_tag_id' }),
+        create: jest.fn().mockResolvedValue({ id: 'mock_tag_id' }),
+    },
+    config: {
+        findUnique: jest.fn().mockResolvedValue({ key: 'mock_key', value: 'mock_value' }),
+        upsert: jest.fn().mockResolvedValue({ key: 'mock_key', value: 'mock_value' }),
+    },
+    $transaction: jest.fn((callback) => callback(mockPrisma)),
+}
+
+jest.mock('@/lib/db', () => ({
+    prisma: mockPrisma,
+}))
+
+jest.mock('@/lib/prisma', () => ({
+    prisma: mockPrisma,
+}))
+
+jest.mock('fs', () => ({
+    existsSync: jest.fn(),
+    promises: {
+        writeFile: jest.fn(),
+        unlink: jest.fn(),
+        mkdir: jest.fn(),
+    }
+}))
+
+jest.mock('fs/promises', () => ({
+    writeFile: jest.fn(),
+    unlink: jest.fn(),
+    mkdir: jest.fn(),
+}))

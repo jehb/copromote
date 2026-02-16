@@ -8,6 +8,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
     DialogTrigger
 } from '@/components/ui/dialog'
@@ -68,6 +69,9 @@ export function TaskDialog({ users, children, task, trigger, onSave, defaultProj
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>{isEditing ? 'Edit Task' : 'Create Task'}</DialogTitle>
+                    <DialogDescription>
+                        {isEditing ? 'Make changes to your task here. Click save when you\'re done.' : 'Add a new task to your project. Click save when you\'re done.'}
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form action={handleSubmit} className="grid gap-4 py-4">

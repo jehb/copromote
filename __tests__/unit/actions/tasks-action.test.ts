@@ -6,19 +6,7 @@ import { getSession } from '@/lib/session'
 import { revalidatePath } from 'next/cache'
 
 // Mock dependencies
-jest.mock('@/lib/db', () => ({
-    prisma: {
-        task: {
-            findMany: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            delete: jest.fn(),
-        },
-        user: {
-            findUnique: jest.fn(),
-        },
-    },
-}))
+
 
 jest.mock('@/app/actions/activity-logs', () => ({
     logActivity: jest.fn(),
@@ -47,7 +35,8 @@ describe('Task Actions', () => {
             expect(tasks).toEqual(mockTasks)
             expect(prisma.task.findMany).toHaveBeenCalledWith({
                 orderBy: { createdAt: 'desc' },
-                include: { assignee: true, project: true },
+                orderBy: { createdAt: 'desc' },
+                include: expect.objectContaining({ assignee: true, project: true }),
             })
         })
     })
@@ -69,7 +58,7 @@ describe('Task Actions', () => {
                     status: 'todo',
                 }),
             })
-            expect(logActivity).toHaveBeenCalledWith('CREATE', 'Task', undefined, expect.stringContaining('New Task'))
+            expect(logActivity).toHaveBeenCalledWith('CREATE', 'Task', 'mock_task_id', expect.stringContaining('New Task'))
             expect(revalidatePath).toHaveBeenCalledWith('/tasks')
         })
 

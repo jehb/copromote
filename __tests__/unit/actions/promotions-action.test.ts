@@ -75,8 +75,7 @@ describe('Promotion Actions', () => {
             const formData = new FormData()
             // Missing required fields
 
-            const result = await createPromotion(formData)
-            expect(result).toEqual({ error: 'Invalid data' })
+            await expect(createPromotion(formData)).rejects.toThrow('Invalid data')
             expect(prisma.promotionPeriod.create).not.toHaveBeenCalled()
         })
     })

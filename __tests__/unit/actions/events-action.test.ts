@@ -14,23 +14,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 // Mock dependencies
-jest.mock('@/lib/db', () => ({
-    prisma: {
-        event: {
-            findMany: jest.fn(),
-            findUnique: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            delete: jest.fn(),
-        },
-        location: {
-            findMany: jest.fn(),
-        },
-        user: {
-            findMany: jest.fn(),
-        }
-    },
-}))
+
 
 jest.mock('@/app/actions/activity-logs', () => ({
     logActivity: jest.fn(),
@@ -74,7 +58,7 @@ describe('Event Actions', () => {
                     locationId: 'loc-1',
                 })
             })
-            expect(logActivity).toHaveBeenCalledWith('CREATE', 'Event', undefined, expect.any(String))
+            expect(logActivity).toHaveBeenCalledWith('CREATE', 'Event', 'mock_event_id', expect.any(String))
             expect(redirect).toHaveBeenCalledWith('/events')
         })
     })
