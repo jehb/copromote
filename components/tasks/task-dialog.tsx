@@ -31,10 +31,35 @@ interface TaskDialogProps {
     projectId?: string
     defaultStatus?: string
     projects?: any[]
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
 }
 
-export function TaskDialog({ users, children, task, trigger, onSave, defaultProjectId, projectId, defaultStatus = 'todo', projects = [] }: TaskDialogProps) {
-    const [isOpen, setIsOpen] = useState(false)
+export function TaskDialog({
+    users,
+    children,
+    task,
+    trigger,
+    onSave,
+    defaultProjectId,
+    projectId,
+    defaultStatus = 'todo',
+    projects = [],
+    open: controlledOpen,
+    onOpenChange: setControlledOpen
+}: TaskDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false)
+    const isControlled = controlledOpen !== undefined
+    const isOpen = isControlled ? controlledOpen : internalOpen
+
+    const setIsOpen = (newOpen: boolean) => {
+        if (isControlled) {
+            setControlledOpen?.(newOpen)
+        } else {
+            setInternalOpen(newOpen)
+        }
+    }
+
     const [isAdmin, setIsAdmin] = useState(false)
     const isEditing = !!task
 
@@ -51,6 +76,7 @@ export function TaskDialog({ users, children, task, trigger, onSave, defaultProj
             await createTask(formData)
         }
         setIsOpen(false)
+        onSave?.()
     }
 
     const formatForInput = (date: Date) => {

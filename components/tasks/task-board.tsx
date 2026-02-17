@@ -1,19 +1,6 @@
 'use client'
 
-import { TaskDialog } from './task-dialog'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { format } from 'date-fns'
-import { Calendar, MoreHorizontal, Trash2 } from 'lucide-react'
-import { UserAvatar } from '@/components/ui/user-avatar'
-import { deleteTask, updateTaskStatus } from '@/app/actions/tasks'
-import { Button } from '@/components/ui/button'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { useState } from 'react'
 
 interface TaskBoardProps {
     tasks: any[]
@@ -22,6 +9,8 @@ interface TaskBoardProps {
 }
 
 export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
+    const [editingTask, setEditingTask] = useState<any>(null)
+
     const todoTasks = tasks.filter(t => t.status === 'todo')
     const progressTasks = tasks.filter(t => t.status === 'in-progress')
     const doneTasks = tasks.filter(t => t.status === 'done')
@@ -38,12 +27,12 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <TaskDialog
-                                users={users}
-                                task={task}
-                                projects={projects}
-                                trigger={<div className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Edit</div>}
-                            />
+                            <DropdownMenuItem onSelect={(e) => {
+                                e.preventDefault()
+                                setEditingTask(task)
+                            }}>
+                                Edit
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => deleteTask(task.id)} className="text-red-600 focus:text-red-600">
                                 Delete
                             </DropdownMenuItem>
@@ -170,9 +159,33 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                     {doneTasks.map(task => <TaskCard key={task.id} task={task} />)}
                 </div>
             </div>
+
+            {/* Central Edit Dialog */}
+            <TaskDialog
+                users={users}
+                projects={projects}
+                task={editingTask}
+                open={!!editingTask}
+                onOpenChange={(open) => !open && setEditingTask(null)}
+            />
         </div>
     )
 }
+
+import { TaskDialog } from './task-dialog'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { format } from 'date-fns'
+import { Calendar, MoreHorizontal } from 'lucide-react'
+import { UserAvatar } from '@/components/ui/user-avatar'
+import { deleteTask, updateTaskStatus } from '@/app/actions/tasks'
+import { Button } from '@/components/ui/button'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 function Plus({ className }: { className?: string }) {
     return (
