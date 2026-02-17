@@ -202,12 +202,18 @@ export async function importData(entity: string, data: any[]) {
                         update: {
                             name: row.Name,
                             startDate: new Date(row['Start Date'] || row.StartDate || Date.now()),
-                            endDate: new Date(row['End Date'] || row.EndDate || Date.now())
+                            endDate: new Date(row['End Date'] || row.EndDate || Date.now()),
+                            adLiveDate: row['Ad Live Date'] ? new Date(row['Ad Live Date']) : null,
+                            adImageDeadline: row['Ad Image Deadline'] ? new Date(row['Ad Image Deadline']) : null,
+                            adPublishingDeadline: row['Ad Publishing Deadline'] ? new Date(row['Ad Publishing Deadline']) : null
                         },
                         create: {
                             name: row.Name,
                             startDate: new Date(row['Start Date'] || row.StartDate || Date.now()),
-                            endDate: new Date(row['End Date'] || row.EndDate || new Date(Date.now() + 86400000 * 7)) // Default 1 week
+                            endDate: new Date(row['End Date'] || row.EndDate || new Date(Date.now() + 86400000 * 7)), // Default 1 week
+                            adLiveDate: row['Ad Live Date'] ? new Date(row['Ad Live Date']) : null,
+                            adImageDeadline: row['Ad Image Deadline'] ? new Date(row['Ad Image Deadline']) : null,
+                            adPublishingDeadline: row['Ad Publishing Deadline'] ? new Date(row['Ad Publishing Deadline']) : null
                         }
                     })
                     count++

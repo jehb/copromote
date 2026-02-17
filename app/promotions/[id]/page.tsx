@@ -45,6 +45,23 @@ export default async function PromotionDetailPage({ params }: { params: { id: st
                             <div className="text-center font-bold text-slate-400">to</div>
                             <div>{format(promotion.endDate, 'PPP')}</div>
                         </div>
+                        <div className="flex gap-2 text-xs">
+                            {promotion.adLiveDate && (
+                                <div className="bg-green-50 text-green-700 px-2 py-1 rounded border border-green-200">
+                                    Ad Live: {format(promotion.adLiveDate, 'PP')}
+                                </div>
+                            )}
+                            {promotion.adImageDeadline && (
+                                <div className="bg-amber-50 text-amber-700 px-2 py-1 rounded border border-amber-200">
+                                    Img Deadline: {format(promotion.adImageDeadline, 'PP')}
+                                </div>
+                            )}
+                            {promotion.adPublishingDeadline && (
+                                <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-200">
+                                    Pub Deadline: {format(promotion.adPublishingDeadline, 'PP')}
+                                </div>
+                            )}
+                        </div>
                         <Button variant="outline" size="sm" asChild>
                             <Link href={`/promotions/${id}/edit`}>Edit Details</Link>
                         </Button>

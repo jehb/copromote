@@ -45,6 +45,21 @@ export default async function EditPromotionPage({ params }: { params: { id: stri
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-3 gap-4 border-t pt-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="adLiveDate">Ad Live Date</Label>
+                                <Input type="date" id="adLiveDate" name="adLiveDate" defaultValue={promotion.adLiveDate ? promotion.adLiveDate.toISOString().split('T')[0] : ''} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="adImageDeadline">Image Deadline</Label>
+                                <Input type="date" id="adImageDeadline" name="adImageDeadline" defaultValue={promotion.adImageDeadline ? promotion.adImageDeadline.toISOString().split('T')[0] : ''} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="adPublishingDeadline">Publishing Deadline</Label>
+                                <Input type="date" id="adPublishingDeadline" name="adPublishingDeadline" defaultValue={promotion.adPublishingDeadline ? promotion.adPublishingDeadline.toISOString().split('T')[0] : ''} />
+                            </div>
+                        </div>
+
                         <div className="flex justify-end gap-3 pt-4">
                             <Button variant="outline" asChild>
                                 <Link href={`/promotions/${id}`}>Cancel</Link>

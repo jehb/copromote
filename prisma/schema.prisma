@@ -55,7 +55,10 @@ model PromotionPeriod {
   id        String       @id @default(uuid())
   name      String
   startDate DateTime
-  endDate   DateTime
+  endDate              DateTime
+  adLiveDate           DateTime?
+  adImageDeadline      DateTime?
+  adPublishingDeadline DateTime?
   assets    Asset[]
   posts     SocialPost[]
   createdAt DateTime     @default(now())

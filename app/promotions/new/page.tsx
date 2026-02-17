@@ -36,6 +36,21 @@ export default function NewPromotionPage() {
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-3 gap-4 border-t pt-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="adLiveDate">Ad Live Date</Label>
+                                <Input type="date" id="adLiveDate" name="adLiveDate" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="adImageDeadline">Image Deadline</Label>
+                                <Input type="date" id="adImageDeadline" name="adImageDeadline" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="adPublishingDeadline">Publishing Deadline</Label>
+                                <Input type="date" id="adPublishingDeadline" name="adPublishingDeadline" />
+                            </div>
+                        </div>
+
                         <div className="flex justify-end gap-3 pt-4">
                             <Button variant="outline" asChild>
                                 <Link href="/promotions">Cancel</Link>

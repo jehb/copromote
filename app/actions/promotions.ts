@@ -10,6 +10,9 @@ const PromotionSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     startDate: z.string().transform((str) => new Date(str)),
     endDate: z.string().transform((str) => new Date(str)),
+    adLiveDate: z.string().optional().transform((str) => str ? new Date(str) : null),
+    adImageDeadline: z.string().optional().transform((str) => str ? new Date(str) : null),
+    adPublishingDeadline: z.string().optional().transform((str) => str ? new Date(str) : null),
 })
 
 export async function getPromotions() {
@@ -41,6 +44,9 @@ export async function createPromotion(formData: FormData) {
         name: formData.get('name') as string,
         startDate: formData.get('startDate') as string,
         endDate: formData.get('endDate') as string,
+        adLiveDate: formData.get('adLiveDate') as string || undefined,
+        adImageDeadline: formData.get('adImageDeadline') as string || undefined,
+        adPublishingDeadline: formData.get('adPublishingDeadline') as string || undefined,
     }
 
     const result = PromotionSchema.safeParse(rawData)
@@ -64,6 +70,9 @@ export async function updatePromotion(id: string, formData: FormData) {
         name: formData.get('name') as string,
         startDate: formData.get('startDate') as string,
         endDate: formData.get('endDate') as string,
+        adLiveDate: formData.get('adLiveDate') as string || undefined,
+        adImageDeadline: formData.get('adImageDeadline') as string || undefined,
+        adPublishingDeadline: formData.get('adPublishingDeadline') as string || undefined,
     }
 
     const result = PromotionSchema.safeParse(rawData)

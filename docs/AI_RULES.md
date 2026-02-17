@@ -2,6 +2,12 @@
 
 This file contains persistent instructions for any AI coding agent working on this repository.
 
+# Best Practices
+
+* Always write command output to a temporary file for debugging.
+* Assume that I want temporary files cleaned up, documentation updated, and tests run succesfully before any git commit.
+* Unless I specify otherwise, please assume you should run `git commit` after any `git push` command.
+
 ## Documentation Maintenance
 
 > **Rule:** After every feature implementation, UI change, or functionality update, you MUST update the corresponding documentation.

@@ -115,6 +115,9 @@ export async function getExportData(entities: string[]) {
             Name: p.name,
             'Start Date': p.startDate.toISOString(),
             'End Date': p.endDate.toISOString(),
+            'Ad Live Date': p.adLiveDate ? p.adLiveDate.toISOString() : '',
+            'Ad Image Deadline': p.adImageDeadline ? p.adImageDeadline.toISOString() : '',
+            'Ad Publishing Deadline': p.adPublishingDeadline ? p.adPublishingDeadline.toISOString() : '',
             'Created At': p.createdAt.toISOString()
         }))
     }
