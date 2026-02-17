@@ -17,6 +17,7 @@ import {
     DialogTitle,
     DialogTrigger,
     DialogFooter,
+    DialogClose,
 } from '@/components/ui/dialog'
 import {
     Save,
@@ -373,12 +374,11 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                         </div>
                                     </div>
                                     <DialogFooter>
-                                        <Button type="button" onClick={(e) => {
-                                            const closeButton = (e.target as HTMLElement).closest('.fixed')?.querySelector('[data-radix-collection-item]') as HTMLElement;
-                                            // Close handled by DialogTrigger
-                                        }}>
-                                            Done
-                                        </Button>
+                                        <DialogClose asChild>
+                                            <Button type="button">
+                                                Done
+                                            </Button>
+                                        </DialogClose>
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
@@ -464,6 +464,13 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                             ))}
                                         </div>
                                     </div>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button type="button">
+                                                Done
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
                                 </DialogContent>
                             </Dialog>
                         </div>
