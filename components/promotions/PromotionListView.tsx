@@ -1,6 +1,6 @@
 'use client'
 
-import { format } from 'date-fns'
+import { formatDateUTC } from '@/lib/date-utils'
 import { Calendar, Trash2, ArrowRight, MoreHorizontal } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -78,7 +78,7 @@ export function PromotionListView({ promotions }: PromotionListViewProps) {
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Calendar className="h-4 w-4" />
                                         <span>
-                                            {format(promo.startDate, 'MMM d')} - {format(promo.endDate, 'MMM d, yyyy')}
+                                            {formatDateUTC(promo.startDate, 'MMM d')} - {formatDateUTC(promo.endDate, 'MMM d, yyyy')}
                                         </span>
                                     </div>
                                 </TableCell>

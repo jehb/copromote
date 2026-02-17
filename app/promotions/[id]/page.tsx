@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { format } from 'date-fns'
+import { formatDateUTC } from '@/lib/date-utils'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -41,24 +41,24 @@ export default async function PromotionDetailPage({ params }: { params: { id: st
                     <div className="flex flex-col items-end gap-2">
                         <div className="text-right text-sm text-muted-foreground bg-slate-100 p-3 rounded-md">
                             <div className="font-semibold text-slate-700">Duration</div>
-                            <div>{format(promotion.startDate, 'PPP')}</div>
+                            <div>{formatDateUTC(promotion.startDate, 'PPP')}</div>
                             <div className="text-center font-bold text-slate-400">to</div>
-                            <div>{format(promotion.endDate, 'PPP')}</div>
+                            <div>{formatDateUTC(promotion.endDate, 'PPP')}</div>
                         </div>
                         <div className="flex gap-2 text-xs">
                             {promotion.adLiveDate && (
                                 <div className="bg-green-50 text-green-700 px-2 py-1 rounded border border-green-200">
-                                    Ad Live: {format(promotion.adLiveDate, 'PP')}
+                                    Ad Live: {formatDateUTC(promotion.adLiveDate, 'PP')}
                                 </div>
                             )}
                             {promotion.adImageDeadline && (
                                 <div className="bg-amber-50 text-amber-700 px-2 py-1 rounded border border-amber-200">
-                                    Img Deadline: {format(promotion.adImageDeadline, 'PP')}
+                                    Img Deadline: {formatDateUTC(promotion.adImageDeadline, 'PP')}
                                 </div>
                             )}
                             {promotion.adPublishingDeadline && (
                                 <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded border border-blue-200">
-                                    Pub Deadline: {format(promotion.adPublishingDeadline, 'PP')}
+                                    Pub Deadline: {formatDateUTC(promotion.adPublishingDeadline, 'PP')}
                                 </div>
                             )}
                         </div>
@@ -172,7 +172,7 @@ export default async function PromotionDetailPage({ params }: { params: { id: st
                                     {post.content}
                                 </div>
                                 <div className="text-xs text-slate-500">
-                                    {post.scheduledDate ? format(post.scheduledDate, 'PPP p') : 'Unscheduled'}
+                                    {post.scheduledDate ? formatDateUTC(post.scheduledDate, 'PPP p') : 'Unscheduled'}
                                 </div>
                             </CardContent>
                         </Card>

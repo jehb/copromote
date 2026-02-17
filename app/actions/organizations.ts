@@ -135,9 +135,16 @@ export async function updateOrganization(formData: FormData) {
             throw error
         }
         console.error('Update Organization Error:', error)
-        // Log to a file we can read
+        // Log to a file we can read from the host
         const fs = await import('fs')
-        fs.appendFileSync('/home/jehb/projects/promoty/error_debug.log', `${new Date().toISOString()} - Update Organization Error: ${error.message}\n${error.stack}\n`)
+        const logMsg = `${new Date().toISOString()} - Update Organization Error: ${error.message}\n` +
+            `Stack: ${error.stack}\n` +
+            `Data: ${JSON.stringify({ id: formData.get('id'), name: formData.get('name'), category: formData.get('category'), descriptionLength: (formData.get('description') as string)?.length })}\n\n`
+        try {
+            fs.appendFileSync('/app/data/error_debug.log', logMsg)
+        } catch (logErr) {
+            console.error('Failed to write to log file:', logErr)
+        }
         throw error
     }
 }

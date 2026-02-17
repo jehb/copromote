@@ -1,6 +1,6 @@
 'use client'
 
-import { format } from 'date-fns'
+import { formatDateUTC } from '@/lib/date-utils'
 import { Calendar, Trash2, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -46,7 +46,7 @@ export function PromotionGridView({ promotions }: PromotionGridViewProps) {
                             <div className="text-sm text-muted-foreground flex items-center gap-2">
                                 <Calendar className="h-4 w-4" />
                                 <span>
-                                    {format(promo.startDate, 'MMM d')} - {format(promo.endDate, 'MMM d, yyyy')}
+                                    {formatDateUTC(promo.startDate, 'MMM d')} - {formatDateUTC(promo.endDate, 'MMM d, yyyy')}
                                 </span>
                             </div>
 

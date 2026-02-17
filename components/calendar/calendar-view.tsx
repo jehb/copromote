@@ -16,6 +16,7 @@ import {
     addMonths,
     subMonths
 } from 'date-fns'
+import { isSameDayUTC } from '@/lib/date-utils'
 import { cn } from '@/lib/utils'
 import { Instagram, Facebook, Linkedin, Twitter, MessageSquare } from 'lucide-react'
 
@@ -144,7 +145,7 @@ export function CalendarView({
                     ))}
 
                     {days.map(day => {
-                        const dayEvents = filteredEvents.filter(e => isSameDay(e.date, day))
+                        const dayEvents = filteredEvents.filter(e => isSameDayUTC(e.date, day))
                         return (
                             <div
                                 key={day.toISOString()}
