@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Check, Sparkles, Globe, Key, Cpu, Loader2 } from 'lucide-react'
 import { getConfig, updateConfig } from '@/app/actions/settings'
-import { testAIConnection, fetchLocalModels } from '@/app/actions/ai'
+import { testAIConnection, fetchLocalModels, fetchGeminiModels } from '@/app/actions/ai'
 import {
     Select,
     SelectContent,
@@ -157,9 +157,7 @@ function AIConfig() {
     const [baseUrl, setBaseUrl] = useState('')
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [testing, setTesting] = useState(false)
     const [status, setStatus] = useState<{ type: 'success' | 'error' | 'testing', message: string } | null>(null)
-    const [testResult, setTestResult] = useState<{ success: boolean, message: string } | null>(null)
 
     useEffect(() => {
         async function loadConfig() {
@@ -192,27 +190,47 @@ function AIConfig() {
         setSaving(true)
         setStatus(null)
         try {
+            let finalModel = model
+            if (!finalModel) {
+                if (provider === 'gemini') {
+                    // Try to fetch models and pick a default if none selected
+                    try {
+                        const availableModels = await fetchGeminiModels(apiKey)
+                        if (availableModels.length > 0) {
+                            // Default to 1.5-flash if available, else first one
+                            finalModel = availableModels.includes('gemini-1.5-flash')
+                                ? 'gemini-1.5-flash'
+                                : availableModels[0]
+                            setModel(finalModel)
+                        } else {
+                            finalModel = 'gemini-1.5-flash' // Hard fallback
+                            setModel(finalModel)
+                        }
+                    } catch (e) {
+                        finalModel = 'gemini-1.5-flash' // Fallback on error
+                        setModel(finalModel)
+                    }
+                } else if (provider === 'openai') {
+                    finalModel = 'gpt-3.5-turbo'
+                    setModel(finalModel)
+                }
+            }
+
             await updateConfig('AI_PROVIDER', provider)
-            await updateConfig('AI_MODEL', model)
+            await updateConfig('AI_MODEL', finalModel)
             await updateConfig('AI_API_KEY', apiKey)
             await updateConfig('AI_BASE_URL', baseUrl)
             setStatus({ type: 'success', message: 'AI configuration saved successfully.' })
 
-            // Run test connection
-            setTesting(true)
-            setStatus({ type: 'testing', message: 'Testing connection to AI provider...' })
             try {
                 const result = await testAIConnection()
-                setTestResult(result)
                 if (result.success) {
                     setStatus({ type: 'success', message: `Saved & Verified: ${result.message}` })
                 } else {
                     setStatus({ type: 'error', message: `Saved but Error: ${result.message}` })
                 }
-            } catch (err: any) {
-                setStatus({ type: 'error', message: `Saved but failed to test: ${err.message}` })
             } finally {
-                setTesting(false)
+                // Done
             }
         } catch (err) {
             console.error('Failed to save AI config:', err)
@@ -259,10 +277,12 @@ function AIConfig() {
                         <Cpu className="h-4 w-4 text-slate-400" />
                         Model Name
                     </Label>
-                    <div className="flex gap-2">
-                        {provider === 'local' ? (
+                    <div className="flex gap-2 w-full">
+                        {provider === 'local' || provider === 'gemini' ? (
                             <ModelSelector
+                                provider={provider}
                                 baseUrl={baseUrl || 'http://127.0.0.1:1234'}
+                                apiKey={apiKey}
                                 value={model}
                                 onChange={setModel}
                             />
@@ -348,7 +368,13 @@ function AIConfig() {
     )
 }
 
-function ModelSelector({ baseUrl, value, onChange }: { baseUrl: string, value: string, onChange: (v: string) => void }) {
+function ModelSelector({ baseUrl, apiKey, provider, value, onChange }: {
+    baseUrl: string,
+    apiKey?: string,
+    provider: string,
+    value: string,
+    onChange: (v: string) => void
+}) {
     const [models, setModels] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
     const [fetched, setFetched] = useState(false)
@@ -356,16 +382,28 @@ function ModelSelector({ baseUrl, value, onChange }: { baseUrl: string, value: s
     const handleFetch = async () => {
         setLoading(true)
         try {
-            const list = await fetchLocalModels(baseUrl)
+            let list: string[] = []
+            if (provider === 'local') {
+                list = await fetchLocalModels(baseUrl)
+            } else if (provider === 'gemini') {
+                if (!apiKey) throw new Error('API Key required to fetch models')
+                list = await fetchGeminiModels(apiKey)
+            }
             setModels(list)
             setFetched(true)
             if (list.length > 0 && !value) {
-                onChange(list[0])
+                // For Gemini, try to default to flash if it exists in the list
+                if (provider === 'gemini' && list.includes('gemini-1.5-flash')) {
+                    onChange('gemini-1.5-flash')
+                } else {
+                    onChange(list[0])
+                }
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to fetch models', err)
             // Fallback to manual input if fetch fails
             setFetched(false)
+            // alert(err.message || 'Failed to fetch models')
         } finally {
             setLoading(false)
         }

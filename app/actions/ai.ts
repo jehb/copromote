@@ -25,12 +25,40 @@ export async function fetchLocalModels(baseUrl: string) {
         const data = await response.json();
         // Standard OpenAI response: { data: [{ id: 'model-id', ... }] }
         if (data && Array.isArray(data.data)) {
-            return data.data.map((m: any) => m.id);
+            return data.data.map((m: { id: string }) => m.id);
         }
         return [];
     } catch (err: any) {
         console.error('Fetch Models Error:', err);
         throw new Error(`Failed to connect to local server: ${err.message}`);
+    }
+}
+
+/**
+ * Fetches available models from Google Gemini.
+ */
+export async function fetchGeminiModels(apiKey: string) {
+    console.log('Fetching Gemini models...');
+    try {
+        // v1beta is often needed for the latest models, but v1 is more stable.
+        // The user's error mentioned v1beta, so we'll try to list from there.
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error?.message || `Failed to fetch Gemini models: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (data && Array.isArray(data.models)) {
+            return data.models
+                .filter((m: { name: string, supportedGenerationMethods?: string[] }) => m.supportedGenerationMethods?.includes('generateContent'))
+                .map((m: { name: string }) => m.name.replace('models/', ''));
+        }
+        return [];
+    } catch (err: any) {
+        console.error('Fetch Gemini Models Error:', err);
+        throw new Error(`Failed to fetch Gemini models: ${err.message}`);
     }
 }
 
@@ -110,8 +138,10 @@ export async function testAIConnection() {
         let advice = ''
         if (err.message?.includes('fetch failed')) {
             advice = ' (Connection refused. Is your local LLM server running?)'
-        } else if (err.status === 404) {
-            advice = ' (404 Not Found. Check if the Base URL and Model Name are correct.)'
+        } else if (err.status === 404 || err.message?.includes('404')) {
+            advice = ' (404 Not Found. Check if the Model Name is correct and available for your account.)'
+        } else if (err.message?.includes('API_KEY_INVALID')) {
+            advice = ' (Invalid API Key. Please check your credentials.)'
         }
         return { success: false, message: (err.message || 'Connection failed') + advice }
     }
