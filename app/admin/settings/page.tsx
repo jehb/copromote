@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Check, Sparkles, Globe, Key, Cpu, Loader2 } from 'lucide-react'
+import { Check, Sparkles, Globe, Key, Cpu, Loader2, MessageSquare } from 'lucide-react'
 import { getConfig, updateConfig } from '@/app/actions/settings'
 import { testAIConnection, fetchLocalModels, fetchGeminiModels } from '@/app/actions/ai'
 import {
@@ -155,6 +155,7 @@ function AIConfig() {
     const [model, setModel] = useState('')
     const [apiKey, setApiKey] = useState('')
     const [baseUrl, setBaseUrl] = useState('')
+    const [chatInstructions, setChatInstructions] = useState('')
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [status, setStatus] = useState<{ type: 'success' | 'error' | 'testing', message: string } | null>(null)
@@ -166,11 +167,13 @@ function AIConfig() {
                 const m = await getConfig('AI_MODEL')
                 const k = await getConfig('AI_API_KEY')
                 const b = await getConfig('AI_BASE_URL')
+                const ci = await getConfig('AI_CHAT_INSTRUCTIONS')
 
                 if (p) setProvider(p)
                 if (m) setModel(m)
                 if (k) setApiKey(k)
                 if (b) setBaseUrl(b)
+                if (ci) setChatInstructions(ci)
 
                 if (!k) {
                     const legacyKey = await getConfig('GEMINI_API_KEY')
@@ -220,6 +223,7 @@ function AIConfig() {
             await updateConfig('AI_MODEL', finalModel)
             await updateConfig('AI_API_KEY', apiKey)
             await updateConfig('AI_BASE_URL', baseUrl)
+            await updateConfig('AI_CHAT_INSTRUCTIONS', chatInstructions)
             setStatus({ type: 'success', message: 'AI configuration saved successfully.' })
 
             try {
@@ -336,6 +340,22 @@ function AIConfig() {
                     </p>
                 </div>
             )}
+
+            <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-slate-400" />
+                    AI Chat Instructions
+                </Label>
+                <textarea
+                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-sans"
+                    placeholder="Enter instructions for the AI Chat (e.g. 'You are a helpful assistant for NCG...')"
+                    value={chatInstructions}
+                    onChange={(e) => setChatInstructions(e.target.value)}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                    Global instructions for the AI Chat Assistant.
+                </p>
+            </div>
 
             <div className="pt-2 flex flex-col gap-4">
                 <Button type="submit" disabled={saving} className="w-full md:w-auto min-w-[120px]">

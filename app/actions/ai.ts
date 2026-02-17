@@ -65,7 +65,10 @@ export async function fetchGeminiModels(apiKey: string) {
 /**
  * Gets the configured AI provider settings from the database.
  */
-async function getAISettings() {
+/**
+ * Gets the configured AI provider settings from the database.
+ */
+export async function getAISettings() {
     const provider = await getConfig('AI_PROVIDER') || 'gemini'
     const model = await getConfig('AI_MODEL')
     const apiKey = await getConfig('AI_API_KEY')
@@ -77,7 +80,10 @@ async function getAISettings() {
 /**
  * Normalizes local URLs for Ollama/LMStudio compatibility.
  */
-function getFinalBaseUrl(baseUrl: string | null, provider: string) {
+/**
+ * Normalizes local URLs for Ollama/LMStudio compatibility.
+ */
+export function getFinalBaseUrl(baseUrl: string | null, provider: string) {
     if (provider !== 'openai' && provider !== 'local') return undefined
 
     let url = baseUrl || (provider === 'local' ? 'http://127.0.0.1:1234' : 'https://api.openai.com/v1')
