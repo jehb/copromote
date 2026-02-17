@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db' // Ensure you have this configured
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logActivity } from '@/app/actions/activity-logs'
-import { getCurrentUserId } from '@/lib/user-util'
+import { getCurrentUserId, getCurrentUser } from '@/lib/user-util'
 
 export async function getProjects() {
     return await prisma.project.findMany({
@@ -125,6 +125,11 @@ export async function createProject(formData: FormData) {
 }
 
 export async function deleteProject(id: string) {
+    const user = await getCurrentUser()
+    if (user?.role !== 'ADMIN') {
+        throw new Error('Only admins can delete projects')
+    }
+
     await prisma.project.delete({ where: { id } })
     await logActivity('DELETE', 'Project', id, 'Deleted project')
     revalidatePath('/projects')

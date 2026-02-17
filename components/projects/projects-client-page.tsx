@@ -7,14 +7,17 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import Link from 'next/link'
-import { Plus, ArrowRight, Loader2, FolderOpen, FolderKanban } from 'lucide-react'
+import { Plus, ArrowRight, Loader2, FolderOpen, FolderKanban, Trash2 } from 'lucide-react'
+import { deleteProject } from '@/app/actions/projects'
 import { PageHeader } from '@/components/ui/page-header'
+import { ProjectDeleteDialog } from '@/components/projects/project-delete-dialog'
 
 interface ProjectsClientPageProps {
     initialProjects: any[]
+    userRole?: string
 }
 
-export function ProjectsClientPage({ initialProjects }: ProjectsClientPageProps) {
+export function ProjectsClientPage({ initialProjects, userRole }: ProjectsClientPageProps) {
     const { data: projects = initialProjects, isLoading } = useQuery({
         queryKey: ['projects'],
         queryFn: () => getProjects(),
@@ -97,13 +100,17 @@ export function ProjectsClientPage({ initialProjects }: ProjectsClientPageProps)
                                 </div>
                             </div>
                         </CardContent>
-                        <CardFooter className="pt-2 bg-slate-50/30">
-                            <Button className="w-full group/btn bg-white hover:bg-slate-900 border-slate-200 text-slate-600 hover:text-white transition-all shadow-sm font-bold text-xs uppercase tracking-widest h-10" variant="outline" asChild>
+                        <CardFooter className="pt-2 bg-slate-50/30 gap-2">
+                            <Button className="flex-1 group/btn bg-white hover:bg-slate-900 border-slate-200 text-slate-600 hover:text-white transition-all shadow-sm font-bold text-xs uppercase tracking-widest h-10" variant="outline" asChild>
                                 <Link href={`/projects/${project.id}`}>
-                                    Manage Project
+                                    Manage
                                     <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover/btn:translate-x-1" />
                                 </Link>
                             </Button>
+
+                            {userRole === 'ADMIN' && (
+                                <ProjectDeleteDialog projectId={project.id} projectName={project.name} />
+                            )}
                         </CardFooter>
                     </Card>
                 ))}

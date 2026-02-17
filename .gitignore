@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# temporary logs and outputs
+*.log
+*_output.txt
+

@@ -19,11 +19,11 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Link as LinkIcon, FileText, Image as ImageIcon, Video, CheckCircle2, Circle, Clock, User as UserIcon, Calendar, ArrowLeft } from 'lucide-react'
+import { Trash2, Link as LinkIcon, FileText, Image as ImageIcon, Video, CheckCircle2, Circle, Clock, User as UserIcon, Calendar, ArrowLeft, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { TaskDialog } from '@/components/tasks/task-dialog'
 import { AuditInfo } from '@/components/common/audit-info'
-import { Settings } from 'lucide-react'
+import { ProjectDeleteDialog } from '@/components/projects/project-delete-dialog'
 
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
     const { id } = await params
@@ -102,6 +102,10 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                                     </form>
                                 </DialogContent>
                             </Dialog>
+
+                            {currentUser?.role === 'ADMIN' && (
+                                <ProjectDeleteDialog projectId={project.id} projectName={project.name} />
+                            )}
                         </div>
                     </div>
                     <p className="text-muted-foreground text-lg max-w-2xl">{project.description}</p>
