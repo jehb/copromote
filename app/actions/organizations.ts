@@ -82,53 +82,64 @@ export async function createOrganization(formData: FormData) {
 }
 
 export async function updateOrganization(formData: FormData) {
-    const id = formData.get('id') as string
-    const name = formData.get('name') as string
-    const category = formData.get('category') as string
-    const description = formData.get('description') as string
-    const website = formData.get('website') as string
-    const primaryContactId = formData.get('primaryContactId') as string
+    try {
+        const id = formData.get('id') as string
+        const name = formData.get('name') as string
+        const category = formData.get('category') as string
+        const description = formData.get('description') as string
+        const website = formData.get('website') as string
+        const primaryContactId = formData.get('primaryContactId') as string
 
-    // Get current state for diffing
-    const currentOrg = await prisma.organization.findUnique({
-        where: { id },
-        include: { primaryContact: true }
-    })
+        // Get current state for diffing
+        const currentOrg = await prisma.organization.findUnique({
+            where: { id },
+            include: { primaryContact: true }
+        })
 
-    const newPrimaryContactId = (primaryContactId && primaryContactId !== 'none') ? primaryContactId : null
+        const newPrimaryContactId = (primaryContactId && primaryContactId !== 'none') ? primaryContactId : null
 
-    await prisma.organization.update({
-        where: { id },
-        data: {
-            name,
-            category,
-            description,
-            website,
-            primaryContactId: newPrimaryContactId,
-            updatedById: await getCurrentUserId()
-        }
-    })
+        await prisma.organization.update({
+            where: { id },
+            data: {
+                name,
+                category,
+                description,
+                website,
+                primaryContactId: newPrimaryContactId,
+                updatedById: await getCurrentUserId()
+            }
+        })
 
-    // Calculate diff
-    const changes: Record<string, { from: any, to: any }> = {}
-    if (currentOrg) {
-        if (currentOrg.name !== name) changes.name = { from: currentOrg.name, to: name }
-        if (currentOrg.category !== category) changes.category = { from: currentOrg.category, to: category }
-        if (currentOrg.description !== description) changes.description = { from: currentOrg.description, to: description }
-        if (currentOrg.website !== website) changes.website = { from: currentOrg.website, to: website }
-        if (currentOrg.primaryContactId !== newPrimaryContactId) {
-            changes.primaryContact = {
-                from: currentOrg.primaryContactId,
-                to: newPrimaryContactId
+        // Calculate diff
+        const changes: Record<string, { from: any, to: any }> = {}
+        if (currentOrg) {
+            if (currentOrg.name !== name) changes.name = { from: currentOrg.name, to: name }
+            if (currentOrg.category !== category) changes.category = { from: currentOrg.category, to: category }
+            if (currentOrg.description !== description) changes.description = { from: currentOrg.description, to: description }
+            if (currentOrg.website !== website) changes.website = { from: currentOrg.website, to: website }
+            if (currentOrg.primaryContactId !== newPrimaryContactId) {
+                changes.primaryContact = {
+                    from: currentOrg.primaryContactId,
+                    to: newPrimaryContactId
+                }
             }
         }
+
+        await logActivity('UPDATE', 'Organization', id, `Updated organization: ${name}`, changes)
+
+        revalidatePath('/organizations')
+        revalidatePath(`/organizations/${id}`)
+        redirect('/organizations')
+    } catch (error: any) {
+        if (error.digest?.startsWith('NEXT_REDIRECT')) {
+            throw error
+        }
+        console.error('Update Organization Error:', error)
+        // Log to a file we can read
+        const fs = await import('fs')
+        fs.appendFileSync('/home/jehb/projects/promoty/error_debug.log', `${new Date().toISOString()} - Update Organization Error: ${error.message}\n${error.stack}\n`)
+        throw error
     }
-
-    await logActivity('UPDATE', 'Organization', id, `Updated organization: ${name}`, changes)
-
-    revalidatePath('/organizations')
-    revalidatePath(`/organizations/${id}`)
-    redirect('/organizations')
 }
 
 export async function deleteOrganization(id: string) {

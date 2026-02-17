@@ -11,92 +11,105 @@ model Project {
   id          String          @id @default(uuid())
   name        String
   description String?
-  status      String          @default("active") // active, completed, archived
+  status      String          @default("active")
   startDate   DateTime
   endDate     DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   createdById String?
-  createdBy   User?           @relation("ProjectCreator", fields: [createdById], references: [id])
   updatedById String?
-  updatedBy   User?           @relation("ProjectUpdater", fields: [updatedById], references: [id])
   assets      Asset[]
   events      CalendarEvent[]
+  createdBy   User?           @relation("ProjectCreator", fields: [createdById], references: [id])
+  updatedBy   User?           @relation("ProjectUpdater", fields: [updatedById], references: [id])
   tasks       Task[]
+
+  @@index([createdById], map: "Project_createdById_fkey")
+  @@index([updatedById], map: "Project_updatedById_fkey")
 }
 
 model Asset {
   id                String           @id @default(uuid())
   name              String
-  type              String // image, video, document, etc.
+  type              String
   url               String
   projectId         String?
-  project           Project?         @relation(fields: [projectId], references: [id], onDelete: Cascade)
   promotionPeriodId String?
-  promotionPeriod   PromotionPeriod? @relation(fields: [promotionPeriodId], references: [id])
   socialPostId      String?
-  socialPost        SocialPost?      @relation(fields: [socialPostId], references: [id])
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
+  project           Project?         @relation(fields: [projectId], references: [id])
+  promotionPeriod   PromotionPeriod? @relation(fields: [promotionPeriodId], references: [id])
+  socialPost        SocialPost?      @relation(fields: [socialPostId], references: [id])
+
+  @@index([projectId], map: "Asset_projectId_fkey")
+  @@index([promotionPeriodId], map: "Asset_promotionPeriodId_fkey")
+  @@index([socialPostId], map: "Asset_socialPostId_fkey")
 }
 
 model CalendarEvent {
   id        String   @id @default(uuid())
   title     String
   date      DateTime
-  type      String // promotion, launch, deadline
+  type      String
   projectId String?
-  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  project   Project? @relation(fields: [projectId], references: [id])
+
+  @@index([projectId], map: "CalendarEvent_projectId_fkey")
 }
 
 model PromotionPeriod {
-  id        String       @id @default(uuid())
-  name      String
-  startDate DateTime
+  id                   String       @id @default(uuid())
+  name                 String
+  startDate            DateTime
   endDate              DateTime
-  adLiveDate           DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
   adImageDeadline      DateTime?
+  adLiveDate           DateTime?
   adPublishingDeadline DateTime?
-  assets    Asset[]
-  posts     SocialPost[]
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  assets               Asset[]
+  posts                SocialPost[]
 }
 
 model SocialPost {
   id                String           @id @default(uuid())
   content           String
-  platform          String // Instagram, Facebook, Twitter, LinkedIn
+  platform          String
   scheduledDate     DateTime?
-  status            String           @default("draft") // draft, scheduled, published, ready-for-review
-  tags              Tag[]
-  assets            Asset[]
-  photos            Photo[]
+  status            String           @default("draft")
   promotionPeriodId String?
-  promotionPeriod   PromotionPeriod? @relation(fields: [promotionPeriodId], references: [id])
   reviewerId        String?
-  reviewer          User?            @relation("PostReviewer", fields: [reviewerId], references: [id])
   eventId           String?
-  event             Event?           @relation(fields: [eventId], references: [id])
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
+  assets            Asset[]
+  event             Event?           @relation(fields: [eventId], references: [id])
+  promotionPeriod   PromotionPeriod? @relation(fields: [promotionPeriodId], references: [id])
+  reviewer          User?            @relation("PostReviewer", fields: [reviewerId], references: [id])
+  photos            Photo[]          @relation("PhotoToSocialPost")
+  tags              Tag[]            @relation("SocialPostToTag")
+
+  @@index([eventId], map: "SocialPost_eventId_fkey")
+  @@index([promotionPeriodId], map: "SocialPost_promotionPeriodId_fkey")
+  @@index([reviewerId], map: "SocialPost_reviewerId_fkey")
 }
 
 model Tag {
   id     String       @id @default(uuid())
   name   String       @unique
-  posts  SocialPost[]
-  photos Photo[]
+  photos Photo[]      @relation("PhotoToTag")
+  posts  SocialPost[] @relation("SocialPostToTag")
 }
 
 model PhotoCategory {
   id        String   @id @default(uuid())
   name      String   @unique
-  photos    Photo[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  photos    Photo[]
 }
 
 model Photo {
@@ -104,41 +117,43 @@ model Photo {
   url        String
   name       String?
   categoryId String
-  category   PhotoCategory @relation(fields: [categoryId], references: [id])
-  tags       Tag[]
-  posts      SocialPost[]
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+  category   PhotoCategory @relation(fields: [categoryId], references: [id])
+  posts      SocialPost[]  @relation("PhotoToSocialPost")
+  tags       Tag[]         @relation("PhotoToTag")
+
+  @@index([categoryId], map: "Photo_categoryId_fkey")
 }
 
 model User {
-  id                    String         @id @default(uuid())
-  name                  String
-  email                 String         @unique
-  username              String         @unique @default("admin") // Temporary default for migration
-  password              String         @default("$2a$10$......................") // Temporary hash
-  role                  String         @default("USER") // ADMIN, USER, EDITOR
-  mustChangePassword    Boolean        @default(true)
-  avatar                String?
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
-  events                Event[]
-  tasks                 Task[]
-  reviewedPosts         SocialPost[]   @relation("PostReviewer")
-  SecurityLog           SecurityLog[]
-  contactId             String?        @unique
-  contact               Contact?       @relation(fields: [contactId], references: [id])
-  activityLogs          ActivityLog[]
-  createdProjects       Project[]      @relation("ProjectCreator")
-  updatedProjects       Project[]      @relation("ProjectUpdater")
-  createdTasks          Task[]         @relation("TaskCreator")
-  updatedTasks          Task[]         @relation("TaskUpdater")
-  createdEvents         Event[]        @relation("EventCreator")
-  updatedEvents         Event[]        @relation("EventUpdater")
-  createdContacts       Contact[]      @relation("ContactCreator")
-  updatedContacts       Contact[]      @relation("ContactUpdater")
-  createdOrganizations  Organization[] @relation("OrganizationCreator")
-  updatedOrganizations  Organization[] @relation("OrganizationUpdater")
+  id                   String         @id @default(uuid())
+  name                 String
+  email                String         @unique
+  username             String         @unique @default("admin")
+  password             String         @default("$2a$10$......................")
+  role                 String         @default("USER")
+  mustChangePassword   Boolean        @default(true)
+  avatar               String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  contactId            String?        @unique
+  activityLogs         ActivityLog[]
+  createdContacts      Contact[]      @relation("ContactCreator")
+  updatedContacts      Contact[]      @relation("ContactUpdater")
+  createdEvents        Event[]        @relation("EventCreator")
+  events               Event[]
+  updatedEvents        Event[]        @relation("EventUpdater")
+  createdOrganizations Organization[] @relation("OrganizationCreator")
+  updatedOrganizations Organization[] @relation("OrganizationUpdater")
+  createdProjects      Project[]      @relation("ProjectCreator")
+  updatedProjects      Project[]      @relation("ProjectUpdater")
+  SecurityLog          SecurityLog[]
+  reviewedPosts        SocialPost[]   @relation("PostReviewer")
+  tasks                Task[]
+  createdTasks         Task[]         @relation("TaskCreator")
+  updatedTasks         Task[]         @relation("TaskUpdater")
+  contact              Contact?       @relation(fields: [contactId], references: [id])
 }
 
 model Event {
@@ -148,57 +163,68 @@ model Event {
   startTime        DateTime
   endTime          DateTime
   locationId       String
-  location         Location       @relation(fields: [locationId], references: [id])
   primaryContactId String?
-  primaryContact   User?          @relation(fields: [primaryContactId], references: [id])
   seriesId         String?
-  series           EventSeries?   @relation(fields: [seriesId], references: [id])
-  socialPosts      SocialPost[]
-  contacts         Contact[]      @relation("EventContacts")
-  organizations    Organization[] @relation("EventOrganizations")
   wordpressId      Int?
   wordpressUrl     String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   createdById      String?
-  createdBy        User?          @relation("EventCreator", fields: [createdById], references: [id])
   updatedById      String?
+  createdBy        User?          @relation("EventCreator", fields: [createdById], references: [id])
+  location         Location       @relation(fields: [locationId], references: [id])
+  primaryContact   User?          @relation(fields: [primaryContactId], references: [id])
+  series           EventSeries?   @relation(fields: [seriesId], references: [id])
   updatedBy        User?          @relation("EventUpdater", fields: [updatedById], references: [id])
+  socialPosts      SocialPost[]
+  contacts         Contact[]      @relation("EventContacts")
+  organizations    Organization[] @relation("EventOrganizations")
+
+  @@index([createdById], map: "Event_createdById_fkey")
+  @@index([locationId], map: "Event_locationId_fkey")
+  @@index([primaryContactId], map: "Event_primaryContactId_fkey")
+  @@index([seriesId], map: "Event_seriesId_fkey")
+  @@index([updatedById], map: "Event_updatedById_fkey")
 }
 
 model EventSeries {
   id          String   @id @default(uuid())
   title       String
   description String?
-  events      Event[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  events      Event[]
 }
 
 model Task {
   id          String    @id @default(uuid())
   title       String
   description String?
-  status      String    @default("todo") // todo, in-progress, done
+  status      String    @default("todo")
   dueDate     DateTime?
   assigneeId  String?
-  assignee    User?     @relation(fields: [assigneeId], references: [id])
   projectId   String?
-  project     Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   createdById String?
-  createdBy   User?     @relation("TaskCreator", fields: [createdById], references: [id])
   updatedById String?
+  assignee    User?     @relation(fields: [assigneeId], references: [id])
+  createdBy   User?     @relation("TaskCreator", fields: [createdById], references: [id])
+  project     Project?  @relation(fields: [projectId], references: [id])
   updatedBy   User?     @relation("TaskUpdater", fields: [updatedById], references: [id])
+
+  @@index([assigneeId], map: "Task_assigneeId_fkey")
+  @@index([createdById], map: "Task_createdById_fkey")
+  @@index([projectId], map: "Task_projectId_fkey")
+  @@index([updatedById], map: "Task_updatedById_fkey")
 }
 
 model Location {
   id        String   @id @default(uuid())
   name      String   @unique
-  events    Event[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  events    Event[]
 }
 
 model Config {
@@ -218,59 +244,70 @@ model Contact {
   company        String?
   jobTitle       String?
   notes          String?
-  type           String // Client, Vendor, Performer, Internal, etc.
+  type           String
   organizationId String?
-  organization   Organization? @relation("OrganizationContacts", fields: [organizationId], references: [id])
-  primaryFor     Organization? @relation("PrimaryContact")
-  events         Event[]       @relation("EventContacts")
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  user           User?
   createdById    String?
-  createdBy      User?         @relation("ContactCreator", fields: [createdById], references: [id])
   updatedById    String?
+  createdBy      User?         @relation("ContactCreator", fields: [createdById], references: [id])
+  organization   Organization? @relation("OrganizationContacts", fields: [organizationId], references: [id])
   updatedBy      User?         @relation("ContactUpdater", fields: [updatedById], references: [id])
+  primaryFor     Organization? @relation("PrimaryContact")
+  user           User?
+  events         Event[]       @relation("EventContacts")
+
+  @@index([createdById], map: "Contact_createdById_fkey")
+  @@index([organizationId], map: "Contact_organizationId_fkey")
+  @@index([updatedById], map: "Contact_updatedById_fkey")
 }
 
 model Organization {
   id               String    @id @default(uuid())
   name             String
-  category         String // Community Partner, Vendor, Band, etc.
+  category         String
   description      String?
   website          String?
   primaryContactId String?   @unique
-  primaryContact   Contact?  @relation("PrimaryContact", fields: [primaryContactId], references: [id])
-  contacts         Contact[] @relation("OrganizationContacts")
-  events           Event[]   @relation("EventOrganizations")
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   createdById      String?
-  createdBy        User?     @relation("OrganizationCreator", fields: [createdById], references: [id])
   updatedById      String?
+  contacts         Contact[] @relation("OrganizationContacts")
+  createdBy        User?     @relation("OrganizationCreator", fields: [createdById], references: [id])
+  primaryContact   Contact?  @relation("PrimaryContact", fields: [primaryContactId], references: [id])
   updatedBy        User?     @relation("OrganizationUpdater", fields: [updatedById], references: [id])
+  events           Event[]   @relation("EventOrganizations")
+
+  @@index([createdById], map: "Organization_createdById_fkey")
+  @@index([updatedById], map: "Organization_updatedById_fkey")
 }
 
 model SecurityLog {
   id        String   @id @default(uuid())
-  action    String // LOGIN, LOGOUT, FAILED_LOGIN, CREATE_USER, etc.
+  action    String
   details   String?
   ipAddress String?
   userAgent String?
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "SecurityLog_userId_fkey")
 }
 
 model ActivityLog {
   id         String   @id @default(uuid())
-  action     String // CREATE, UPDATE, DELETE
-  entityType String // Event, Task, Project, etc.
+  action     String
+  entityType String
   entityId   String?
   details    String?
-  metadata   String? // JSON string for structured changes
+  metadata   String?
   userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
   createdAt  DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId], map: "ActivityLog_userId_fkey")
 }
 
 model Hyperlink {
@@ -284,11 +321,11 @@ model Hyperlink {
 }
 
 model MagicLink {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   email     String
-  token     String   @unique
+  token     String    @unique
   expires   DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   usedAt    DateTime?
 }
