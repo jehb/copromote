@@ -5,6 +5,9 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logActivity } from '@/app/actions/activity-logs'
 import { getCurrentUserId } from '@/lib/user-util'
+import { fromZonedTime } from 'date-fns-tz'
+
+const TIMEZONE = 'America/New_York'
 
 export async function getEvents() {
     return await prisma.event.findMany({
@@ -58,8 +61,8 @@ export async function createEvent(formData: FormData) {
         data: {
             title,
             description,
-            startTime: new Date(startTimeStr),
-            endTime: new Date(endTimeStr),
+            startTime: fromZonedTime(startTimeStr, TIMEZONE),
+            endTime: fromZonedTime(endTimeStr, TIMEZONE),
             locationId,
             primaryContactId: primaryContactId || undefined,
             seriesId: seriesId || undefined,
@@ -103,8 +106,8 @@ export async function updateEvent(id: string, formData: FormData) {
         data: {
             title,
             description,
-            startTime: new Date(startTimeStr),
-            endTime: new Date(endTimeStr),
+            startTime: fromZonedTime(startTimeStr, TIMEZONE),
+            endTime: fromZonedTime(endTimeStr, TIMEZONE),
             locationId,
             primaryContactId: primaryContactId || null,
             seriesId: seriesId || null,

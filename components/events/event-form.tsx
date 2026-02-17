@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { formatInTimeZone } from 'date-fns-tz'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -43,6 +44,8 @@ interface EventFormProps {
     eventSeries?: any[]
     action: (formData: FormData) => Promise<void>
 }
+
+const TIMEZONE = 'America/New_York'
 
 export function EventForm({ event, locations, users, contacts, organizations, eventSeries = [], action }: EventFormProps) {
     const [isSaving, setIsSaving] = useState(false)
@@ -170,7 +173,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                     id="startTime"
                                     name="startTime"
                                     type="datetime-local"
-                                    defaultValue={event?.startTime ? new Date(event.startTime).toISOString().slice(0, 16) : ''}
+                                    defaultValue={event?.startTime ? formatInTimeZone(new Date(event.startTime), TIMEZONE, "yyyy-MM-dd'T'HH:mm") : ''}
                                     required
                                     className="bg-slate-50/50 border-slate-200"
                                 />
@@ -181,7 +184,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                     id="endTime"
                                     name="endTime"
                                     type="datetime-local"
-                                    defaultValue={event?.endTime ? new Date(event.endTime).toISOString().slice(0, 16) : ''}
+                                    defaultValue={event?.endTime ? formatInTimeZone(new Date(event.endTime), TIMEZONE, "yyyy-MM-dd'T'HH:mm") : ''}
                                     required
                                     className="bg-slate-50/50 border-slate-200"
                                 />

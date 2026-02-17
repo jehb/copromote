@@ -10,8 +10,11 @@ import {
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import { useRouter } from 'next/navigation'
 import { Instagram, Facebook, Linkedin, Twitter, MessageSquare, MapPin, User } from 'lucide-react'
+
+const TIMEZONE = 'America/New_York'
 
 interface EventListViewProps {
     events: any[]
@@ -41,9 +44,9 @@ export function EventListView({ events }: EventListViewProps) {
                         >
                             <TableCell className="font-medium text-slate-700">
                                 <div className="flex flex-col">
-                                    <span>{format(new Date(event.startTime), 'MMM d, yyyy')}</span>
+                                    <span>{formatInTimeZone(new Date(event.startTime), TIMEZONE, 'MMM d, yyyy')}</span>
                                     <span className="text-xs text-slate-400 font-normal">
-                                        {format(new Date(event.startTime), 'h:mm a')}
+                                        {formatInTimeZone(new Date(event.startTime), TIMEZONE, 'h:mm a')}
                                     </span>
                                 </div>
                             </TableCell>

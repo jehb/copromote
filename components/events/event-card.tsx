@@ -7,7 +7,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2, Calendar, User, MessageSquare, Instagram, Facebook, Linkedin, Twitter } from 'lucide-react'
 import { format } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import { deleteEvent } from '@/app/actions/events'
+
+const TIMEZONE = 'America/New_York'
 
 
 interface EventCardProps {
@@ -62,9 +65,9 @@ export function EventCard({ event, locations, users, contacts, organizations, ev
                 <div className="pt-4 border-t space-y-2 text-sm text-slate-600">
                     <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-slate-400" />
-                        <span>{format(new Date(event.startTime), 'MMM d, yyyy')}</span>
+                        <span>{formatInTimeZone(new Date(event.startTime), TIMEZONE, 'MMM d, yyyy')}</span>
                         <span className="text-slate-400">|</span>
-                        <span>{format(new Date(event.startTime), 'h:mm a')} - {format(new Date(event.endTime), 'h:mm a')}</span>
+                        <span>{formatInTimeZone(new Date(event.startTime), TIMEZONE, 'h:mm a')} - {formatInTimeZone(new Date(event.endTime), TIMEZONE, 'h:mm a')}</span>
                     </div>
                     {event.primaryContact && (
                         <div className="flex items-center gap-2">

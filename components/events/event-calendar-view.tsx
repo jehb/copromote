@@ -15,8 +15,11 @@ import {
     startOfWeek,
     endOfWeek
 } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+const TIMEZONE = 'America/New_York'
 
 interface EventCalendarViewProps {
     events: any[]
@@ -113,7 +116,7 @@ export function EventCalendarView({ events }: EventCalendarViewProps) {
                                             variant="outline"
                                             className="w-full justify-start text-[10px] py-0.5 px-1 truncate font-normal border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
                                         >
-                                            {format(new Date(event.startTime), 'h:mma')} {event.title}
+                                            {formatInTimeZone(new Date(event.startTime), TIMEZONE, 'h:mma')} {event.title}
                                         </Badge>
                                     </Link>
                                 ))}

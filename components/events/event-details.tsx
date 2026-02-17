@@ -6,9 +6,12 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 import Link from 'next/link'
 import { format } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import { Pencil, Calendar, MapPin, User, ArrowLeft, MessageSquare, Building2, UserCircle2, Trash2, Clock } from 'lucide-react'
 import { updateEvent, deleteEvent } from '@/app/actions/events'
 import { EventForm } from './event-form'
+
+const TIMEZONE = 'America/New_York'
 import { AuditInfo } from '@/components/common/audit-info'
 import { useRouter } from 'next/navigation'
 import {
@@ -148,10 +151,10 @@ export function EventDetails({
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
                                 <div className="space-y-1">
                                     <div className="text-xs font-bold uppercase text-slate-400">Date & Time</div>
-                                    <div className="font-medium text-slate-900">{format(new Date(event.startTime), 'EEEE, MMMM do, yyyy')}</div>
+                                    <div className="font-medium text-slate-900">{formatInTimeZone(new Date(event.startTime), TIMEZONE, 'EEEE, MMMM do, yyyy')}</div>
                                     <div className="text-sm text-slate-500 flex items-center gap-1.5">
                                         <Clock className="h-3.5 w-3.5" />
-                                        {format(new Date(event.startTime), 'h:mm a')} - {format(new Date(event.endTime), 'h:mm a')}
+                                        {formatInTimeZone(new Date(event.startTime), TIMEZONE, 'h:mm a')} - {formatInTimeZone(new Date(event.endTime), TIMEZONE, 'h:mm a')}
                                     </div>
                                 </div>
 
