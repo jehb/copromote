@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { searchEventsForAutocomplete } from '@/app/actions/events'
 import { Badge } from '@/components/ui/badge'
+import MentionInput, { type MentionInputHandle } from '@/components/chat/MentionInput'
 
 function MessageContent({ content }: { content: string }) {
     // Regex to match @type:id[Name] or @type:id
@@ -66,7 +67,7 @@ export default function ChatPage() {
     const [showSuggestions, setShowSuggestions] = useState(false)
     const [suggestionIndex, setSuggestionIndex] = useState(0)
     const messagesEndRef = useRef<HTMLDivElement>(null)
-    const inputRef = useRef<HTMLInputElement>(null)
+    const mentionInputRef = useRef<MentionInputHandle>(null)
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -98,19 +99,8 @@ export default function ChatPage() {
         }
     }
 
-    const handleInputChange = async (val: string) => {
-        setInput(val)
-
-        // Detect @ for autocomplete
-        const lastAtPos = val.lastIndexOf('@')
-        if (lastAtPos !== -1 && lastAtPos >= val.length - 20) { // arbitrary limit to avoid triggering on old text
-            const query = val.slice(lastAtPos + 1)
-            // If query contains space, hide
-            if (query.includes(' ')) {
-                setShowSuggestions(false)
-                return
-            }
-
+    const onTriggerMention = async (query: string) => {
+        if (query) {
             const results = await searchEventsForAutocomplete(query)
             setSuggestions(results)
             setShowSuggestions(results.length > 0)
@@ -121,14 +111,8 @@ export default function ChatPage() {
     }
 
     const selectSuggestion = (suggestion: typeof suggestions[0]) => {
-        const lastAtPos = input.lastIndexOf('@')
-        if (lastAtPos === -1) return
-
-        const prefix = input.slice(0, lastAtPos)
-        const newValue = `${prefix}@event:${suggestion.id}[${suggestion.title}] `
-        setInput(newValue)
+        mentionInputRef.current?.insertMention('event', suggestion.id, suggestion.title)
         setShowSuggestions(false)
-        inputRef.current?.focus()
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -236,7 +220,10 @@ export default function ChatPage() {
                                                 "w-full text-left px-4 py-2 text-sm flex items-center justify-between hover:bg-primary/5 transition-colors",
                                                 suggestionIndex === i ? "bg-primary/10 text-primary font-medium" : "text-slate-700"
                                             )}
-                                            onClick={() => selectSuggestion(s)}
+                                            onMouseDown={(e) => {
+                                                e.preventDefault()
+                                                selectSuggestion(s)
+                                            }}
                                         >
                                             <div className="flex flex-col">
                                                 <span>{s.title}</span>
@@ -251,15 +238,16 @@ export default function ChatPage() {
 
                         <div className="max-w-4xl mx-auto flex flex-col gap-2">
                             <div className="flex gap-2">
-                                <Input
-                                    ref={inputRef}
+                                <MentionInput
+                                    ref={mentionInputRef}
                                     placeholder="Type your message... (Try @ to mention an event)"
                                     value={input}
-                                    onChange={(e) => handleInputChange(e.target.value)}
+                                    onChange={setInput}
+                                    onTrigger={onTriggerMention}
                                     onKeyDown={handleKeyDown}
-                                    className="flex-1 bg-white border-primary/20 focus-visible:ring-primary"
+                                    className="flex-1"
                                 />
-                                <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
+                                <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="mt-auto h-[42px]">
                                     <Send className="h-4 w-4" />
                                 </Button>
                             </div>

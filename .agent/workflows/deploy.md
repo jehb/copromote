@@ -8,9 +8,9 @@ description: Stage, commit, push, build, and deploy the application
 git add . > deploy_git_add.log 2>&1
 ```
 
-2. Commit changes with timestamp
+2. Commit changes with a meaningful message
 ```bash
-git commit -m "Deploy: $(date '+%Y-%m-%d %H:%M:%S')" > deploy_git_commit.log 2>&1 || echo "No changes to commit"
+git commit -m "[Meaningful commit message describing the changes]" > deploy_git_commit.log 2>&1 || echo "No changes to commit"
 ```
 
 3. Push changes to remote
