@@ -1,0 +1,27 @@
+[
+  {
+    action: 'FAILED_LOGIN',
+    details: 'Failed login attempt. Username: "admin@promoty.app", Password: "admin"',
+    createdAt: 2026-02-17T00:57:20.331Z
+  },
+  {
+    action: 'FAILED_LOGIN',
+    details: 'Failed login attempt. Username: "admin@promoty.app", Password: "admin"',
+    createdAt: 2026-02-17T00:57:01.390Z
+  },
+  {
+    action: 'FAILED_LOGIN',
+    details: 'Failed login attempt. Username: "admin@promoty.app", Password: "admin"',
+    createdAt: 2026-02-17T00:56:25.898Z
+  },
+  {
+    action: 'FAILED_LOGIN',
+    details: 'Failed login attempt. Username: "admin@promoty.app", Password: "admin"',
+    createdAt: 2026-02-17T00:56:07.708Z
+  },
+  {
+    action: 'FAILED_LOGIN',
+    details: 'Failed login attempt. Username: "admin@promoty.app", Password: "admin"',
+    createdAt: 2026-02-17T00:55:54.593Z
+  }
+]

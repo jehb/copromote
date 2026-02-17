@@ -1,0 +1,20 @@
+Running Prisma migrations...
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": MySQL database "promoty_db" at "mariadb:3306"
+
+1 migration found in prisma/migrations
+
+
+No pending migrations to apply.
+npm notice
+npm notice New major version of npm available! 10.8.2 -> 11.10.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.10.0
+npm notice To update run: npm install -g npm@11.10.0
+npm notice
+Starting application...
+▲ Next.js 16.1.6
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+
+✓ Starting...
+✓ Ready in 31ms

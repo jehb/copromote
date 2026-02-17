@@ -45,6 +45,17 @@ Promoty is a comprehensive promotion management system designed to streamline th
 
     Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Docker Support
+
+To run the application using Docker (simulation of production environment):
+
+1.  Configure your `.env` file with `DISABLE_SECURE_COOKIES=true` if running locally over HTTP.
+2.  Set `NEXTAUTH_URL` to your local hostname (e.g., `http://localhost:3000` or `http://pluto`).
+3.  Run:
+    ```bash
+    docker compose up -d --build
+    ```
+
 ## Testing
 
 Promoty maintains high test coverage using Jest and React Testing Library.

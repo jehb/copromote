@@ -66,7 +66,7 @@ export async function login(prevState: any, formData: FormData) {
             ; (await cookies()).set('session', session, {
                 expires,
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: process.env.NODE_ENV === 'production' && process.env.DISABLE_SECURE_COOKIES !== 'true',
                 sameSite: 'lax',
                 path: '/',
             })
@@ -133,7 +133,7 @@ export async function changePassword(prevState: any, formData: FormData) {
             ; (await cookies()).set('session', newSession, {
                 expires,
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: process.env.NODE_ENV === 'production' && process.env.DISABLE_SECURE_COOKIES !== 'true',
                 sameSite: 'lax',
                 path: '/',
             })

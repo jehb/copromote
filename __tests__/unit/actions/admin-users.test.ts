@@ -77,6 +77,50 @@ describe('Admin Users Actions', () => {
             expect(revalidatePath).toHaveBeenCalledWith('/admin/users')
         })
 
+        it('should update user password if provided', async () => {
+            const formData = new FormData()
+            formData.append('id', '1')
+            formData.append('name', 'Test User')
+            formData.append('username', 'testuser')
+            formData.append('email', 'test@example.com')
+            formData.append('role', 'USER')
+            formData.append('password', 'newpassword')
+
+                ; (prisma.user.findFirst as jest.Mock).mockResolvedValue(null)
+                ; (hashPassword as jest.Mock).mockResolvedValue('hashed_new_password')
+                ; (prisma.user.update as jest.Mock).mockResolvedValue({ id: '1' })
+
+            const result = await updateUser(formData)
+
+            expect(result.success).toBe(true)
+            expect(hashPassword).toHaveBeenCalledWith('newpassword')
+            expect(prisma.user.update).toHaveBeenCalledWith(expect.objectContaining({
+                data: expect.objectContaining({
+                    password: 'hashed_new_password'
+                })
+            }))
+        })
+
+        it('should NOT update password if not provided', async () => {
+            const formData = new FormData()
+            formData.append('id', '1')
+            formData.append('name', 'Test User')
+            formData.append('username', 'testuser')
+            formData.append('email', 'test@example.com')
+            formData.append('role', 'USER')
+                // No password appended
+
+                ; (prisma.user.findFirst as jest.Mock).mockResolvedValue(null)
+                ; (prisma.user.update as jest.Mock).mockResolvedValue({ id: '1' })
+
+            const result = await updateUser(formData)
+
+            expect(result.success).toBe(true)
+            expect(hashPassword).not.toHaveBeenCalled()
+            const updateCall = (prisma.user.update as jest.Mock).mock.calls[0][0]
+            expect(updateCall.data).not.toHaveProperty('password')
+        })
+
         it('should fail if username exists', async () => {
             const formData = new FormData()
             formData.append('name', 'Test User')

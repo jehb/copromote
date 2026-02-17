@@ -99,6 +99,10 @@ export function EditUserDialog({ user, contacts }: EditUserDialogProps) {
                             <Input id="email" name="email" type="email" defaultValue={user.email} required />
                         </div>
                         <div className="grid gap-2">
+                            <Label htmlFor="password">New Password (optional)</Label>
+                            <Input id="password" name="password" type="password" placeholder="Leave blank to keep current" />
+                        </div>
+                        <div className="grid gap-2">
                             <Label htmlFor="role">Role</Label>
                             <Select name="role" defaultValue={user.role}>
                                 <SelectTrigger>

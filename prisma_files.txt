@@ -1,0 +1,13 @@
+prisma:
+dev.db
+migrations
+schema.prisma
+seed.ts
+test-seed.ts
+
+prisma/migrations:
+20260216020326_init
+migration_lock.toml
+
+prisma/migrations/20260216020326_init:
+migration.sql

@@ -133,6 +133,7 @@ const UpdateUserSchema = z.object({
     email: z.string().email('Invalid email address'),
     role: z.string(),
     contactId: z.string().optional().nullable(),
+    password: z.string().optional(),
 })
 
 export async function updateUser(formData: FormData) {
@@ -151,7 +152,7 @@ export async function updateUser(formData: FormData) {
         }
     }
 
-    const { id, name, username, email, role, contactId } = result.data
+    const { id, name, username, email, role, contactId, password } = result.data
 
     try {
         // Check availability (exclude current user)
@@ -186,7 +187,8 @@ export async function updateUser(formData: FormData) {
                 username,
                 email,
                 role,
-                contactId
+                contactId,
+                ...(password ? { password: await hashPassword(password) } : {})
             } as any
         })
 
