@@ -101,6 +101,119 @@ export async function importData(entity: string, data: any[]) {
                     count++
                 }
                 break
+
+            case 'events':
+                for (const row of data) {
+                    // Try to find location by name given
+                    let locationId = undefined
+                    if (row.Location) {
+                        const loc = await prisma.location.findUnique({
+                            where: { name: row.Location }
+                        })
+                        if (loc) {
+                            locationId = loc.id
+                        } else {
+                            // Create it? Let's create it to be safe
+                            const newLoc = await prisma.location.create({
+                                data: { name: row.Location }
+                            })
+                            locationId = newLoc.id
+                        }
+                    }
+
+                    // Provide a default location if one wasn't found or created (schema requires it)
+                    if (!locationId) {
+                        // Find any location or create a default "TBD"
+                        let defaultLoc = await prisma.location.findFirst()
+                        if (!defaultLoc) {
+                            defaultLoc = await prisma.location.create({ data: { name: 'TBD' } })
+                        }
+                        locationId = defaultLoc.id
+                    }
+
+                    await prisma.event.upsert({
+                        where: { id: row.ID || '' },
+                        update: {
+                            title: row.Title,
+                            description: row.Description,
+                            startTime: new Date(row['Start Time'] || row.Date || Date.now()),
+                            endTime: new Date(row['End Time'] || row.Date || Date.now()),
+                            locationId
+                        },
+                        create: {
+                            title: row.Title,
+                            description: row.Description,
+                            startTime: new Date(row['Start Time'] || row.Date || Date.now()),
+                            endTime: new Date(row['End Time'] || row.Date || new Date(Date.now() + 3600000)), // Default 1 hour
+                            locationId
+                        }
+                    })
+                    count++
+                }
+                break
+
+            case 'social-posts':
+                for (const row of data) {
+                    await prisma.socialPost.upsert({
+                        where: { id: row.ID || '' },
+                        update: {
+                            content: row.Content,
+                            platform: row.Platform || 'Twitter',
+                            scheduledDate: row['Scheduled Date'] ? new Date(row['Scheduled Date']) : null,
+                            status: row.Status || 'draft'
+                        },
+                        create: {
+                            content: row.Content,
+                            platform: row.Platform || 'Twitter',
+                            scheduledDate: row['Scheduled Date'] ? new Date(row['Scheduled Date']) : null,
+                            status: row.Status || 'draft'
+                        }
+                    })
+                    count++
+                }
+                break
+
+            case 'hyperlinks':
+                for (const row of data) {
+                    await prisma.hyperlink.upsert({
+                        where: { id: row.ID || '' },
+                        update: {
+                            title: row.Title,
+                            url: row.URL || row.Url,
+                            description: row.Description,
+                            icon: row.Icon
+                        },
+                        create: {
+                            title: row.Title,
+                            url: row.URL || row.Url,
+                            description: row.Description,
+                            icon: row.Icon
+                        }
+                    })
+                    count++
+                }
+                break
+
+
+            case 'promotions':
+                for (const row of data) {
+                    await prisma.promotionPeriod.upsert({
+                        where: { id: row.ID || '' },
+                        update: {
+                            name: row.Name,
+                            startDate: new Date(row['Start Date'] || row.StartDate || Date.now()),
+                            endDate: new Date(row['End Date'] || row.EndDate || Date.now())
+                        },
+                        create: {
+                            name: row.Name,
+                            startDate: new Date(row['Start Date'] || row.StartDate || Date.now()),
+                            endDate: new Date(row['End Date'] || row.EndDate || new Date(Date.now() + 86400000 * 7)) // Default 1 week
+                        }
+                    })
+                    count++
+                }
+                break
+
         }
 
         revalidatePath('/admin/data')

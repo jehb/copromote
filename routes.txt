@@ -1,1 +1,0 @@
-app/api/debug-wp/route.ts

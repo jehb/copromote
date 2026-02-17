@@ -23,6 +23,7 @@ const ENTITIES = [
     { id: 'tasks', label: 'Tasks', description: 'To-do items and assignments' },
     { id: 'hyperlinks', label: 'Hyperlinks', description: 'Quick access external links' },
     { id: 'social-posts', label: 'Social Posts', description: 'Social media content and schedule' },
+    { id: 'promotions', label: 'Promotions', description: 'Marketing campaigns timelines' },
 ]
 
 export function ExportHub() {

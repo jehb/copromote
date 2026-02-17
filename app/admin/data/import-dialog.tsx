@@ -28,6 +28,10 @@ const ENTITIES = [
     { value: 'organizations', label: 'Organizations' },
     { value: 'projects', label: 'Projects' },
     { value: 'tasks', label: 'Tasks' },
+    { value: 'events', label: 'Events' },
+    { value: 'social-posts', label: 'Social Media Posts' },
+    { value: 'hyperlinks', label: 'Hyperlinks' },
+    { value: 'promotions', label: 'Promotions' },
 ]
 
 export function ImportDialog() {

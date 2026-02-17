@@ -1,2 +1,0 @@
-time="2026-02-15T21:02:58-05:00" level=warning msg="The \"NEXTAUTH_SECRET\" variable is not set. Defaulting to a blank string."
- Container promoty-db Running 

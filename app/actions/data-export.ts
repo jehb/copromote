@@ -108,5 +108,16 @@ export async function getExportData(entities: string[]) {
         }))
     }
 
+    if (entities.includes('promotions')) {
+        const promotions = await prisma.promotionPeriod.findMany()
+        data.promotions = promotions.map(p => ({
+            ID: p.id,
+            Name: p.name,
+            'Start Date': p.startDate.toISOString(),
+            'End Date': p.endDate.toISOString(),
+            'Created At': p.createdAt.toISOString()
+        }))
+    }
+
     return data
 }
