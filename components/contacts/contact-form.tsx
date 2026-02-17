@@ -13,6 +13,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Save, Loader2, User, Building2, Mail, Phone, Briefcase, FileText } from 'lucide-react'
+import { PhoneInput } from '@/components/ui/phone-input'
+import { Value } from 'react-phone-number-input'
 
 interface ContactFormProps {
     contact?: any
@@ -22,6 +24,7 @@ interface ContactFormProps {
 
 export function ContactForm({ contact, organizations, action }: ContactFormProps) {
     const [isSaving, setIsSaving] = useState(false)
+    const [phone, setPhone] = useState<Value>(contact?.phone || '')
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setIsSaving(true)
@@ -78,16 +81,18 @@ export function ContactForm({ contact, organizations, action }: ContactFormProps
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="phone" className="flex items-center gap-2">
+                        <Label htmlFor="phone-input" className="flex items-center gap-2">
                             <Phone className="h-3.5 w-3.5 text-slate-400" /> Primary Phone
                         </Label>
-                        <Input
-                            id="phone"
-                            name="phone"
-                            defaultValue={contact?.phone}
-                            placeholder="+1 (555) 000-0000"
-                            className="bg-slate-50/50 border-slate-200"
+                        <PhoneInput
+                            id="phone-input"
+                            value={phone}
+                            onChange={setPhone}
+                            defaultCountry="US"
+                            placeholder="Enter phone number"
+                            className="bg-slate-50/50"
                         />
+                        <input type="hidden" name="phone" value={phone} />
                     </div>
                 </div>
 

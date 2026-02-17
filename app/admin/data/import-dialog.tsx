@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
+import Papa from 'papaparse'
 import { Upload, FileSpreadsheet, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -55,29 +56,53 @@ export function ImportDialog() {
         setResult(null)
 
         try {
-            const reader = new FileReader()
-            reader.onload = async (e) => {
-                try {
-                    const data = e.target?.result
-                    const workbook = XLSX.read(data, { type: 'binary' })
-                    const sheetName = workbook.SheetNames[0]
-                    const worksheet = workbook.Sheets[sheetName]
-                    const json = XLSX.utils.sheet_to_json(worksheet)
+            const fileExtension = file.name.split('.').pop()?.toLowerCase()
+            let jsonData: any[] = []
 
-                    const res = await importData(entity, json as any[])
-                    setResult(res)
-                    if (res.success) {
-                        setFile(null)
-                    }
-                } catch (err) {
-                    setResult({ success: false, message: 'Failed to parse file' })
-                } finally {
-                    setLoading(false)
-                }
+            if (fileExtension === 'csv') {
+                const text = await file.text()
+                const parseResult = Papa.parse(text, { header: true, skipEmptyLines: true })
+                jsonData = parseResult.data
+            } else if (fileExtension === 'xlsx') {
+                const buffer = await file.arrayBuffer()
+                const workbook = new ExcelJS.Workbook()
+                await (workbook.xlsx as any).load(buffer)
+                const worksheet = workbook.worksheets[0]
+
+                const rows: any[] = []
+                const headerRow = worksheet.getRow(1)
+                const headers: string[] = []
+                headerRow.eachCell((cell) => {
+                    headers.push(cell.toString())
+                })
+
+                worksheet.eachRow((row, rowNumber) => {
+                    if (rowNumber === 1) return // Skip header
+                    const rowData: any = {}
+                    row.eachCell((cell, colNumber) => {
+                        const header = headers[colNumber - 1]
+                        if (header) {
+                            rowData[header.toLowerCase().replace(/\s+/g, '_')] = cell.value
+                        }
+                    })
+                    rows.push(rowData)
+                })
+                jsonData = rows
+            } else {
+                setResult({ success: false, message: 'Unsupported file format' })
+                setLoading(false)
+                return
             }
-            reader.readAsBinaryString(file)
+
+            const res = await importData(entity, jsonData)
+            setResult(res)
+            if (res.success) {
+                setFile(null)
+            }
         } catch (err) {
-            setResult({ success: false, message: 'Failed to read file' })
+            console.error('Import error:', err)
+            setResult({ success: false, message: 'Failed to process file' })
+        } finally {
             setLoading(false)
         }
     }

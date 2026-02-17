@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import * as XLSX from 'xlsx'
-import { Download } from 'lucide-react'
+import ExcelJS from 'exceljs'
+import { Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -24,30 +24,64 @@ export function ExportButton({
     label = 'Export',
     className
 }: ExportButtonProps) {
+    const [loading, setLoading] = React.useState(false)
 
-    const handleExport = (type: 'csv' | 'xlsx') => {
-        // Create a worksheet from the data
-        const ws = XLSX.utils.json_to_sheet(data)
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
+    const handleExport = async (type: 'csv' | 'xlsx') => {
+        if (!data || data.length === 0) return
 
-        // Generate file name
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-        const fullFilename = `${filename}-${timestamp}.${type}`
+        setLoading(true)
+        try {
+            const workbook = new ExcelJS.Workbook()
+            const worksheet = workbook.addWorksheet('Sheet1')
 
-        // Write and download
-        if (type === 'csv') {
-            XLSX.writeFile(wb, fullFilename, { bookType: 'csv' })
-        } else {
-            XLSX.writeFile(wb, fullFilename, { bookType: 'xlsx' })
+            // Get columns from the first object
+            if (data.length > 0) {
+                const columns = Object.keys(data[0]).map(key => ({
+                    header: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '),
+                    key: key,
+                    width: 20
+                }))
+                worksheet.columns = columns
+
+                // Add rows
+                worksheet.addRows(data)
+            }
+
+            // Generate file name
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+            const fullFilename = `${filename}-${timestamp}.${type}`
+
+            // Write and download
+            let buffer: ArrayBuffer;
+            let mimeType: string;
+
+            if (type === 'csv') {
+                buffer = await workbook.csv.writeBuffer()
+                mimeType = 'text/csv'
+            } else {
+                buffer = await workbook.xlsx.writeBuffer()
+                mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }
+
+            const blob = new Blob([buffer], { type: mimeType })
+            const url = window.URL.createObjectURL(blob)
+            const anchor = document.createElement('a')
+            anchor.href = url
+            anchor.download = fullFilename
+            anchor.click()
+            window.URL.revokeObjectURL(url)
+        } catch (error) {
+            console.error('Export failed:', error)
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className={`gap-2 ${className}`}>
-                    <Download className="h-4 w-4" />
+                <Button variant="outline" size="sm" className={`gap-2 ${className}`} disabled={loading}>
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                     {label}
                 </Button>
             </DropdownMenuTrigger>

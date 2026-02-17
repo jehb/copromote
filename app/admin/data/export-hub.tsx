@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import { Download, FileSpreadsheet, Loader2, CheckSquare, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,17 +43,45 @@ export function ExportHub() {
         setLoading(true)
         try {
             const dataMap = await getExportData(selectedEntities)
-            const wb = XLSX.utils.book_new()
+            const workbook = new ExcelJS.Workbook()
 
             Object.entries(dataMap).forEach(([entity, records]) => {
-                const ws = XLSX.utils.json_to_sheet(records)
-                XLSX.utils.book_append_sheet(wb, ws, entity.charAt(0).toUpperCase() + entity.slice(1))
+                const sheetName = entity.charAt(0).toUpperCase() + entity.slice(1)
+                const worksheet = workbook.addWorksheet(sheetName)
+
+                const data = records as any[]
+                if (data.length > 0) {
+                    const columns = Object.keys(data[0]).map(key => ({
+                        header: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '),
+                        key: key,
+                        width: 20
+                    }))
+                    worksheet.columns = columns
+                    worksheet.addRows(data)
+                }
             })
 
             const timestamp = new Date().toISOString().split('T')[0]
             const filename = `promoty-data-export-${timestamp}.${format}`
 
-            XLSX.writeFile(wb, filename, { bookType: format })
+            let buffer: ArrayBuffer;
+            let mimeType: string;
+
+            if (format === 'csv') {
+                buffer = await (workbook.csv as any).writeBuffer()
+                mimeType = 'text/csv'
+            } else {
+                buffer = await (workbook.xlsx as any).writeBuffer()
+                mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }
+
+            const blob = new Blob([buffer], { type: mimeType })
+            const url = window.URL.createObjectURL(blob)
+            const anchor = document.createElement('a')
+            anchor.href = url
+            anchor.download = filename
+            anchor.click()
+            window.URL.revokeObjectURL(url)
         } catch (error) {
             console.error('Export failed:', error)
         } finally {

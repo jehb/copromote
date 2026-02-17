@@ -50,6 +50,7 @@ export function ContactsClientPage({ initialContacts }: ContactsClientPageProps)
 
     const filteredContacts = contacts.filter((contact: any) =>
         `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contact.organization?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -152,7 +153,17 @@ export function ContactsClientPage({ initialContacts }: ContactsClientPageProps)
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
-                                            {contact.company ? (
+                                            {contact.organization ? (
+                                                <Link
+                                                    href={`/organizations/${contact.organization.id}`}
+                                                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-bold transition-colors w-fit"
+                                                >
+                                                    <div className="p-1 rounded bg-blue-50 border border-blue-100">
+                                                        <Building2 className="h-3.5 w-3.5 text-blue-500" />
+                                                    </div>
+                                                    {contact.organization.name}
+                                                </Link>
+                                            ) : contact.company ? (
                                                 <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
                                                     <div className="p-1 rounded bg-slate-100 border border-slate-200">
                                                         <Building2 className="h-3.5 w-3.5 text-slate-500" />
