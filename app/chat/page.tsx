@@ -2,21 +2,71 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { MessageSquare, Send, Bot, User, Loader2, Sparkles, AlertCircle } from 'lucide-react'
 import { sendChatMessage, type ChatMessage } from '@/app/actions/chat'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { searchEventsForAutocomplete } from '@/app/actions/events'
+import { Badge } from '@/components/ui/badge'
+
+function MessageContent({ content }: { content: string }) {
+    // Regex to match @type:id[Name] or @type:id
+    const mentionRegex = /@(event|task|promotion):([a-zA-Z0-9-]+)(?:\[([^\]]+)\])?/gi
+
+    const parts = []
+    let lastIndex = 0
+    let match
+
+    while ((match = mentionRegex.exec(content)) !== null) {
+        // Text before the mention
+        if (match.index > lastIndex) {
+            parts.push(content.slice(lastIndex, match.index))
+        }
+
+        const type = match[1]
+        const id = match[2]
+        const name = match[3] || id
+
+        parts.push(
+            <Badge
+                key={`${match.index}`}
+                variant="secondary"
+                className="mx-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors cursor-default"
+            >
+                <span className="opacity-70 mr-1 text-[10px] uppercase font-bold">{type}</span>
+                {name}
+            </Badge>
+        )
+
+        lastIndex = mentionRegex.lastIndex
+    }
+
+    // Remaining text
+    if (lastIndex < content.length) {
+        parts.push(content.slice(lastIndex))
+    }
+
+    if (parts.length === 0) {
+        return <div className="whitespace-pre-wrap leading-relaxed">{content}</div>
+    }
+
+    return <div className="leading-relaxed">{parts}</div>
+}
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<ChatMessage[]>([
-        { role: 'assistant', content: 'Hello! I am your Promoty AI Assistant. How can I help you today? You can mention events, tasks, or promotions using @ (e.g., "@event:uuid") to provide me with more context.' }
+        { role: 'assistant', content: 'Hello! I am your Promoty AI Assistant. How can I help you today? You can mention events, tasks, or promotions using @ to search for them and provide me with more context.' }
     ])
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [suggestions, setSuggestions] = useState<{ id: string, title: string, startTime: string }[]>([])
+    const [showSuggestions, setShowSuggestions] = useState(false)
+    const [suggestionIndex, setSuggestionIndex] = useState(0)
     const messagesEndRef = useRef<HTMLDivElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -39,11 +89,64 @@ export default function ChatPage() {
         try {
             const response = await sendChatMessage(newMessages)
             setMessages(prev => [...prev, { role: 'assistant', content: response }])
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err)
-            setMessages(prev => [...prev, { role: 'assistant', content: `Sorry, I encountered an error: ${err.message}` }])
+            const error = err as Error
+            setMessages(prev => [...prev, { role: 'assistant', content: `Sorry, I encountered an error: ${error.message}` }])
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    const handleInputChange = async (val: string) => {
+        setInput(val)
+
+        // Detect @ for autocomplete
+        const lastAtPos = val.lastIndexOf('@')
+        if (lastAtPos !== -1 && lastAtPos >= val.length - 20) { // arbitrary limit to avoid triggering on old text
+            const query = val.slice(lastAtPos + 1)
+            // If query contains space, hide
+            if (query.includes(' ')) {
+                setShowSuggestions(false)
+                return
+            }
+
+            const results = await searchEventsForAutocomplete(query)
+            setSuggestions(results)
+            setShowSuggestions(results.length > 0)
+            setSuggestionIndex(0)
+        } else {
+            setShowSuggestions(false)
+        }
+    }
+
+    const selectSuggestion = (suggestion: typeof suggestions[0]) => {
+        const lastAtPos = input.lastIndexOf('@')
+        if (lastAtPos === -1) return
+
+        const prefix = input.slice(0, lastAtPos)
+        const newValue = `${prefix}@event:${suggestion.id}[${suggestion.title}] `
+        setInput(newValue)
+        setShowSuggestions(false)
+        inputRef.current?.focus()
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (showSuggestions) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault()
+                setSuggestionIndex(prev => (prev + 1) % suggestions.length)
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault()
+                setSuggestionIndex(prev => (prev - 1 + suggestions.length) % suggestions.length)
+            } else if (e.key === 'Enter' || e.key === 'Tab') {
+                e.preventDefault()
+                selectSuggestion(suggestions[suggestionIndex])
+            } else if (e.key === 'Escape') {
+                setShowSuggestions(false)
+            }
+        } else if (e.key === 'Enter') {
+            handleSend()
         }
     }
 
@@ -98,7 +201,7 @@ export default function ChatPage() {
                                                 ? "bg-primary text-primary-foreground rounded-tr-none"
                                                 : "bg-white border rounded-tl-none text-slate-800"
                                         )}>
-                                            <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                                            <MessageContent content={message.content} />
                                         </div>
                                     </motion.div>
                                 ))}
@@ -118,14 +221,42 @@ export default function ChatPage() {
                         </div>
                     </ScrollArea>
 
-                    <div className="p-4 border-t bg-slate-50/50">
+                    <div className="p-4 border-t bg-slate-50/50 relative">
+                        {showSuggestions && (
+                            <div className="absolute bottom-full left-4 right-4 mb-2 max-w-4xl mx-auto bg-white border rounded-lg shadow-xl z-50 overflow-hidden animate-in slide-in-from-bottom-2">
+                                <div className="bg-slate-50 px-3 py-2 border-b text-xs font-semibold text-slate-500 flex items-center justify-between">
+                                    <span>Event Suggestions (ordered by date proximity)</span>
+                                    <span>↑↓ to navigate, Enter to select</span>
+                                </div>
+                                <div className="max-h-60 overflow-y-auto">
+                                    {suggestions.map((s, i) => (
+                                        <button
+                                            key={s.id}
+                                            className={cn(
+                                                "w-full text-left px-4 py-2 text-sm flex items-center justify-between hover:bg-primary/5 transition-colors",
+                                                suggestionIndex === i ? "bg-primary/10 text-primary font-medium" : "text-slate-700"
+                                            )}
+                                            onClick={() => selectSuggestion(s)}
+                                        >
+                                            <div className="flex flex-col">
+                                                <span>{s.title}</span>
+                                                <span className="text-[10px] opacity-60">{new Date(s.startTime).toLocaleDateString()}</span>
+                                            </div>
+                                            <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded uppercase font-bold tracking-tighter opacity-50">@event</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="max-w-4xl mx-auto flex flex-col gap-2">
                             <div className="flex gap-2">
                                 <Input
-                                    placeholder="Type your message... (Try @event:id to reference something)"
+                                    ref={inputRef}
+                                    placeholder="Type your message... (Try @ to mention an event)"
                                     value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                                    onChange={(e) => handleInputChange(e.target.value)}
+                                    onKeyDown={handleKeyDown}
                                     className="flex-1 bg-white border-primary/20 focus-visible:ring-primary"
                                 />
                                 <Button onClick={handleSend} disabled={isLoading || !input.trim()}>

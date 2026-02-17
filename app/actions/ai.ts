@@ -83,7 +83,7 @@ export async function getAISettings() {
 /**
  * Normalizes local URLs for Ollama/LMStudio compatibility.
  */
-export function getFinalBaseUrl(baseUrl: string | null, provider: string) {
+export async function getFinalBaseUrl(baseUrl: string | null, provider: string) {
     if (provider !== 'openai' && provider !== 'local') return undefined
 
     let url = baseUrl || (provider === 'local' ? 'http://127.0.0.1:1234' : 'https://api.openai.com/v1')
@@ -118,7 +118,7 @@ export async function testAIConnection() {
             return { success: true, message: `Connected to Gemini! Response: ${text}` }
         } else {
             // Local or OpenAI
-            const finalBaseUrl = getFinalBaseUrl(settings.baseUrl, settings.provider)!
+            const finalBaseUrl = await getFinalBaseUrl(settings.baseUrl, settings.provider)!
             const client = new OpenAI({
                 apiKey: settings.apiKey || 'not-needed', // Local LLMs might accept any string
                 baseURL: finalBaseUrl,
@@ -211,7 +211,7 @@ async function callGemini(prompt: string, modelName: string, apiKey: string) {
  */
 async function callOpenAI(prompt: string, modelName: string, apiKey: string, baseUrl?: string, provider?: string) {
     try {
-        const finalBaseUrl = getFinalBaseUrl(baseUrl || null, provider || 'openai')
+        const finalBaseUrl = await getFinalBaseUrl(baseUrl || null, provider || 'openai')
         const client = new OpenAI({
             apiKey: apiKey,
             baseURL: finalBaseUrl,

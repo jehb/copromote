@@ -17,9 +17,9 @@ export type ChatMessage = {
 async function getChatContext(text: string) {
     const contextLines: string[] = []
 
-    // Improved regex to catch @type:id or just @word
-    // Patterns: @event:ID, @task:ID, @promotion:ID
-    const mentionRegex = /@(event|task|promotion):([a-zA-Z0-9-]+)/gi
+    // Improved regex to catch @type:id[Name] or @type:id
+    // Patterns: @event:ID[Title], @task:ID[Title], @promotion:ID[Title]
+    const mentionRegex = /@(event|task|promotion):([a-zA-Z0-9-]+)(?:\[[^\]]*\])?/gi
     let match
 
     const processedIds = new Set<string>()
@@ -95,12 +95,16 @@ Rules:
             const genAI = new GoogleGenerativeAI(settings.apiKey!)
             const model = genAI.getGenerativeModel({ model: settings.model || 'gemini-1.5-flash' })
 
-            // Convert history for Gemini
             // Gemini expects: { role: 'user'|'model', parts: [{ text: '...' }] }
-            const history = messages.slice(0, -1).map(m => ({
+            // It MUST start with 'user'. If our first message is 'assistant', we skip it.
+            let history = messages.slice(0, -1).map(m => ({
                 role: m.role === 'assistant' ? 'model' : 'user',
                 parts: [{ text: m.content }]
             }))
+
+            if (history.length > 0 && history[0].role === 'model') {
+                history = history.slice(1)
+            }
 
             const chat = model.startChat({
                 history: history as any[], // Gemini SDK types can be strict
@@ -120,7 +124,7 @@ Rules:
 
         } else {
             // OpenAI or Local
-            const finalBaseUrl = getFinalBaseUrl(settings.baseUrl, settings.provider)!
+            const finalBaseUrl = await getFinalBaseUrl(settings.baseUrl, settings.provider)!
             const client = new OpenAI({
                 apiKey: settings.apiKey || 'not-needed',
                 baseURL: finalBaseUrl,

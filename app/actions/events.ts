@@ -150,3 +150,29 @@ export async function getUsers() {
         orderBy: { name: 'asc' }
     })
 }
+export async function searchEventsForAutocomplete(query: string) {
+    const now = new Date()
+
+    // Fetch events matching query or just latest if query is empty
+    const events = await prisma.event.findMany({
+        where: query ? {
+            title: { contains: query }
+        } : {},
+        take: 10,
+        select: {
+            id: true,
+            title: true,
+            startTime: true
+        }
+    })
+
+    // We calculate the absolute difference in milliseconds
+    return events.sort((a, b) => {
+        const diffA = Math.abs(a.startTime.getTime() - now.getTime())
+        const diffB = Math.abs(b.startTime.getTime() - now.getTime())
+        return diffA - diffB
+    }).map(e => ({
+        ...e,
+        startTime: e.startTime.toISOString() // Ensure serializability
+    }))
+}

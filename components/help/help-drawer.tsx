@@ -92,7 +92,11 @@ export function HelpDrawer() {
     // Keyboard shortcut: ? or Ctrl+/
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === '?' || (e.ctrlKey && e.key === '/')) {
+            // Disable shortcut if user is typing in an input or textarea
+            const activeElement = document.activeElement
+            const isTyping = activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement
+
+            if ((e.key === '?' || (e.ctrlKey && e.key === '/')) && !isTyping) {
                 e.preventDefault()
                 setIsOpen(prev => !prev)
             }
