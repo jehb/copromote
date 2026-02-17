@@ -6,7 +6,7 @@ export type EventItem = {
     id: string
     title: string
     date: Date
-    type: 'project_start' | 'project_end' | 'event' | 'promotion_start' | 'promotion_end' | 'social_post' | 'logistics_event'
+    type: 'project_start' | 'project_end' | 'event' | 'promotion_start' | 'promotion_end' | 'social_post' | 'logistics_event' | 'promotion_ad_live' | 'promotion_image_deadline' | 'promotion_publishing_deadline'
     description?: string
     projectId?: string
 }
@@ -44,7 +44,7 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
             date: p.startDate,
             type: 'promotion_start',
             description: 'Promotion Start',
-            projectId: p.id // Reusing projectId field to store promotion ID for linking, or we should add a new field to EventItem
+            projectId: p.id
         })
         items.push({
             id: p.id + '_end',
@@ -54,6 +54,34 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
             description: 'Promotion End',
             projectId: p.id
         })
+
+        if (p.adLiveDate) {
+            items.push({
+                id: p.id + '_ad_live',
+                title: `${p.name} (Ad Live)`,
+                date: p.adLiveDate,
+                type: 'promotion_ad_live',
+                projectId: p.id
+            })
+        }
+        if (p.adImageDeadline) {
+            items.push({
+                id: p.id + '_image_deadline',
+                title: `${p.name} (Image Deadline)`,
+                date: p.adImageDeadline,
+                type: 'promotion_image_deadline',
+                projectId: p.id
+            })
+        }
+        if (p.adPublishingDeadline) {
+            items.push({
+                id: p.id + '_publishing_deadline',
+                title: `${p.name} (Publishing Deadline)`,
+                date: p.adPublishingDeadline,
+                type: 'promotion_publishing_deadline',
+                projectId: p.id
+            })
+        }
     })
 
     const logisticsEvents = await prisma.event.findMany({
