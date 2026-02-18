@@ -179,6 +179,7 @@ model Event {
   socialPosts      SocialPost[]
   contacts         Contact[]      @relation("EventContacts")
   organizations    Organization[] @relation("EventOrganizations")
+  emailItems       EmailItem[]    @relation("EmailItemEvents")
 
   @@index([createdById], map: "Event_createdById_fkey")
   @@index([locationId], map: "Event_locationId_fkey")
@@ -328,4 +329,28 @@ model MagicLink {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   usedAt    DateTime?
+}
+
+model EmailPlan {
+  id          String      @id @default(uuid())
+  subject     String
+  sendDate    DateTime
+  notes       String?     @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       EmailItem[]
+}
+
+model EmailItem {
+  id          String    @id @default(uuid())
+  title       String
+  description String?   @db.Text
+  planId      String
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  plan        EmailPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  events      Event[]   @relation("EmailItemEvents")
+
+  @@index([planId], map: "EmailItem_planId_fkey")
 }
