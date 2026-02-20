@@ -76,7 +76,7 @@ model PromotionPeriod {
 
 model SocialPost {
   id                String           @id @default(uuid())
-  content           String
+  content           String           @db.Text
   platform          String
   scheduledDate     DateTime?
   status            String           @default("draft")
