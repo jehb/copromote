@@ -1,2 +1,0 @@
-To https://github.com/jehb/promoty.git
-   a41e12d..e0efa90  main -> main
