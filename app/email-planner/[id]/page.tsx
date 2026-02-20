@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { notFound } from 'next/navigation'
 import { getEmailPlan } from '@/app/actions/email-plan'
 import { EmailPlanForm } from '@/components/email-planner/email-plan-form'

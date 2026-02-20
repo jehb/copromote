@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { getEmailPlans, deleteEmailPlan } from '@/app/actions/email-plan'
 import { Button } from '@/components/ui/button'
