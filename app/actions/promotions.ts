@@ -10,9 +10,18 @@ const PromotionSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     startDate: z.string().transform((str) => new Date(str)),
     endDate: z.string().transform((str) => new Date(str)),
-    adLiveDate: z.string().optional().transform((str) => str ? new Date(str) : null),
-    adImageDeadline: z.string().optional().transform((str) => str ? new Date(str) : null),
-    adPublishingDeadline: z.string().optional().transform((str) => str ? new Date(str) : null),
+    adLiveDate: z.string().nullable().optional().transform((str) => {
+        if (!str) return null
+        return new Date(str)
+    }),
+    adImageDeadline: z.string().nullable().optional().transform((str) => {
+        if (!str) return null
+        return new Date(str)
+    }),
+    adPublishingDeadline: z.string().nullable().optional().transform((str) => {
+        if (!str) return null
+        return new Date(str)
+    }),
 })
 
 export async function getPromotions() {
@@ -52,6 +61,7 @@ export async function createPromotion(formData: FormData) {
     const result = PromotionSchema.safeParse(rawData)
 
     if (!result.success) {
+        console.error(result.error)
         throw new Error('Invalid data')
     }
 
@@ -78,6 +88,7 @@ export async function updatePromotion(id: string, formData: FormData) {
     const result = PromotionSchema.safeParse(rawData)
 
     if (!result.success) {
+        console.error(result.error)
         throw new Error('Invalid data')
     }
 

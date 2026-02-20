@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { logActivity } from '@/app/actions/activity-logs'
 import { getCurrentUserId } from '@/lib/user-util'
 import { fromZonedTime } from 'date-fns-tz'
+import { EventStatus } from '@prisma/client'
 
 const TIMEZONE = 'America/New_York'
 
@@ -56,6 +57,7 @@ export async function createEvent(formData: FormData) {
     // Multi-select values as JSON string or multiple fields
     const contactIds = formData.getAll('contactIds') as string[]
     const organizationIds = formData.getAll('organizationIds') as string[]
+    const status = (formData.get('status') as EventStatus) || EventStatus.SCHEDULED
 
     const event = await prisma.event.create({
         data: {
@@ -63,6 +65,7 @@ export async function createEvent(formData: FormData) {
             description,
             startTime: fromZonedTime(startTimeStr, TIMEZONE),
             endTime: fromZonedTime(endTimeStr, TIMEZONE),
+            status,
             locationId,
             primaryContactId: primaryContactId || undefined,
             seriesId: seriesId || undefined,
@@ -100,6 +103,7 @@ export async function updateEvent(id: string, formData: FormData) {
 
     const contactIds = formData.getAll('contactIds') as string[]
     const organizationIds = formData.getAll('organizationIds') as string[]
+    const status = (formData.get('status') as EventStatus) || EventStatus.SCHEDULED
 
     await prisma.event.update({
         where: { id },
@@ -108,6 +112,7 @@ export async function updateEvent(id: string, formData: FormData) {
             description,
             startTime: fromZonedTime(startTimeStr, TIMEZONE),
             endTime: fromZonedTime(endTimeStr, TIMEZONE),
+            status,
             locationId,
             primaryContactId: primaryContactId || null,
             seriesId: seriesId || null,

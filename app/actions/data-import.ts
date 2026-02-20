@@ -2,6 +2,15 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { fromZonedTime } from 'date-fns-tz'
+
+const TIMEZONE = 'America/New_York'
+
+function parseDate(value: any) {
+    if (!value) return null
+    if (value instanceof Date) return value
+    return fromZonedTime(value, TIMEZONE)
+}
 
 export async function importData(entity: string, data: any[]) {
     try {
@@ -66,15 +75,15 @@ export async function importData(entity: string, data: any[]) {
                             name: row.Name,
                             description: row.Description,
                             status: row.Status || 'active',
-                            startDate: new Date(row['Start Date'] || Date.now()),
-                            endDate: row['End Date'] ? new Date(row['End Date']) : null
+                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                            endDate: parseDate(row['End Date'] || row.EndDate)
                         },
                         create: {
                             name: row.Name,
                             description: row.Description,
                             status: row.Status || 'active',
-                            startDate: new Date(row['Start Date'] || Date.now()),
-                            endDate: row['End Date'] ? new Date(row['End Date']) : null
+                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                            endDate: parseDate(row['End Date'] || row.EndDate)
                         }
                     })
                     count++
@@ -89,13 +98,13 @@ export async function importData(entity: string, data: any[]) {
                             title: row.Title,
                             description: row.Description,
                             status: row.Status || 'todo',
-                            dueDate: row['Due Date'] ? new Date(row['Due Date']) : null
+                            dueDate: parseDate(row['Due Date'])
                         },
                         create: {
                             title: row.Title,
                             description: row.Description,
                             status: row.Status || 'todo',
-                            dueDate: row['Due Date'] ? new Date(row['Due Date']) : null
+                            dueDate: parseDate(row['Due Date'])
                         }
                     })
                     count++
@@ -136,15 +145,15 @@ export async function importData(entity: string, data: any[]) {
                         update: {
                             title: row.Title,
                             description: row.Description,
-                            startTime: new Date(row['Start Time'] || row.Date || Date.now()),
-                            endTime: new Date(row['End Time'] || row.Date || Date.now()),
+                            startTime: parseDate(row['Start Time'] || row.Date) || new Date(),
+                            endTime: parseDate(row['End Time'] || row.Date) || new Date(),
                             locationId
                         },
                         create: {
                             title: row.Title,
                             description: row.Description,
-                            startTime: new Date(row['Start Time'] || row.Date || Date.now()),
-                            endTime: new Date(row['End Time'] || row.Date || new Date(Date.now() + 3600000)), // Default 1 hour
+                            startTime: parseDate(row['Start Time'] || row.Date) || new Date(),
+                            endTime: parseDate(row['End Time'] || row.Date) || new Date(Date.now() + 3600000), // Default 1 hour
                             locationId
                         }
                     })
@@ -159,13 +168,13 @@ export async function importData(entity: string, data: any[]) {
                         update: {
                             content: row.Content,
                             platform: row.Platform || 'Twitter',
-                            scheduledDate: row['Scheduled Date'] ? new Date(row['Scheduled Date']) : null,
+                            scheduledDate: parseDate(row['Scheduled Date']),
                             status: row.Status || 'draft'
                         },
                         create: {
                             content: row.Content,
                             platform: row.Platform || 'Twitter',
-                            scheduledDate: row['Scheduled Date'] ? new Date(row['Scheduled Date']) : null,
+                            scheduledDate: parseDate(row['Scheduled Date']),
                             status: row.Status || 'draft'
                         }
                     })
@@ -201,19 +210,19 @@ export async function importData(entity: string, data: any[]) {
                         where: { id: row.ID || '' },
                         update: {
                             name: row.Name,
-                            startDate: new Date(row['Start Date'] || row.StartDate || Date.now()),
-                            endDate: new Date(row['End Date'] || row.EndDate || Date.now()),
-                            adLiveDate: row['Ad Live Date'] ? new Date(row['Ad Live Date']) : null,
-                            adImageDeadline: row['Ad Image Deadline'] ? new Date(row['Ad Image Deadline']) : null,
-                            adPublishingDeadline: row['Ad Publishing Deadline'] ? new Date(row['Ad Publishing Deadline']) : null
+                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                            endDate: parseDate(row['End Date'] || row.EndDate) || new Date(),
+                            adLiveDate: parseDate(row['Ad Live Date']),
+                            adImageDeadline: parseDate(row['Ad Image Deadline']),
+                            adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
                         },
                         create: {
                             name: row.Name,
-                            startDate: new Date(row['Start Date'] || row.StartDate || Date.now()),
-                            endDate: new Date(row['End Date'] || row.EndDate || new Date(Date.now() + 86400000 * 7)), // Default 1 week
-                            adLiveDate: row['Ad Live Date'] ? new Date(row['Ad Live Date']) : null,
-                            adImageDeadline: row['Ad Image Deadline'] ? new Date(row['Ad Image Deadline']) : null,
-                            adPublishingDeadline: row['Ad Publishing Deadline'] ? new Date(row['Ad Publishing Deadline']) : null
+                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                            endDate: parseDate(row['End Date'] || row.EndDate) || new Date(Date.now() + 86400000 * 7), // Default 1 week
+                            adLiveDate: parseDate(row['Ad Live Date']),
+                            adImageDeadline: parseDate(row['Ad Image Deadline']),
+                            adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
                         }
                     })
                     count++

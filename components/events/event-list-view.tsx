@@ -13,6 +13,7 @@ import { format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
 import { useRouter } from 'next/navigation'
 import { Instagram, Facebook, Linkedin, Twitter, MessageSquare, MapPin, User } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const TIMEZONE = 'America/New_York'
 
@@ -30,6 +31,7 @@ export function EventListView({ events }: EventListViewProps) {
                     <TableRow className="bg-slate-50/50">
                         <TableHead className="w-[180px]">Date & Time</TableHead>
                         <TableHead>Event Title</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead>Location</TableHead>
                         <TableHead>Primary Contact</TableHead>
                         <TableHead className="text-right">Social</TableHead>
@@ -61,6 +63,16 @@ export function EventListView({ events }: EventListViewProps) {
                                         </span>
                                     )}
                                 </div>
+                            </TableCell>
+                            <TableCell>
+                                <Badge variant="outline" className={cn("text-[10px] uppercase font-bold tracking-wider", {
+                                    'bg-green-50 text-green-700 border-green-200': event.status === 'SCHEDULED' || !event.status,
+                                    'bg-yellow-50 text-yellow-700 border-yellow-200': event.status === 'TENTATIVE',
+                                    'bg-slate-100 text-slate-500 border-slate-200': event.status === 'PAST',
+                                    'bg-red-50 text-red-700 border-red-200': event.status === 'CANCELED',
+                                })}>
+                                    {event.status || 'SCHEDULED'}
+                                </Badge>
                             </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-1.5 text-slate-600">

@@ -24,6 +24,8 @@ const ENTITIES = [
     { id: 'hyperlinks', label: 'Hyperlinks', description: 'Quick access external links' },
     { id: 'social-posts', label: 'Social Posts', description: 'Social media content and schedule' },
     { id: 'promotions', label: 'Promotions', description: 'Marketing campaigns timelines' },
+    { id: 'email-plans', label: 'Email Plans', description: 'Newsletter subjects and schedule' },
+    { id: 'email-items', label: 'Email Items', description: 'Newsletter content items' },
 ]
 
 export function ExportHub() {

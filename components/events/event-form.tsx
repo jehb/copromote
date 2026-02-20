@@ -155,16 +155,32 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                         <div className="flex items-center gap-2 text-slate-900 font-bold border-b pb-2">
                             <Info className="h-4 w-4 text-primary" /> Basic Information
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="title">Event Title</Label>
-                            <Input
-                                id="title"
-                                name="title"
-                                defaultValue={event?.title}
-                                required
-                                placeholder="e.g., Summer Solstice Concert"
-                                className="bg-slate-50/50 border-slate-200"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="title">Event Title</Label>
+                                <Input
+                                    id="title"
+                                    name="title"
+                                    defaultValue={event?.title}
+                                    required
+                                    placeholder="e.g., Summer Solstice Concert"
+                                    className="bg-slate-50/50 border-slate-200"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="status">Event Status</Label>
+                                <Select name="status" defaultValue={event?.status || 'SCHEDULED'} required>
+                                    <SelectTrigger className="bg-slate-50/50 border-slate-200">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="TENTATIVE">Tentative</SelectItem>
+                                        <SelectItem value="SCHEDULED">Scheduled</SelectItem>
+                                        <SelectItem value="PAST">Past</SelectItem>
+                                        <SelectItem value="CANCELED">Canceled</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">

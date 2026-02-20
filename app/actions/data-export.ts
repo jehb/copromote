@@ -1,6 +1,15 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
+import { formatInTimeZone } from 'date-fns-tz'
+
+const TIMEZONE = 'America/New_York'
+const DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX"
+
+function formatDate(date: Date | null | undefined) {
+    if (!date) return ''
+    return formatInTimeZone(date, TIMEZONE, DATE_FORMAT)
+}
 
 export async function getExportData(entities: string[]) {
     const data: Record<string, any[]> = {}
@@ -20,7 +29,7 @@ export async function getExportData(entities: string[]) {
             Type: c.type,
             Notes: c.notes || '',
             Organization: c.organization?.name || '',
-            'Created At': c.createdAt.toISOString()
+            'Created At': formatDate(c.createdAt)
         }))
     }
 
@@ -35,7 +44,7 @@ export async function getExportData(entities: string[]) {
             Description: o.description || '',
             Website: o.website || '',
             'Primary Contact': o.primaryContact ? `${o.primaryContact.firstName} ${o.primaryContact.lastName}` : '',
-            'Created At': o.createdAt.toISOString()
+            'Created At': formatDate(o.createdAt)
         }))
     }
 
@@ -47,11 +56,11 @@ export async function getExportData(entities: string[]) {
             ID: e.id,
             Title: e.title,
             Description: e.description || '',
-            'Start Time': e.startTime.toISOString(),
-            'End Time': e.endTime.toISOString(),
+            'Start Time': formatDate(e.startTime),
+            'End Time': formatDate(e.endTime),
             Location: e.location.name,
             'Primary Contact': e.primaryContact ? e.primaryContact.name : '',
-            'Created At': e.createdAt.toISOString()
+            'Created At': formatDate(e.createdAt)
         }))
     }
 
@@ -64,10 +73,10 @@ export async function getExportData(entities: string[]) {
             Title: t.title,
             Description: t.description || '',
             Status: t.status,
-            'Due Date': t.dueDate ? t.dueDate.toISOString() : '',
+            'Due Date': formatDate(t.dueDate),
             Assignee: t.assignee?.name || '',
             Project: t.project?.name || '',
-            'Created At': t.createdAt.toISOString()
+            'Created At': formatDate(t.createdAt)
         }))
     }
 
@@ -78,9 +87,9 @@ export async function getExportData(entities: string[]) {
             Name: p.name,
             Description: p.description || '',
             Status: p.status,
-            'Start Date': p.startDate.toISOString(),
-            'End Date': p.endDate ? p.endDate.toISOString() : '',
-            'Created At': p.createdAt.toISOString()
+            'Start Date': formatDate(p.startDate),
+            'End Date': formatDate(p.endDate),
+            'Created At': formatDate(p.createdAt)
         }))
     }
 
@@ -92,7 +101,7 @@ export async function getExportData(entities: string[]) {
             URL: h.url,
             Description: h.description || '',
             Icon: h.icon || '',
-            'Created At': h.createdAt.toISOString()
+            'Created At': formatDate(h.createdAt)
         }))
     }
 
@@ -103,8 +112,8 @@ export async function getExportData(entities: string[]) {
             Content: p.content,
             Platform: p.platform,
             Status: p.status,
-            'Scheduled Date': p.scheduledDate ? p.scheduledDate.toISOString() : '',
-            'Created At': p.createdAt.toISOString()
+            'Scheduled Date': formatDate(p.scheduledDate),
+            'Created At': formatDate(p.createdAt)
         }))
     }
 
@@ -113,12 +122,37 @@ export async function getExportData(entities: string[]) {
         data.promotions = promotions.map(p => ({
             ID: p.id,
             Name: p.name,
-            'Start Date': p.startDate.toISOString(),
-            'End Date': p.endDate.toISOString(),
-            'Ad Live Date': p.adLiveDate ? p.adLiveDate.toISOString() : '',
-            'Ad Image Deadline': p.adImageDeadline ? p.adImageDeadline.toISOString() : '',
-            'Ad Publishing Deadline': p.adPublishingDeadline ? p.adPublishingDeadline.toISOString() : '',
-            'Created At': p.createdAt.toISOString()
+            'Start Date': formatDate(p.startDate),
+            'End Date': formatDate(p.endDate),
+            'Ad Live Date': formatDate(p.adLiveDate),
+            'Ad Image Deadline': formatDate(p.adImageDeadline),
+            'Ad Publishing Deadline': formatDate(p.adPublishingDeadline),
+            'Created At': formatDate(p.createdAt)
+        }))
+    }
+
+    if (entities.includes('email-plans')) {
+        const plans = await prisma.emailPlan.findMany()
+        data['email-plans'] = plans.map(p => ({
+            ID: p.id,
+            Subject: p.subject,
+            'Send Date': formatDate(p.sendDate),
+            Notes: p.notes || '',
+            'Created At': formatDate(p.createdAt)
+        }))
+    }
+
+    if (entities.includes('email-items')) {
+        const items = await prisma.emailItem.findMany({
+            include: { plan: true }
+        })
+        data['email-items'] = items.map(i => ({
+            ID: i.id,
+            Title: i.title,
+            Description: i.description || '',
+            'Plan Subject': i.plan.subject,
+            Order: i.order,
+            'Created At': formatDate(i.createdAt)
         }))
     }
 

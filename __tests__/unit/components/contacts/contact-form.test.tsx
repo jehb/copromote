@@ -13,7 +13,7 @@ const mockContact = {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@example.com',
-    phone: '123-456-7890',
+    phone: '+11234567890',
     company: 'Acme',
     jobTitle: 'Manager',
     organizationId: 'org1',

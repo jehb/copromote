@@ -13,7 +13,7 @@ import { getConfig } from './settings'
 export async function fetchLocalModels(baseUrl: string) {
     console.log('Fetching local models from:', baseUrl);
     try {
-        const url = getFinalBaseUrl(baseUrl, 'openai')!;
+        const url = await getFinalBaseUrl(baseUrl, 'openai')!;
         // The models endpoint is usually at /v1/models or just /models depending on the server
         // standardized openai is /v1/models. getFinalBaseUrl adds /v1.
         const response = await fetch(`${url}/models`);

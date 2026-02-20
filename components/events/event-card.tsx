@@ -9,6 +9,7 @@ import { Trash2, Calendar, User, MessageSquare, Instagram, Facebook, Linkedin, T
 import { format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
 import { deleteEvent } from '@/app/actions/events'
+import { cn } from '@/lib/utils'
 
 const TIMEZONE = 'America/New_York'
 
@@ -38,10 +39,20 @@ export function EventCard({ event, locations, users, contacts, organizations, ev
         >
             <CardContent className="p-5 space-y-4">
                 <div className="flex justify-between items-start">
-                    <div className="flex flex-col gap-1">
-                        <Badge variant="secondary" className="group-hover:bg-slate-200 transition-colors w-fit">
-                            {event.location?.name || 'No Location'}
-                        </Badge>
+                    <div className="flex flex-col gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className={cn("text-[10px] uppercase font-bold tracking-wider", {
+                                'bg-green-50 text-green-700 border-green-200': event.status === 'SCHEDULED' || !event.status,
+                                'bg-yellow-50 text-yellow-700 border-yellow-200': event.status === 'TENTATIVE',
+                                'bg-slate-100 text-slate-500 border-slate-200': event.status === 'PAST',
+                                'bg-red-50 text-red-700 border-red-200': event.status === 'CANCELED',
+                            })}>
+                                {event.status || 'SCHEDULED'}
+                            </Badge>
+                            <Badge variant="secondary" className="group-hover:bg-slate-200 transition-colors w-fit">
+                                {event.location?.name || 'No Location'}
+                            </Badge>
+                        </div>
                         {event.series && (
                             <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                                 {event.series.title}
