@@ -142,6 +142,116 @@ describe('Admin Users Actions', () => {
             const result = await createUser(formData)
             expect(result.success).toBe(false)
         })
+
+        it('should handle errors in createUser', async () => {
+            const formData = new FormData()
+            formData.append('name', 'Test')
+            formData.append('username', 'testuser')
+            formData.append('email', 'test@test.com')
+            formData.append('role', 'USER')
+
+                ; (prisma.user.findFirst as jest.Mock).mockResolvedValue(null)
+                ; (prisma.user.create as jest.Mock).mockRejectedValue(new Error('DB Error'))
+
+            const result = await createUser(formData)
+            expect(result.success).toBe(false)
+            expect(result.message).toContain('Failed: DB Error')
+        })
+    })
+
+    describe('updateUser', () => {
+        it('should handle setting contactId to none', async () => {
+            const formData = new FormData()
+            formData.append('id', '1')
+            formData.append('name', 'Test')
+            formData.append('username', 'testuser')
+            formData.append('email', 'test@test.com')
+            formData.append('role', 'USER')
+            formData.append('contactId', 'none')
+
+                ; (prisma.user.findFirst as jest.Mock).mockResolvedValue(null)
+                ; (prisma.user.update as jest.Mock).mockResolvedValue({ id: '1' })
+
+            const result = await updateUser(formData)
+            expect(result.success).toBe(true)
+            expect(prisma.user.update).toHaveBeenCalledWith(expect.objectContaining({
+                data: expect.objectContaining({ contactId: null })
+            }))
+        })
+
+        it('should handle setting contactId to empty string', async () => {
+            const formData = new FormData()
+            formData.append('id', '1')
+            formData.append('name', 'Test')
+            formData.append('username', 'testuser')
+            formData.append('email', 'test@test.com')
+            formData.append('role', 'USER')
+            formData.append('contactId', '')
+
+                ; (prisma.user.findFirst as jest.Mock).mockResolvedValue(null)
+                ; (prisma.user.update as jest.Mock).mockResolvedValue({ id: '1' })
+
+            const result = await updateUser(formData)
+            expect(result.success).toBe(true)
+            expect(prisma.user.update).toHaveBeenCalledWith(expect.objectContaining({
+                data: expect.objectContaining({ contactId: null })
+            }))
+        })
+
+        it('should return error if validation fails', async () => {
+            const formData = new FormData()
+            const result = await updateUser(formData)
+            expect(result.success).toBe(false)
+        })
+
+        it('should fail if username or email exists for another user', async () => {
+            const formData = new FormData()
+            formData.append('id', '1')
+            formData.append('name', 'Test')
+            formData.append('username', 'exist')
+            formData.append('email', 'test@test.com')
+            formData.append('role', 'USER')
+
+                ; (prisma.user.findFirst as jest.Mock).mockResolvedValue({ id: '2' })
+
+            const result = await updateUser(formData)
+            expect(result.success).toBe(false)
+            expect(result.message).toContain('already exists')
+        })
+
+        it('should fail if contact is linked to another user', async () => {
+            const formData = new FormData()
+            formData.append('id', '1')
+            formData.append('name', 'Test')
+            formData.append('username', 'testuser')
+            formData.append('email', 'test@test.com')
+            formData.append('role', 'USER')
+            formData.append('contactId', 'c1')
+
+                ; (prisma.user.findFirst as jest.Mock)
+                    .mockResolvedValueOnce(null) // Check 1: username/email
+                    .mockResolvedValueOnce({ id: '2' }) // Check 2: contact
+
+            const result = await updateUser(formData)
+            expect(result.success).toBe(false)
+            expect(result.message).toContain('already linked to another user')
+        })
+
+        it('should handle errors in updateUser', async () => {
+            const formData = new FormData()
+            formData.append('id', '1')
+            formData.append('name', 'Test')
+            formData.append('username', 'testuser')
+            formData.append('email', 'test@test.com')
+            formData.append('role', 'USER')
+
+                ; (prisma.user.findFirst as jest.Mock).mockResolvedValue(null)
+                ; (prisma.user.update as jest.Mock).mockRejectedValue(new Error('Update failed'))
+
+            const result = await updateUser(formData)
+            expect(result.success).toBe(false)
+            expect(result.message).toContain('Failed: Update failed')
+        })
     })
 
     describe('deleteUser', () => {
@@ -163,6 +273,22 @@ describe('Admin Users Actions', () => {
             expect(result.success).toBe(false)
             expect(result.message).toContain('Cannot delete')
             expect(prisma.user.delete).not.toHaveBeenCalled()
+        })
+
+        it('should fail if user not found', async () => {
+            ; (prisma.user.findUnique as jest.Mock).mockResolvedValue(null)
+            const result = await deleteUser('1')
+            expect(result.success).toBe(false)
+            expect(result.message).toBe('User not found')
+        })
+
+        it('should handle errors in deleteUser', async () => {
+            ; (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: '1', username: 'testuser' })
+                ; (prisma.user.delete as jest.Mock).mockRejectedValue(new Error('Delete Error'))
+
+            const result = await deleteUser('1')
+            expect(result.success).toBe(false)
+            expect(result.message).toBe('Failed to delete user')
         })
     })
 })

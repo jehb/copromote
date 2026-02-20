@@ -28,6 +28,7 @@ jest.mock('next/cache', () => ({
 describe('Email Item Actions', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        jest.spyOn(console, 'error').mockImplementation(() => { })
     })
 
     describe('createEmailItem', () => {
@@ -51,7 +52,7 @@ describe('Email Item Actions', () => {
         })
 
         it('should handle errors when creating an item', async () => {
-            ; (prisma.emailItem.create as jest.Mock).mockRejectedValue(new Error('DB Error'))
+            ; (prisma.emailItem.create as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
 
             const result = await createEmailItem('p1', { title: 'New Item' })
 
@@ -87,7 +88,7 @@ describe('Email Item Actions', () => {
         })
 
         it('should handle errors when updating an item', async () => {
-            ; (prisma.emailItem.findUnique as jest.Mock).mockRejectedValue(new Error('DB Error'))
+            ; (prisma.emailItem.findUnique as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
 
             const result = await updateEmailItem('1', { title: 'Updated' })
 
@@ -118,7 +119,7 @@ describe('Email Item Actions', () => {
         })
 
         it('should handle errors when deleting an item', async () => {
-            ; (prisma.emailItem.findUnique as jest.Mock).mockRejectedValue(new Error('DB Error'))
+            ; (prisma.emailItem.findUnique as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
 
             const result = await deleteEmailItem('1')
 
@@ -143,7 +144,7 @@ describe('Email Item Actions', () => {
         })
 
         it('should handle errors when adding event', async () => {
-            ; (prisma.emailItem.update as jest.Mock).mockRejectedValue(new Error('DB Error'))
+            ; (prisma.emailItem.update as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
 
             const result = await addItemEvent('1', 'e1')
 
@@ -168,7 +169,7 @@ describe('Email Item Actions', () => {
         })
 
         it('should handle errors when removing event', async () => {
-            ; (prisma.emailItem.update as jest.Mock).mockRejectedValue(new Error('DB Error'))
+            ; (prisma.emailItem.update as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
 
             const result = await removeItemEvent('1', 'e1')
 
@@ -212,7 +213,7 @@ describe('Email Item Actions', () => {
         })
 
         it('should handle errors during reorder', async () => {
-            ; (prisma.emailItem.findUnique as jest.Mock).mockRejectedValue(new Error('DB Error'))
+            ; (prisma.emailItem.findUnique as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
 
             const result = await reorderEmailItems([{ id: '1', order: 1 }])
 

@@ -262,6 +262,36 @@ describe('AI Actions', () => {
             expect(result.success).toBe(false)
             expect(result.message).toContain('empty response')
         })
+
+        it('should handle API_KEY_INVALID specially', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'AI_PROVIDER') return 'openai'
+                if (key === 'AI_API_KEY') return 'test-key'
+                return null
+            })
+                ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
+                    chat: { completions: { create: jest.fn().mockRejectedValue(new Error('API_KEY_INVALID')) } },
+                }))
+            const result = await testAIConnection()
+            expect(result.success).toBe(false)
+            expect(result.message).toContain('Invalid API Key')
+        })
+
+        it('should handle 404 error specially', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'AI_PROVIDER') return 'openai'
+                if (key === 'AI_API_KEY') return 'test-key'
+                return null
+            })
+            const error404 = new Error('Not Found') as any
+            error404.status = 404
+                ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
+                    chat: { completions: { create: jest.fn().mockRejectedValue(error404) } },
+                }))
+            const result = await testAIConnection()
+            expect(result.success).toBe(false)
+            expect(result.message).toContain('404 Not Found')
+        })
     })
 
     describe('generateSocialPostAlternatives', () => {
@@ -347,6 +377,18 @@ describe('AI Actions', () => {
                 }))
 
             await expect(generateSocialPostAlternatives(...promptParams)).rejects.toThrow('AI Error: Rate Limit')
+        })
+
+        it('should handle empty choices from OpenAI', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'AI_PROVIDER') return 'openai'
+                if (key === 'AI_API_KEY') return 'test-key'
+                return null
+            })
+                ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
+                    chat: { completions: { create: jest.fn().mockResolvedValue({ choices: [] }) } },
+                }))
+            await expect(generateSocialPostAlternatives('test', 'test')).rejects.toThrow('AI provider returned an empty response')
         })
 
         it('should throw unsupported provider error', async () => {
