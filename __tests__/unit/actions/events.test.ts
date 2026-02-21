@@ -128,6 +128,8 @@ describe('Events Actions', () => {
             formData.append('contactIds', 'c1')
             formData.append('contactIds', 'c2')
             formData.append('organizationIds', 'o1')
+            formData.append('productUpcs', '123456789012')
+            formData.append('productUpcs', '987654321098')
             formData.append('status', EventStatus.CANCELED)
 
                 ; (prisma.event.create as jest.Mock).mockResolvedValue({ id: 'event-2' })
@@ -144,6 +146,7 @@ describe('Events Actions', () => {
                     status: EventStatus.CANCELED,
                     contacts: { connect: [{ id: 'c1' }, { id: 'c2' }] },
                     organizations: { connect: [{ id: 'o1' }] },
+                    products: { create: [{ upc: '123456789012' }, { upc: '987654321098' }] },
                 })
             })
         })
@@ -179,6 +182,7 @@ describe('Events Actions', () => {
             formData.append('status', EventStatus.PAST)
             formData.append('contactIds', 'c3')
             formData.append('organizationIds', 'o2')
+            formData.append('productUpcs', '555555555555')
 
                 ; (prisma.event.update as jest.Mock).mockResolvedValue({ id: 'event-1' })
 
@@ -194,6 +198,10 @@ describe('Events Actions', () => {
                     seriesId: null, // Since seriesId is undefined/not provided
                     contacts: { set: [{ id: 'c3' }] },
                     organizations: { set: [{ id: 'o2' }] },
+                    products: {
+                        deleteMany: {},
+                        create: [{ upc: '555555555555' }]
+                    },
                     updatedById: 'user-1'
                 })
             })
@@ -217,6 +225,24 @@ describe('Events Actions', () => {
             expect(prisma.event.update).toHaveBeenCalledWith(expect.objectContaining({
                 data: expect.objectContaining({
                     seriesId: null
+                })
+            }))
+        })
+
+        it('should handle a valid seriesId in update', async () => {
+            const formData = new FormData()
+            formData.append('title', 'Event')
+            formData.append('startTime', '2025-01-01T10:00:00')
+            formData.append('endTime', '2025-01-01T12:00:00')
+            formData.append('seriesId', 'series-123')
+
+                ; (prisma.event.update as jest.Mock).mockResolvedValue({ id: 'event-1' })
+
+            await updateEvent('event-1', formData)
+
+            expect(prisma.event.update).toHaveBeenCalledWith(expect.objectContaining({
+                data: expect.objectContaining({
+                    seriesId: 'series-123'
                 })
             }))
         })

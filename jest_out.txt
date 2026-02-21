@@ -1,0 +1,28 @@
+PASS __tests__/unit/actions/events.test.ts
+  Events Actions
+    getEvents
+      ✓ should fetch events with includes ordered by startTime (2 ms)
+    getEvent
+      ✓ should fetch a single event by id (1 ms)
+    createEvent
+      ✓ should create an event with basic fields (9 ms)
+      ✓ should create an event with optional fields and relations (2 ms)
+      ✓ should handle "none" seriesId correctly
+    updateEvent
+      ✓ should update an event successfully (1 ms)
+      ✓ should handle "none" seriesId in update (1 ms)
+    deleteEvent
+      ✓ should delete an event and revalidate paths
+    getLocations
+      ✓ should fetch locations ordered by name (1 ms)
+    getUsers
+      ✓ should fetch users ordered by name
+    searchEventsForAutocomplete
+      ✓ should return recent events sorted by time proximity when query is empty (1 ms)
+      ✓ should filter events by query
+
+Test Suites: 1 passed, 1 total
+Tests:       12 passed, 12 total
+Snapshots:   0 total
+Time:        0.373 s, estimated 1 s
+Ran all test suites matching /__tests__\/unit\/actions\/events.test.ts/i.

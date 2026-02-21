@@ -159,6 +159,36 @@ describe('Chat Actions', () => {
             // The AI SDK mock logic handles it. Just assert no crash.
         })
 
+        it('should format history correctly for Gemini when user is first', async () => {
+            const messages = [
+                { role: 'user', content: 'Hello' },
+                { role: 'assistant', content: 'Hi' },
+                { role: 'user', content: 'How are you?' },
+            ] as any[]
+
+            await sendChatMessage(messages)
+        })
+
+        it('should handle fully populated and empty records for all entity types', async () => {
+            ; (prisma.event.findUnique as jest.Mock).mockImplementation(async ({ where }) => {
+                if (where.id === 'full') return { title: 'T', startTime: new Date(), endTime: new Date(), location: { name: 'L' }, description: 'D' }
+                return { title: 'T', startTime: new Date(), endTime: new Date(), location: { name: 'L' }, description: null }
+            })
+                ; (prisma.task.findUnique as jest.Mock).mockImplementation(async ({ where }) => {
+                    if (where.id === 'full') return { title: 'T', status: 'TODO', dueDate: new Date(), assignee: { name: 'A' }, description: 'D' }
+                    if (where.id === 'semi') return { title: 'T', status: 'TODO', dueDate: null, assignee: { name: null }, description: null }
+                    return { title: 'T', status: 'TODO', dueDate: null, assignee: null, description: null }
+                })
+                ; (prisma.promotionPeriod.findUnique as jest.Mock).mockImplementation(async ({ where }) => {
+                    if (where.id === 'full') return { name: 'N', startDate: new Date(), endDate: new Date(), adLiveDate: new Date() }
+                    return { name: 'N', startDate: new Date(), endDate: new Date(), adLiveDate: null }
+                })
+
+            // Also test sending duplicate mentions inside the same text to hit the processedIds continue branch
+            const messages = [{ role: 'user', content: '@event:full @event:empty @task:full @task:semi @task:empty @promotion:full @promotion:empty @event:full' }] as any[]
+            await sendChatMessage(messages)
+        })
+
         it('should send messages via OpenAI/Local', async () => {
             ; (getAISettings as jest.Mock).mockResolvedValue({
                 provider: 'openai',
@@ -176,16 +206,67 @@ describe('Chat Actions', () => {
             expect(getFinalBaseUrl).toHaveBeenCalledWith('fake-url', 'openai')
         })
 
+        it('should send messages via OpenAI/Local and test fallbacks', async () => {
+            ; (getConfig as jest.Mock).mockResolvedValue(null)
+                ; (getAISettings as jest.Mock).mockResolvedValue({
+                    provider: 'local',
+                    apiKey: null,
+                    model: null,
+                })
+                ; (getFinalBaseUrl as jest.Mock).mockResolvedValue('https://local-ai.com/v1')
+
+            const messages = [{ role: 'user', content: 'Hello Local' }] as any[]
+
+            const response = await sendChatMessage(messages)
+
+            expect(response).toBe('mock openai chat response')
+            expect(getFinalBaseUrl).toHaveBeenCalledWith(undefined, 'local')
+        })
+
+        it('should hit Gemini defaults when settings are missing', async () => {
+            ; (getAISettings as jest.Mock).mockResolvedValue({
+                provider: 'gemini',
+                apiKey: 'fake',
+                model: null,
+            })
+            const messages = [{ role: 'user', content: 'Hello Gemini' }] as any[]
+            const response = await sendChatMessage(messages)
+            expect(response).toBe('mock gemini chat response')
+        })
+
         it('should handle generic errors from the provider', async () => {
             ; (getAISettings as jest.Mock).mockResolvedValue({
                 provider: 'local',
                 apiKey: 'fake-key',
             })
-                // Make getFinalBaseUrl throw to simulate a generic error block
-                ; (getFinalBaseUrl as jest.Mock).mockRejectedValue(new Error('URL processing failed'))
+                ; (getFinalBaseUrl as jest.Mock).mockRejectedValue({})
 
             await expect(sendChatMessage([{ role: 'user', content: 'fail' }] as any[]))
-                .rejects.toThrow('AI error: URL processing failed')
+                .rejects.toThrow('AI error: Unknown error')
+        })
+
+        it('should handle empty response content from openai', async () => {
+            ; (getAISettings as jest.Mock).mockResolvedValue({
+                provider: 'openai',
+                model: 'gpt-4',
+                apiKey: 'fake-key',
+                baseUrl: 'fake-url'
+            })
+                ; (getFinalBaseUrl as jest.Mock).mockResolvedValue('https://api.openai.com/v1')
+
+                ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
+                    chat: {
+                        completions: {
+                            create: jest.fn().mockResolvedValue({
+                                choices: [{ message: { content: null } }],
+                            }),
+                        },
+                    },
+                }))
+
+            const messages = [{ role: 'user', content: 'Hello OpenAI' }] as any[]
+            const response = await sendChatMessage(messages)
+            expect(response).toBe('')
         })
     })
 })

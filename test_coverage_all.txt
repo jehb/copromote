@@ -1,0 +1,635 @@
+
+> promoty@0.1.0 test:coverage
+> jest --coverage
+
+PASS __tests__/unit/actions/locations.test.ts
+PASS __tests__/unit/actions/wordpress.test.ts
+PASS __tests__/unit/actions/chat.test.ts
+PASS __tests__/unit/actions/magic-link.test.ts
+PASS __tests__/unit/date-utils.test.ts
+PASS __tests__/unit/actions/events-action.test.ts
+PASS __tests__/unit/actions/data-import.test.ts
+PASS __tests__/unit/offline/action-registry.test.ts
+PASS __tests__/components/layout/connection-status.test.tsx
+PASS __tests__/unit/actions/admin-users.test.ts
+  ● Console
+
+    console.error
+      Create user error: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/admin-users.test.ts:154:71)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      122 |
+      123 |     } catch (error) {
+    > 124 |         console.error('Create user error:', error)
+          |                 ^
+      125 |         return { success: false, message: `Failed: ${(error as Error).message}` }
+      126 |     }
+      127 | }
+
+      at error (app/actions/admin-users.ts:124:17)
+      at Object.<anonymous> (__tests__/unit/actions/admin-users.test.ts:156:28)
+
+    console.error
+      Update user error: Error: Update failed
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/admin-users.test.ts:249:71)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      199 |
+      200 |     } catch (error) {
+    > 201 |         console.error('Update user error:', error)
+          |                 ^
+      202 |         return { success: false, message: `Failed: ${(error as Error).message}` }
+      203 |     }
+      204 | }
+
+      at error (app/actions/admin-users.ts:201:17)
+      at Object.<anonymous> (__tests__/unit/actions/admin-users.test.ts:251:28)
+
+    console.error
+      Failed to delete user: Error: Delete Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/admin-users.test.ts:287:71)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      229 |         return { success: true, message: 'User deleted successfully' }
+      230 |     } catch (error) {
+    > 231 |         console.error('Failed to delete user:', error)
+          |                 ^
+      232 |         return { success: false, message: 'Failed to delete user' }
+      233 |     }
+      234 | }
+
+      at error (app/actions/admin-users.ts:231:17)
+      at Object.<anonymous> (__tests__/unit/actions/admin-users.test.ts:289:28)
+
+PASS __tests__/unit/components/ui/avatar.test.tsx
+PASS __tests__/unit/components/ui/input.test.tsx
+PASS __tests__/unit/actions/promotions.test.ts
+PASS __tests__/integration/contacts-page.test.tsx
+PASS __tests__/unit/components/ui/card.test.tsx
+PASS __tests__/unit/actions/data-export.test.ts
+PASS __tests__/unit/actions/projects.test.ts
+PASS __tests__/unit/components/ui/button.test.tsx
+PASS __tests__/unit/actions/calendar.test.ts
+PASS __tests__/unit/actions/organizations-action.test.ts
+PASS __tests__/unit/actions/settings.test.ts
+PASS __tests__/unit/actions/auth.test.ts
+PASS __tests__/unit/actions/ai.test.ts
+PASS __tests__/integration/tasks-page.test.tsx
+PASS __tests__/unit/components/ui/dropdown-menu.test.tsx
+PASS __tests__/integration/dashboard.test.tsx
+PASS __tests__/unit/actions/misc-actions.test.ts
+  ● Console
+
+    console.log
+      --- SERVER ACTION: uploadPhoto ---
+
+      at log (app/actions/photos.ts:48:13)
+
+    console.log
+      File Name: test.png
+
+      at log (app/actions/photos.ts:49:13)
+
+    console.log
+      File Size: 4
+
+      at log (app/actions/photos.ts:50:13)
+
+    console.log
+      File Type: image/png
+
+      at log (app/actions/photos.ts:51:13)
+
+PASS __tests__/unit/actions/contacts-action.test.ts
+PASS __tests__/unit/prisma.test.ts
+PASS __tests__/unit/components/ui/badge.test.tsx
+PASS __tests__/unit/actions/social-action.test.ts
+PASS __tests__/unit/actions/hyperlinks.test.ts
+PASS __tests__/unit/auth.test.ts
+PASS __tests__/unit/actions/photos.test.ts
+PASS __tests__/unit/actions/auth-action.test.ts
+PASS __tests__/unit/actions/activity-logs.test.ts
+PASS __tests__/unit/components/ui/select.test.tsx
+PASS __tests__/unit/actions/search.test.ts
+PASS __tests__/components/social/social-filter-bar.test.tsx
+PASS __tests__/unit/actions/projects-action.test.ts
+PASS __tests__/unit/utils.test.ts
+PASS __tests__/unit/session.test.ts
+PASS __tests__/unit/gravatar.test.ts
+PASS __tests__/unit/actions/activity-logs-diff.test.ts
+PASS __tests__/unit/components/ui/alert-dialog.test.tsx
+PASS __tests__/unit/components/projects/projects-client-page.test.tsx
+PASS __tests__/unit/actions/events.test.ts
+PASS __tests__/unit/actions/external-db.test.ts
+PASS __tests__/unit/actions/admin-logs.test.ts
+PASS __tests__/components/layout/sidebar.test.tsx
+PASS __tests__/unit/components/ui/dialog.test.tsx
+PASS __tests__/unit/db.test.ts
+PASS __tests__/unit/actions/email-item.test.ts
+PASS __tests__/unit/actions/organizations.test.ts
+PASS __tests__/unit/components/tasks/task-board.test.tsx
+PASS __tests__/unit/actions/promotions-action.test.ts
+  ● Console
+
+    console.error
+      ZodError: [
+        {
+          "expected": "string",
+          "code": "invalid_type",
+          "path": [
+            "name"
+          ],
+          "message": "Invalid input: expected string, received null"
+        },
+        {
+          "expected": "string",
+          "code": "invalid_type",
+          "path": [
+            "startDate"
+          ],
+          "message": "Invalid input: expected string, received null"
+        },
+        {
+          "expected": "string",
+          "code": "invalid_type",
+          "path": [
+            "endDate"
+          ],
+          "message": "Invalid input: expected string, received null"
+        }
+      ]
+          at new ZodError (/home/jehb/projects/promoty/node_modules/zod/v4/core/core.cjs:44:39)
+          at Object.safeParse (/home/jehb/projects/promoty/node_modules/zod/v4/core/parse.cjs:68:20)
+          at _.inst.safeParse (/home/jehb/projects/promoty/node_modules/zod/v4/classic/schemas.cjs:161:46)
+          at safeParse (/home/jehb/projects/promoty/app/actions/promotions.ts:61:36)
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/promotions-action.test.ts:78:41)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      62 |
+      63 |     if (!result.success) {
+    > 64 |         console.error(result.error)
+         |                 ^
+      65 |         throw new Error('Invalid data')
+      66 |     }
+      67 |
+
+      at error (app/actions/promotions.ts:64:17)
+      at Object.<anonymous> (__tests__/unit/actions/promotions-action.test.ts:78:41)
+
+PASS __tests__/unit/actions/tasks-action.test.ts
+PASS __tests__/unit/actions/email-plan.test.ts
+  ● Console
+
+    console.error
+      Failed to fetch email plans: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:49:74)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      18 |         return { success: true, data: plans }
+      19 |     } catch (error) {
+    > 20 |         console.error('Failed to fetch email plans:', error)
+         |                 ^
+      21 |         return { success: false, error: 'Failed to fetch email plans' }
+      22 |     }
+      23 | }
+
+      at error (app/actions/email-plan.ts:20:17)
+      at Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:51:28)
+
+    console.error
+      Failed to fetch email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:88:76)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      46 |         return { success: true, data: plan }
+      47 |     } catch (error) {
+    > 48 |         console.error('Failed to fetch email plan:', error)
+         |                 ^
+      49 |         return { success: false, error: 'Failed to fetch email plan' }
+      50 |     }
+      51 | }
+
+      at error (app/actions/email-plan.ts:48:17)
+      at Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:90:28)
+
+    console.error
+      Failed to create email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:123:72)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      68 |         return { success: true, data: plan }
+      69 |     } catch (error) {
+    > 70 |         console.error('Failed to create email plan:', error)
+         |                 ^
+      71 |         return { success: false, error: 'Failed to create email plan' }
+      72 |     }
+      73 | }
+
+      at error (app/actions/email-plan.ts:70:17)
+      at Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:125:28)
+
+    console.error
+      Failed to update email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:153:72)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      93 |         return { success: true, data: plan }
+      94 |     } catch (error) {
+    > 95 |         console.error('Failed to update email plan:', error)
+         |                 ^
+      96 |         return { success: false, error: 'Failed to update email plan' }
+      97 |     }
+      98 | }
+
+      at error (app/actions/email-plan.ts:95:17)
+      at Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:155:28)
+
+    console.error
+      Failed to delete email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:176:72)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+          at Object.worker (/home/jehb/projects/promoty/node_modules/jest-runner/build/testWorker.js:106:12)
+
+      107 |         return { success: true }
+      108 |     } catch (error) {
+    > 109 |         console.error('Failed to delete email plan:', error)
+          |                 ^
+      110 |         return { success: false, error: 'Failed to delete email plan' }
+      111 |     }
+      112 | }
+
+      at error (app/actions/email-plan.ts:109:17)
+      at Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:178:28)
+
+PASS __tests__/unit/components/tasks/task-dialog.test.tsx
+PASS __tests__/unit/actions/social.test.ts
+PASS __tests__/unit/components/contacts/contact-form.test.tsx
+------------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------
+File                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                 
+------------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------
+All files                     |    35.4 |    80.39 |   57.22 |    35.4 |                                                                                   
+ app                          |   54.49 |       80 |      50 |   54.49 |                                                                                   
+  layout.tsx                  |       0 |        0 |       0 |       0 | 1-76                                                                              
+  page.tsx                    |     100 |      100 |     100 |     100 |                                                                                   
+ app/(auth)/change-password   |       0 |        0 |       0 |       0 |                                                                                   
+  error.tsx                   |       0 |        0 |       0 |       0 | 1-35                                                                              
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-107                                                                             
+ app/(auth)/login             |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-144                                                                             
+ app/(auth)/verify-magic-link |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-93                                                                              
+ app/actions                  |   97.65 |    90.69 |   97.47 |   97.65 |                                                                                   
+  activity-logs.ts            |     100 |      100 |     100 |     100 |                                                                                   
+  admin-logs.ts               |     100 |      100 |     100 |     100 |                                                                                   
+  admin-users.ts              |     100 |    93.33 |     100 |     100 | 85,151                                                                            
+  ai.ts                       |     100 |     87.3 |     100 |     100 | 49,138,152,183,205,214,229,233                                                    
+  assets.ts                   |     100 |      100 |     100 |     100 |                                                                                   
+  auth.ts                     |     100 |    89.65 |     100 |     100 | 69,77,136                                                                         
+  calendar.ts                 |     100 |      100 |     100 |     100 |                                                                                   
+  chat.ts                     |     100 |    70.96 |     100 |     100 | 31,41,49,72,96,129,142,147,151                                                    
+  contacts.ts                 |     100 |    69.23 |     100 |     100 | 68,109-112                                                                        
+  data-export.ts              |     100 |    87.09 |     100 |     100 | 46,62,77-78                                                                       
+  data-import.ts              |     100 |    65.51 |     100 |     100 | 11,23,55-61,78-85,191-197                                                         
+  email-item.ts               |     100 |      100 |     100 |     100 |                                                                                   
+  email-plan.ts               |     100 |      100 |     100 |     100 |                                                                                   
+  event-series.ts             |       0 |        0 |       0 |       0 | 1-42                                                                              
+  events.ts                   |     100 |      100 |     100 |     100 |                                                                                   
+  external-db.ts              |   79.75 |    71.42 |   71.42 |   79.75 | 159-178,181-209                                                                   
+  hyperlinks.ts               |     100 |      100 |     100 |     100 |                                                                                   
+  locations.ts                |     100 |      100 |     100 |     100 |                                                                                   
+  magic-link.ts               |     100 |      100 |     100 |     100 |                                                                                   
+  organizations.ts            |     100 |      100 |     100 |     100 |                                                                                   
+  photos.ts                   |     100 |      100 |     100 |     100 |                                                                                   
+  projects.ts                 |     100 |      100 |     100 |     100 |                                                                                   
+  promotions.ts               |     100 |      100 |     100 |     100 |                                                                                   
+  search.ts                   |     100 |      100 |     100 |     100 |                                                                                   
+  settings.ts                 |     100 |      100 |     100 |     100 |                                                                                   
+  social.ts                   |   97.99 |    92.75 |     100 |   97.99 | 206-211                                                                           
+  tasks.ts                    |     100 |    90.47 |     100 |     100 | 59,85                                                                             
+  user-role.ts                |     100 |      100 |     100 |     100 |                                                                                   
+  wordpress.ts                |     100 |    95.83 |     100 |     100 | 93,131                                                                            
+ app/admin                    |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-119                                                                             
+ app/admin/activity           |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-141                                                                             
+ app/admin/data               |       0 |        0 |       0 |       0 |                                                                                   
+  export-hub.tsx              |       0 |        0 |       0 |       0 | 1-171                                                                             
+  import-dialog.tsx           |       0 |        0 |       0 |       0 | 1-189                                                                             
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-96                                                                              
+ app/admin/hyperlinks         |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-31                                                                              
+ app/admin/locations          |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-30                                                                              
+ app/admin/logs               |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-101                                                                             
+ app/admin/settings           |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-712                                                                             
+ app/admin/users              |       0 |        0 |       0 |       0 |                                                                                   
+  delete-user-dialog.tsx      |       0 |        0 |       0 |       0 | 1-87                                                                              
+  edit-user-dialog.tsx        |       0 |        0 |       0 |       0 | 1-147                                                                             
+  new-user-dialog.tsx         |       0 |        0 |       0 |       0 | 1-102                                                                             
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-108                                                                             
+ app/api/debug-wp             |       0 |        0 |       0 |       0 |                                                                                   
+  route.ts                    |       0 |        0 |       0 |       0 | 1-65                                                                              
+ app/calendar                 |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-29                                                                              
+ app/chat                     |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-267                                                                             
+ app/contacts                 |     100 |      100 |     100 |     100 |                                                                                   
+  page.tsx                    |     100 |      100 |     100 |     100 |                                                                                   
+ app/contacts/[id]            |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-192                                                                             
+ app/contacts/edit/[id]       |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-46                                                                              
+ app/contacts/new             |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-34                                                                              
+ app/email-planner            |       0 |        0 |       0 |       0 |                                                                                   
+  delete-plan-button.tsx      |       0 |        0 |       0 |       0 | 1-29                                                                              
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-84                                                                              
+ app/email-planner/[id]       |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-87                                                                              
+ app/email-planner/new        |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-11                                                                              
+ app/events                   |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-30                                                                              
+ app/events/[id]              |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-46                                                                              
+ app/events/new               |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-56                                                                              
+ app/gallery                  |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-29                                                                              
+ app/organizations            |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-181                                                                             
+ app/organizations/[id]       |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-299                                                                             
+ app/organizations/edit/[id]  |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-49                                                                              
+ app/organizations/new        |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-47                                                                              
+ app/product/[upc]            |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-117                                                                             
+ app/products                 |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-113                                                                             
+ app/projects                 |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-11                                                                              
+ app/projects/[id]            |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-308                                                                             
+ app/projects/new             |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-61                                                                              
+ app/promotions               |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-48                                                                              
+ app/promotions/[id]          |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-190                                                                             
+ app/promotions/[id]/edit     |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-74                                                                              
+ app/promotions/new           |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-65                                                                              
+ app/social                   |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-57                                                                              
+ app/social/[id]              |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-270                                                                             
+ app/social/new               |       0 |        0 |       0 |       0 |                                                                                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-39                                                                              
+ app/tasks                    |     100 |      100 |     100 |     100 |                                                                                   
+  page.tsx                    |     100 |      100 |     100 |     100 |                                                                                   
+ components/calendar          |       0 |        0 |       0 |       0 |                                                                                   
+  calendar-view.tsx           |       0 |        0 |       0 |       0 | 1-203                                                                             
+ components/chat              |       0 |        0 |       0 |       0 |                                                                                   
+  MentionInput.tsx            |       0 |        0 |       0 |       0 | 1-197                                                                             
+ components/common            |     100 |    33.33 |     100 |     100 |                                                                                   
+  audit-info.tsx              |     100 |    33.33 |     100 |     100 | 28-32                                                                             
+ components/contacts          |    32.5 |       88 |      50 |    32.5 |                                                                                   
+  add-organization-choice.tsx |       0 |        0 |       0 |       0 | 1-167                                                                             
+  contact-form.tsx            |   98.99 |    95.65 |      75 |   98.99 | 30-31                                                                             
+  contacts-client-page.tsx    |       0 |        0 |       0 |       0 | 1-240                                                                             
+ components/dashboard         |   21.05 |       50 |      50 |   21.05 |                                                                                   
+  quick-links.tsx             |   21.05 |       50 |      50 |   21.05 | 10-14,18-57                                                                       
+ components/email-planner     |       0 |        0 |       0 |       0 |                                                                                   
+  email-item-card.tsx         |       0 |        0 |       0 |       0 | 1-260                                                                             
+  email-item-list.tsx         |       0 |        0 |       0 |       0 | 1-116                                                                             
+  email-plan-form.tsx         |       0 |        0 |       0 |       0 | 1-123                                                                             
+  event-selector.tsx          |       0 |        0 |       0 |       0 | 1-94                                                                              
+  product-selector.tsx        |       0 |        0 |       0 |       0 | 1-135                                                                             
+ components/events            |       0 |        0 |       0 |       0 |                                                                                   
+  event-calendar-view.tsx     |       0 |        0 |       0 |       0 | 1-130                                                                             
+  event-card.tsx              |       0 |        0 |       0 |       0 | 1-113                                                                             
+  event-details.tsx           |       0 |        0 |       0 |       0 | 1-336                                                                             
+  event-form.tsx              |       0 |        0 |       0 |       0 | 1-692                                                                             
+  event-list-view.tsx         |       0 |        0 |       0 |       0 | 1-123                                                                             
+  events-client-page.tsx      |       0 |        0 |       0 |       0 | 1-182                                                                             
+ components/gallery           |       0 |        0 |       0 |       0 |                                                                                   
+  gallery-client.tsx          |       0 |        0 |       0 |       0 | 1-168                                                                             
+  photo-selection-modal.tsx   |       0 |        0 |       0 |       0 | 1-221                                                                             
+  upload-modal.tsx            |       0 |        0 |       0 |       0 | 1-145                                                                             
+ components/help              |       0 |        0 |       0 |       0 |                                                                                   
+  help-drawer.tsx             |       0 |        0 |       0 |       0 | 1-177                                                                             
+ components/hyperlinks        |       0 |        0 |       0 |       0 |                                                                                   
+  hyperlink-form.tsx          |       0 |        0 |       0 |       0 | 1-141                                                                             
+  hyperlink-list.tsx          |       0 |        0 |       0 |       0 | 1-70                                                                              
+ components/layout            |   93.58 |    80.76 |      80 |   93.58 |                                                                                   
+  connection-status.tsx       |    86.3 |    73.33 |     100 |    86.3 | 18-26,45                                                                          
+  sidebar.tsx                 |   98.24 |     90.9 |      75 |   98.24 | 35-36                                                                             
+ components/locations         |       0 |        0 |       0 |       0 |                                                                                   
+  location-form.tsx           |       0 |        0 |       0 |       0 | 1-113                                                                             
+  location-list.tsx           |       0 |        0 |       0 |       0 | 1-66                                                                              
+ components/organizations     |       0 |        0 |       0 |       0 |                                                                                   
+  add-person-choice.tsx       |       0 |        0 |       0 |       0 | 1-160                                                                             
+  organization-form.tsx       |       0 |        0 |       0 |       0 | 1-173                                                                             
+ components/products          |       0 |        0 |       0 |       0 |                                                                                   
+  page-size-selector.tsx      |       0 |        0 |       0 |       0 | 1-40                                                                              
+  product-toolbar.tsx         |       0 |        0 |       0 |       0 | 1-50                                                                              
+  products-pagination.tsx     |       0 |        0 |       0 |       0 | 1-54                                                                              
+ components/projects          |   76.14 |      100 |   33.33 |   76.14 |                                                                                   
+  project-delete-dialog.tsx   |   34.17 |      100 |       0 |   34.17 | 28-79                                                                             
+  projects-client-page.tsx    |     100 |      100 |      50 |     100 |                                                                                   
+ components/promotions        |       0 |        0 |       0 |       0 |                                                                                   
+  PromotionGridView.tsx       |       0 |        0 |       0 |       0 | 1-87                                                                              
+  PromotionListView.tsx       |       0 |        0 |       0 |       0 | 1-111                                                                             
+  ViewToggle.tsx              |       0 |        0 |       0 |       0 | 1-40                                                                              
+ components/providers         |       0 |        0 |       0 |       0 |                                                                                   
+  offline-sync-provider.tsx   |       0 |        0 |       0 |       0 | 1-84                                                                              
+  query-provider.tsx          |       0 |        0 |       0 |       0 | 1-63                                                                              
+ components/search            |   48.48 |    19.04 |   11.11 |   48.48 |                                                                                   
+  command-menu.tsx            |   48.48 |    19.04 |   11.11 |   48.48 | 47-51,62-77,81-82,106-127,157-169,172-184,187-199,202-214,217-229,232-244,247-259 
+ components/social            |   17.99 |       70 |   15.38 |   17.99 |                                                                                   
+  social-client-page.tsx      |       0 |        0 |       0 |       0 | 1-207                                                                             
+  social-filter-bar.tsx       |   91.19 |      100 |      20 |   91.19 | 22-29,32-34,57-59                                                                 
+  social-post-form.tsx        |       0 |        0 |       0 |       0 | 1-315                                                                             
+  social-table.tsx            |       0 |        0 |       0 |       0 | 1-125                                                                             
+ components/tasks             |   95.06 |    85.36 |   53.84 |   95.06 |                                                                                   
+  task-board.tsx              |   90.72 |       90 |    37.5 |   90.72 | 31-33,54-68                                                                       
+  task-dialog.tsx             |   99.47 |    83.87 |      80 |   99.47 | 57                                                                                
+ components/ui                |   56.76 |    82.89 |   62.92 |   56.76 |                                                                                   
+  alert-dialog.tsx            |   92.34 |      100 |   91.66 |   92.34 | 131-145                                                                           
+  avatar.tsx                  |   75.67 |       80 |   66.66 |   75.67 | 75-86,88-102                                                                      
+  badge.tsx                   |     100 |       50 |     100 |     100 | 36                                                                                
+  button.tsx                  |     100 |      100 |     100 |     100 |                                                                                   
+  calendar.tsx                |       0 |        0 |       0 |       0 | 1-220                                                                             
+  card.tsx                    |   86.95 |      100 |   85.71 |   86.95 | 51-62                                                                             
+  checkbox.tsx                |       0 |        0 |       0 |       0 | 1-32                                                                              
+  command.tsx                 |   91.97 |      100 |      50 |   91.97 | 137-149                                                                           
+  date-picker.tsx             |       0 |        0 |       0 |       0 | 1-50                                                                              
+  dialog.tsx                  |   96.83 |      100 |      90 |   96.83 | 28-32                                                                             
+  dropdown-menu.tsx           |   52.14 |      100 |   46.66 |   52.14 | 77-101,103-125,160-174,176-180,182-204,206-220,222-231,233-239                    
+  export-button.tsx           |       0 |        0 |       0 |       0 | 1-98                                                                              
+  input.tsx                   |     100 |      100 |     100 |     100 |                                                                                   
+  label.tsx                   |     100 |      100 |     100 |     100 |                                                                                   
+  page-header.tsx             |     100 |      100 |     100 |     100 |                                                                                   
+  phone-input.tsx             |   98.73 |     87.5 |      50 |   98.73 | 82-83                                                                             
+  popover.tsx                 |   60.67 |      100 |   42.85 |   60.67 | 42-46,48-56,58-66,68-79                                                           
+  scroll-area.tsx             |   17.24 |      100 |       0 |   17.24 | 8-29,31-56                                                                        
+  select.tsx                  |   83.68 |    77.77 |      70 |   83.68 | 15-19,67,79,90-101,130-141                                                        
+  sheet.tsx                   |       0 |        0 |       0 |       0 | 1-143                                                                             
+  sonner.tsx                  |       0 |        0 |       0 |       0 | 1-31                                                                              
+  table.tsx                   |       0 |        0 |       0 |       0 | 1-116                                                                             
+  textarea.tsx                |     100 |      100 |     100 |     100 |                                                                                   
+  user-avatar.tsx             |       0 |        0 |       0 |       0 | 1-34                                                                              
+ hooks                        |   17.39 |       60 |      50 |   17.39 |                                                                                   
+  use-debounce.ts             |     100 |       75 |     100 |     100 | 8                                                                                 
+  use-offline-mutation.ts     |       0 |        0 |       0 |       0 | 1-76                                                                              
+ lib                          |   86.92 |    82.85 |   86.66 |   86.92 |                                                                                   
+  auth.ts                     |     100 |      100 |     100 |     100 |                                                                                   
+  date-utils.ts               |     100 |    77.77 |     100 |     100 | 18,21                                                                             
+  db.ts                       |       0 |        0 |       0 |       0 | 1-9                                                                               
+  gravatar.ts                 |     100 |      100 |     100 |     100 |                                                                                   
+  prisma.ts                   |       0 |        0 |       0 |       0 | 1-11                                                                              
+  session.ts                  |     100 |    92.85 |     100 |     100 | 39                                                                                
+  user-util.ts                |     100 |       80 |     100 |     100 | 10                                                                                
+  utils.ts                    |     100 |      100 |     100 |     100 |                                                                                   
+ lib/hooks                    |       0 |        0 |       0 |       0 |                                                                                   
+  use-debounce.ts             |       0 |        0 |       0 |       0 | 1-15                                                                              
+ lib/offline                  |   73.33 |      100 |   14.28 |   73.33 |                                                                                   
+  action-registry.ts          |   73.33 |      100 |   14.28 |   73.33 | 11-13,15-17,21-23,25-27                                                           
+------------------------------|---------|----------|---------|---------|-----------------------------------------------------------------------------------
+
+Test Suites: 61 passed, 61 total
+Tests:       419 passed, 419 total
+Snapshots:   0 total
+Time:        3.877 s
+Ran all test suites.

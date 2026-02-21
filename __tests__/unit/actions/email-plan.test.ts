@@ -69,7 +69,7 @@ describe('Email Plan Actions', () => {
                 include: {
                     items: {
                         orderBy: { order: 'asc' },
-                        include: { events: true },
+                        include: { events: true, products: true },
                     },
                 },
             })

@@ -1,0 +1,87 @@
+FAIL __tests__/unit/actions/email-item.test.ts
+  Email Item Actions
+    createEmailItem
+      ✓ should create an email item successfully (5 ms)
+      ✓ should handle errors when creating an item
+    updateEmailItem
+      ✓ should update an email item successfully (1 ms)
+      ✓ should return error if item not found
+      ✓ should handle errors when updating an item (1 ms)
+    deleteEmailItem
+      ✓ should delete an email item successfully
+      ✓ should return error if item not found for deletion
+      ✓ should handle errors when deleting an item (1 ms)
+    addItemEvent
+      ✓ should add event to item successfully
+      ✓ should handle errors when adding event
+    removeItemEvent
+      ✓ should remove event from item successfully
+      ✓ should handle errors when removing event (1 ms)
+    addItemProduct
+      ✓ should add product to item successfully
+      ✓ should handle errors when adding product
+    removeItemProduct
+      ✕ should remove product from item successfully (1 ms)
+      ✕ should return success even if plan not found for revalidation
+      ✓ should handle errors when removing product (1 ms)
+    reorderEmailItems
+      ✕ should reorder items and revalidate successfully if items provided
+      ✓ should reorder successfully even if no items provided (1 ms)
+      ✓ should handle errors during reorder
+
+  ● Email Item Actions › removeItemProduct › should remove product from item successfully
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      216 |             const result = await removeItemProduct('1', '123456789012')
+      217 |
+    > 218 |             expect(result.success).toBe(true)
+          |                                    ^
+      219 |             expect(prisma.emailItemProduct.deleteMany).toHaveBeenCalledWith({
+      220 |                 where: { itemId: '1', upc: '123456789012' },
+      221 |             })
+
+      at Object.<anonymous> (__tests__/unit/actions/email-item.test.ts:218:36)
+
+  ● Email Item Actions › removeItemProduct › should return success even if plan not found for revalidation
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      229 |             const result = await removeItemProduct('1', '123456789012')
+      230 |
+    > 231 |             expect(result.success).toBe(true)
+          |                                    ^
+      232 |             expect(prisma.emailItemProduct.deleteMany).toHaveBeenCalledWith({
+      233 |                 where: { itemId: '1', upc: '123456789012' },
+      234 |             })
+
+      at Object.<anonymous> (__tests__/unit/actions/email-item.test.ts:231:36)
+
+  ● Email Item Actions › reorderEmailItems › should reorder items and revalidate successfully if items provided
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      260 |             const result = await reorderEmailItems(itemsToReorder)
+      261 |
+    > 262 |             expect(result.success).toBe(true)
+          |                                    ^
+      263 |             expect(prisma.emailItem.findUnique).toHaveBeenCalledWith({
+      264 |                 where: { id: '1' },
+      265 |                 select: { planId: true },
+
+      at Object.<anonymous> (__tests__/unit/actions/email-item.test.ts:262:36)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 17 passed, 20 total
+Snapshots:   0 total
+Time:        0.346 s, estimated 1 s
+Ran all test suites matching /__tests__\/unit\/actions\/email-item.test.ts/i.

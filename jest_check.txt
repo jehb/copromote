@@ -1,0 +1,139 @@
+PASS __tests__/unit/actions/social.test.ts
+PASS __tests__/unit/actions/organizations.test.ts
+PASS __tests__/unit/actions/email-plan.test.ts
+  ● Console
+
+    console.error
+      Failed to fetch email plans: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:49:74)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at async _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at async runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at async jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at async runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at async runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+
+    [0m [90m 48 |[39m         console[33m.[39merror([32m'Failed to fetch email plan:'[39m[33m,[39m error)
+     [90m 49 |[39m         [36mreturn[39m { success[33m:[39m [36mfalse[39m[33m,[39m error[33m:[39m [32m'Failed to fetch email plan'[39m }
+    [31m[1m>[22m[39m[90m 50 |[39m     }
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 51 |[39m }
+     [90m 52 |[39m
+     [90m 53 |[39m [36mexport[39m [36masync[39m [36mfunction[39m createEmailPlan(data[33m:[39m {[0m
+
+      at getEmailPlans (app/actions/email-plan.ts:50:17)
+      at async Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:55:28)
+
+    console.error
+      Failed to fetch email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:88:76)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at async _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at async runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at async jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at async runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at async runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+
+    [0m [90m 84 |[39m         [36mconst[39m plan [33m=[39m [36mawait[39m prisma[33m.[39memailPlan[33m.[39mupdate({
+     [90m 85 |[39m             where[33m:[39m { id }[33m,[39m
+    [31m[1m>[22m[39m[90m 86 |[39m             data[33m:[39m {
+     [90m    |[39m                 [31m[1m^[22m[39m
+     [90m 87 |[39m                 [33m...[39mdata[33m,[39m
+     [90m 88 |[39m             }[33m,[39m
+     [90m 89 |[39m         })[0m
+
+      at getEmailPlan (app/actions/email-plan.ts:86:17)
+      at async Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:98:28)
+
+    console.error
+      Failed to create email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:123:72)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at async _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at async runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at async jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at async runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at async runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+
+    [0m [90m 106 |[39m         revalidatePath([32m'/email-planner'[39m)
+     [90m 107 |[39m         [36mreturn[39m { success[33m:[39m [36mtrue[39m }
+    [31m[1m>[22m[39m[90m 108 |[39m     } [36mcatch[39m (error) {
+     [90m     |[39m                 [31m[1m^[22m[39m
+     [90m 109 |[39m         console[33m.[39merror([32m'Failed to delete email plan:'[39m[33m,[39m error)
+     [90m 110 |[39m         [36mreturn[39m { success[33m:[39m [36mfalse[39m[33m,[39m error[33m:[39m [32m'Failed to delete email plan'[39m }
+     [90m 111 |[39m     }[0m
+
+      at createEmailPlan (app/actions/email-plan.ts:108:17)
+      at async Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:131:28)
+
+    console.error
+      Failed to update email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:153:72)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at async _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at async runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at async jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at async runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at async runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+
+    [0m[0m
+
+      at updateEmailPlan (app/actions/email-plan.ts:132:17)
+      at async Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:165:28)
+
+    console.error
+      Failed to delete email plan: Error: DB Error
+          at Object.<anonymous> (/home/jehb/projects/promoty/__tests__/unit/actions/email-plan.test.ts:176:72)
+          at Promise.then.completed (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/home/jehb/projects/promoty/node_modules/jest-circus/build/utils.js:231:10)
+          at _callCircusTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:316:40)
+          at async _runTest (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:252:3)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:126:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async _runTestsForDescribeBlock (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:121:9)
+          at async run (/home/jehb/projects/promoty/node_modules/jest-circus/build/run.js:71:3)
+          at async runAndTransformResultsToJestFormat (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)
+          at async jestAdapter (/home/jehb/projects/promoty/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)
+          at async runTestInternal (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:367:16)
+          at async runTest (/home/jehb/projects/promoty/node_modules/jest-runner/build/runTest.js:444:34)
+
+    [0m[0m
+
+      at deleteEmailPlan (app/actions/email-plan.ts:151:17)
+      at async Object.<anonymous> (__tests__/unit/actions/email-plan.test.ts:188:28)
+
+
+Test Suites: 3 passed, 3 total
+Tests:       33 passed, 33 total
+Snapshots:   0 total
+Time:        0.444 s, estimated 1 s
+Ran all test suites matching /__tests__\/unit\/actions\/social.test.ts|__tests__\/unit\/actions\/email-plan.test.ts|__tests__\/unit\/actions\/organizations.test.ts/i.

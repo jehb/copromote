@@ -181,12 +181,25 @@ model Event {
   contacts         Contact[]      @relation("EventContacts")
   organizations    Organization[] @relation("EventOrganizations")
   emailItems       EmailItem[]    @relation("EmailItemEvents")
+  products         EventProduct[]
 
   @@index([createdById], map: "Event_createdById_fkey")
   @@index([locationId], map: "Event_locationId_fkey")
   @@index([primaryContactId], map: "Event_primaryContactId_fkey")
   @@index([seriesId], map: "Event_seriesId_fkey")
   @@index([updatedById], map: "Event_updatedById_fkey")
+}
+
+model EventProduct {
+  id        String   @id @default(uuid())
+  upc       String
+  eventId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, upc])
+  @@index([eventId], map: "EventProduct_eventId_fkey")
 }
 
 model EventSeries {

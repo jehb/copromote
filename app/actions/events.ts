@@ -19,6 +19,7 @@ export async function getEvents() {
             series: true,
             contacts: true,
             organizations: true,
+            products: true,
             socialPosts: {
                 orderBy: { scheduledDate: 'asc' }
             }
@@ -35,6 +36,7 @@ export async function getEvent(id: string) {
             series: true,
             contacts: true,
             organizations: true,
+            products: true,
             socialPosts: {
                 orderBy: { scheduledDate: 'asc' }
             }
@@ -57,6 +59,7 @@ export async function createEvent(formData: FormData) {
     // Multi-select values as JSON string or multiple fields
     const contactIds = formData.getAll('contactIds') as string[]
     const organizationIds = formData.getAll('organizationIds') as string[]
+    const productUpcs = formData.getAll('productUpcs') as string[]
     const status = (formData.get('status') as EventStatus) || EventStatus.SCHEDULED
 
     const event = await prisma.event.create({
@@ -76,6 +79,9 @@ export async function createEvent(formData: FormData) {
             },
             organizations: {
                 connect: organizationIds.map(id => ({ id }))
+            },
+            products: {
+                create: productUpcs.map(upc => ({ upc }))
             },
             createdById: await getCurrentUserId(),
             updatedById: await getCurrentUserId()
@@ -103,6 +109,7 @@ export async function updateEvent(id: string, formData: FormData) {
 
     const contactIds = formData.getAll('contactIds') as string[]
     const organizationIds = formData.getAll('organizationIds') as string[]
+    const productUpcs = formData.getAll('productUpcs') as string[]
     const status = (formData.get('status') as EventStatus) || EventStatus.SCHEDULED
 
     await prisma.event.update({
@@ -123,6 +130,10 @@ export async function updateEvent(id: string, formData: FormData) {
             },
             organizations: {
                 set: organizationIds.map(id => ({ id }))
+            },
+            products: {
+                deleteMany: {},
+                create: productUpcs.map(upc => ({ upc }))
             },
             updatedById: await getCurrentUserId()
         }

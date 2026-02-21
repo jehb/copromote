@@ -1,0 +1,278 @@
+PASS __tests__/unit/actions/external-db.test.ts
+  External DB Actions
+    testExternalConnection
+      ✓ should return error if config is invalid (2 ms)
+      ✓ should test connection successfully (1 ms)
+      ✓ should handle jdbc style url for server extraction (1 ms)
+      ✓ should handle missing user, password, and database config defaults
+      ✓ should handle connection errors explicitly (1 ms)
+    getExternalProducts
+      ✓ should return empty array if config is invalid
+      ✓ should fetch external products with pagination (1 ms)
+      ✓ should apply search filter and pass it to count query
+      ✓ should handle undefined fields gracefully
+      ✓ should handle fetch errors gracefully and return mock error product (1 ms)
+    getExternalProductByUPC
+      ✓ should return null if config is invalid
+      ✓ should fetch single external product by UPC
+      ✓ should return null if no product found
+      ✓ should handle fetch errors gracefully and return null
+    getExternalBrands
+      ✓ should return empty array if config is invalid
+      ✓ should fetch external brands (1 ms)
+      ✓ should handle fetch errors gracefully
+    getExternalProductsByBrand
+      ✓ should return empty array if config is invalid
+      ✓ should fetch external products by brand (1 ms)
+      ✓ should handle undefined fields gracefully in brand products
+      ✓ should handle fetch errors gracefully
+  getExternalProductsByUPCs
+    ✓ should return empty array if config is invalid (1 ms)
+    ✓ should return empty array if no UPCs provided
+    ✓ should return empty array if over 2000 UPCs provided
+    ✓ should fetch multiple external products by UPCs (1 ms)
+    ✓ should handle undefined fields gracefully in UPC products
+    ✓ should handle fetch errors gracefully and return empty array (1 ms)
+
+------------------------------|---------|----------|---------|---------|-------------------
+File                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+------------------------------|---------|----------|---------|---------|-------------------
+All files                     |    1.23 |    26.69 |    4.14 |    1.23 |                   
+ app                          |       0 |        0 |       0 |       0 |                   
+  layout.tsx                  |       0 |        0 |       0 |       0 | 1-76              
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-91              
+ app/(auth)/change-password   |       0 |        0 |       0 |       0 |                   
+  error.tsx                   |       0 |        0 |       0 |       0 | 1-35              
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-107             
+ app/(auth)/login             |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-144             
+ app/(auth)/verify-magic-link |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-93              
+ app/actions                  |    5.85 |    67.81 |      20 |    5.85 |                   
+  activity-logs.ts            |       0 |        0 |       0 |       0 | 1-53              
+  admin-logs.ts               |       0 |        0 |       0 |       0 | 1-60              
+  admin-users.ts              |       0 |        0 |       0 |       0 | 1-236             
+  ai.ts                       |       0 |        0 |       0 |       0 | 1-246             
+  assets.ts                   |       0 |        0 |       0 |       0 | 1-27              
+  auth.ts                     |       0 |        0 |       0 |       0 | 1-161             
+  calendar.ts                 |       0 |        0 |       0 |       0 | 1-130             
+  chat.ts                     |       0 |        0 |       0 |       0 | 1-153             
+  contacts.ts                 |       0 |        0 |       0 |       0 | 1-176             
+  data-export.ts              |       0 |        0 |       0 |       0 | 1-160             
+  data-import.ts              |       0 |        0 |       0 |       0 | 1-240             
+  email-item.ts               |       0 |        0 |       0 |       0 | 1-212             
+  email-plan.ts               |       0 |        0 |       0 |       0 | 1-112             
+  event-series.ts             |       0 |        0 |       0 |       0 | 1-42              
+  events.ts                   |       0 |        0 |       0 |       0 | 1-194             
+  external-db.ts              |     100 |      100 |     100 |     100 |                   
+  hyperlinks.ts               |       0 |        0 |       0 |       0 | 1-88              
+  locations.ts                |       0 |        0 |       0 |       0 | 1-98              
+  magic-link.ts               |       0 |        0 |       0 |       0 | 1-71              
+  organizations.ts            |       0 |        0 |       0 |       0 | 1-146             
+  photos.ts                   |       0 |        0 |       0 |       0 | 1-149             
+  projects.ts                 |       0 |        0 |       0 |       0 | 1-174             
+  promotions.ts               |       0 |        0 |       0 |       0 | 1-144             
+  search.ts                   |       0 |        0 |       0 |       0 | 1-195             
+  settings.ts                 |       0 |        0 |       0 |       0 | 1-20              
+  social.ts                   |       0 |        0 |       0 |       0 | 1-299             
+  tasks.ts                    |       0 |        0 |       0 |       0 | 1-110             
+  user-role.ts                |       0 |        0 |       0 |       0 | 1-8               
+  wordpress.ts                |       0 |        0 |       0 |       0 | 1-187             
+ app/admin                    |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-119             
+ app/admin/activity           |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-141             
+ app/admin/data               |       0 |        0 |       0 |       0 |                   
+  export-hub.tsx              |       0 |        0 |       0 |       0 | 1-171             
+  import-dialog.tsx           |       0 |        0 |       0 |       0 | 1-189             
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-96              
+ app/admin/hyperlinks         |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-31              
+ app/admin/locations          |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-30              
+ app/admin/logs               |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-101             
+ app/admin/settings           |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-712             
+ app/admin/users              |       0 |        0 |       0 |       0 |                   
+  delete-user-dialog.tsx      |       0 |        0 |       0 |       0 | 1-87              
+  edit-user-dialog.tsx        |       0 |        0 |       0 |       0 | 1-147             
+  new-user-dialog.tsx         |       0 |        0 |       0 |       0 | 1-102             
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-108             
+ app/api/debug-wp             |       0 |        0 |       0 |       0 |                   
+  route.ts                    |       0 |        0 |       0 |       0 | 1-65              
+ app/calendar                 |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-29              
+ app/chat                     |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-267             
+ app/contacts                 |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-10              
+ app/contacts/[id]            |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-192             
+ app/contacts/edit/[id]       |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-46              
+ app/contacts/new             |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-34              
+ app/email-planner            |       0 |        0 |       0 |       0 |                   
+  delete-plan-button.tsx      |       0 |        0 |       0 |       0 | 1-29              
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-84              
+ app/email-planner/[id]       |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-87              
+ app/email-planner/new        |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-11              
+ app/events                   |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-30              
+ app/events/[id]              |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-46              
+ app/events/new               |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-56              
+ app/gallery                  |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-29              
+ app/organizations            |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-181             
+ app/organizations/[id]       |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-299             
+ app/organizations/edit/[id]  |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-49              
+ app/organizations/new        |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-47              
+ app/product/[upc]            |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-117             
+ app/products                 |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-113             
+ app/projects                 |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-11              
+ app/projects/[id]            |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-308             
+ app/projects/new             |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-61              
+ app/promotions               |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-48              
+ app/promotions/[id]          |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-190             
+ app/promotions/[id]/edit     |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-74              
+ app/promotions/new           |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-65              
+ app/social                   |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-57              
+ app/social/[id]              |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-270             
+ app/social/new               |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-39              
+ app/tasks                    |       0 |        0 |       0 |       0 |                   
+  page.tsx                    |       0 |        0 |       0 |       0 | 1-44              
+ components/calendar          |       0 |        0 |       0 |       0 |                   
+  calendar-view.tsx           |       0 |        0 |       0 |       0 | 1-203             
+ components/chat              |       0 |        0 |       0 |       0 |                   
+  MentionInput.tsx            |       0 |        0 |       0 |       0 | 1-197             
+ components/common            |       0 |        0 |       0 |       0 |                   
+  audit-info.tsx              |       0 |        0 |       0 |       0 | 1-37              
+ components/contacts          |       0 |        0 |       0 |       0 |                   
+  add-organization-choice.tsx |       0 |        0 |       0 |       0 | 1-167             
+  contact-form.tsx            |       0 |        0 |       0 |       0 | 1-199             
+  contacts-client-page.tsx    |       0 |        0 |       0 |       0 | 1-240             
+ components/dashboard         |       0 |        0 |       0 |       0 |                   
+  quick-links.tsx             |       0 |        0 |       0 |       0 | 1-57              
+ components/email-planner     |       0 |        0 |       0 |       0 |                   
+  email-item-card.tsx         |       0 |        0 |       0 |       0 | 1-260             
+  email-item-list.tsx         |       0 |        0 |       0 |       0 | 1-116             
+  email-plan-form.tsx         |       0 |        0 |       0 |       0 | 1-123             
+  event-selector.tsx          |       0 |        0 |       0 |       0 | 1-94              
+  product-selector.tsx        |       0 |        0 |       0 |       0 | 1-135             
+ components/events            |       0 |        0 |       0 |       0 |                   
+  event-calendar-view.tsx     |       0 |        0 |       0 |       0 | 1-130             
+  event-card.tsx              |       0 |        0 |       0 |       0 | 1-113             
+  event-details.tsx           |       0 |        0 |       0 |       0 | 1-336             
+  event-form.tsx              |       0 |        0 |       0 |       0 | 1-692             
+  event-list-view.tsx         |       0 |        0 |       0 |       0 | 1-123             
+  events-client-page.tsx      |       0 |        0 |       0 |       0 | 1-182             
+ components/gallery           |       0 |        0 |       0 |       0 |                   
+  gallery-client.tsx          |       0 |        0 |       0 |       0 | 1-168             
+  photo-selection-modal.tsx   |       0 |        0 |       0 |       0 | 1-221             
+  upload-modal.tsx            |       0 |        0 |       0 |       0 | 1-145             
+ components/help              |       0 |        0 |       0 |       0 |                   
+  help-drawer.tsx             |       0 |        0 |       0 |       0 | 1-177             
+ components/hyperlinks        |       0 |        0 |       0 |       0 |                   
+  hyperlink-form.tsx          |       0 |        0 |       0 |       0 | 1-141             
+  hyperlink-list.tsx          |       0 |        0 |       0 |       0 | 1-70              
+ components/layout            |       0 |        0 |       0 |       0 |                   
+  connection-status.tsx       |       0 |        0 |       0 |       0 | 1-73              
+  sidebar.tsx                 |       0 |        0 |       0 |       0 | 1-114             
+ components/locations         |       0 |        0 |       0 |       0 |                   
+  location-form.tsx           |       0 |        0 |       0 |       0 | 1-113             
+  location-list.tsx           |       0 |        0 |       0 |       0 | 1-66              
+ components/organizations     |       0 |        0 |       0 |       0 |                   
+  add-person-choice.tsx       |       0 |        0 |       0 |       0 | 1-160             
+  organization-form.tsx       |       0 |        0 |       0 |       0 | 1-173             
+ components/products          |       0 |        0 |       0 |       0 |                   
+  page-size-selector.tsx      |       0 |        0 |       0 |       0 | 1-40              
+  product-toolbar.tsx         |       0 |        0 |       0 |       0 | 1-50              
+  products-pagination.tsx     |       0 |        0 |       0 |       0 | 1-54              
+ components/projects          |       0 |        0 |       0 |       0 |                   
+  project-delete-dialog.tsx   |       0 |        0 |       0 |       0 | 1-79              
+  projects-client-page.tsx    |       0 |        0 |       0 |       0 | 1-139             
+ components/promotions        |       0 |        0 |       0 |       0 |                   
+  PromotionGridView.tsx       |       0 |        0 |       0 |       0 | 1-87              
+  PromotionListView.tsx       |       0 |        0 |       0 |       0 | 1-111             
+  ViewToggle.tsx              |       0 |        0 |       0 |       0 | 1-40              
+ components/providers         |       0 |        0 |       0 |       0 |                   
+  offline-sync-provider.tsx   |       0 |        0 |       0 |       0 | 1-84              
+  query-provider.tsx          |       0 |        0 |       0 |       0 | 1-63              
+ components/search            |       0 |        0 |       0 |       0 |                   
+  command-menu.tsx            |       0 |        0 |       0 |       0 | 1-264             
+ components/social            |       0 |        0 |       0 |       0 |                   
+  social-client-page.tsx      |       0 |        0 |       0 |       0 | 1-207             
+  social-filter-bar.tsx       |       0 |        0 |       0 |       0 | 1-159             
+  social-post-form.tsx        |       0 |        0 |       0 |       0 | 1-315             
+  social-table.tsx            |       0 |        0 |       0 |       0 | 1-125             
+ components/tasks             |       0 |        0 |       0 |       0 |                   
+  task-board.tsx              |       0 |        0 |       0 |       0 | 1-194             
+  task-dialog.tsx             |       0 |        0 |       0 |       0 | 1-191             
+ components/ui                |       0 |        0 |       0 |       0 |                   
+  alert-dialog.tsx            |       0 |        0 |       0 |       0 | 1-196             
+  avatar.tsx                  |       0 |        0 |       0 |       0 | 1-111             
+  badge.tsx                   |       0 |        0 |       0 |       0 | 1-48              
+  button.tsx                  |       0 |        0 |       0 |       0 | 1-64              
+  calendar.tsx                |       0 |        0 |       0 |       0 | 1-220             
+  card.tsx                    |       0 |        0 |       0 |       0 | 1-92              
+  checkbox.tsx                |       0 |        0 |       0 |       0 | 1-32              
+  command.tsx                 |       0 |        0 |       0 |       0 | 1-162             
+  date-picker.tsx             |       0 |        0 |       0 |       0 | 1-50              
+  dialog.tsx                  |       0 |        0 |       0 |       0 | 1-158             
+  dropdown-menu.tsx           |       0 |        0 |       0 |       0 | 1-257             
+  export-button.tsx           |       0 |        0 |       0 |       0 | 1-98              
+  input.tsx                   |       0 |        0 |       0 |       0 | 1-21              
+  label.tsx                   |       0 |        0 |       0 |       0 | 1-24              
+  page-header.tsx             |       0 |        0 |       0 |       0 | 1-24              
+  phone-input.tsx             |       0 |        0 |       0 |       0 | 1-158             
+  popover.tsx                 |       0 |        0 |       0 |       0 | 1-89              
+  scroll-area.tsx             |       0 |        0 |       0 |       0 | 1-58              
+  select.tsx                  |       0 |        0 |       0 |       0 | 1-190             
+  sheet.tsx                   |       0 |        0 |       0 |       0 | 1-143             
+  sonner.tsx                  |       0 |        0 |       0 |       0 | 1-31              
+  table.tsx                   |       0 |        0 |       0 |       0 | 1-116             
+  textarea.tsx                |       0 |        0 |       0 |       0 | 1-18              
+  user-avatar.tsx             |       0 |        0 |       0 |       0 | 1-34              
+ hooks                        |       0 |        0 |       0 |       0 |                   
+  use-debounce.ts             |       0 |        0 |       0 |       0 | 1-16              
+  use-offline-mutation.ts     |       0 |        0 |       0 |       0 | 1-76              
+ lib                          |       0 |        0 |       0 |       0 |                   
+  auth.ts                     |       0 |        0 |       0 |       0 | 1-9               
+  date-utils.ts               |       0 |        0 |       0 |       0 | 1-28              
+  db.ts                       |       0 |        0 |       0 |       0 | 1-9               
+  gravatar.ts                 |       0 |        0 |       0 |       0 | 1-11              
+  prisma.ts                   |       0 |        0 |       0 |       0 | 1-11              
+  session.ts                  |       0 |        0 |       0 |       0 | 1-63              
+  user-util.ts                |       0 |        0 |       0 |       0 | 1-16              
+  utils.ts                    |       0 |        0 |       0 |       0 | 1-6               
+ lib/hooks                    |       0 |        0 |       0 |       0 |                   
+  use-debounce.ts             |       0 |        0 |       0 |       0 | 1-15              
+ lib/offline                  |       0 |        0 |       0 |       0 |                   
+  action-registry.ts          |       0 |        0 |       0 |       0 | 1-45              
+------------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 passed, 1 total
+Tests:       27 passed, 27 total
+Snapshots:   0 total
+Time:        1.278 s
+Ran all test suites matching /__tests__\/unit\/actions\/external-db.test.ts/i.

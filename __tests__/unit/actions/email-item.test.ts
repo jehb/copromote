@@ -4,6 +4,8 @@ import {
     deleteEmailItem,
     addItemEvent,
     removeItemEvent,
+    addItemProduct,
+    removeItemProduct,
     reorderEmailItems,
 } from '@/app/actions/email-item'
 import { prisma } from '@/lib/prisma'
@@ -14,6 +16,11 @@ jest.mock('@/lib/prisma', () => ({
         emailItem: {
             create: jest.fn(),
             update: jest.fn(),
+            delete: jest.fn(),
+            findUnique: jest.fn(),
+        },
+        emailItemProduct: {
+            create: jest.fn(),
             delete: jest.fn(),
             findUnique: jest.fn(),
         },
@@ -178,12 +185,70 @@ describe('Email Item Actions', () => {
         })
     })
 
+    describe('addItemProduct', () => {
+        it('should add product to item successfully', async () => {
+            ; (prisma.emailItemProduct.create as jest.Mock).mockResolvedValue({ item: { planId: 'p1' } })
+
+            const result = await addItemProduct('1', '123456789012')
+
+            expect(result.success).toBe(true)
+            expect(prisma.emailItemProduct.create).toHaveBeenCalledWith({
+                data: { itemId: '1', upc: '123456789012' },
+                include: { item: { select: { planId: true } } },
+            })
+            expect(revalidatePath).toHaveBeenCalledWith('/email-planner/p1')
+        })
+
+        it('should handle errors when adding product', async () => {
+            ; (prisma.emailItemProduct.create as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
+
+            const result = await addItemProduct('1', '123456789012')
+
+            expect(result.success).toBe(false)
+            expect(result.error).toBe('Failed to add product to item')
+        })
+    })
+
+    describe('removeItemProduct', () => {
+        it('should remove product from item successfully', async () => {
+            ; (prisma.emailItemProduct.findUnique as jest.Mock).mockResolvedValue({ item: { planId: 'p1' } })
+                ; (prisma.emailItemProduct.delete as jest.Mock).mockResolvedValue({})
+
+            const result = await removeItemProduct('1', '123456789012')
+
+            expect(result.success).toBe(true)
+            expect(prisma.emailItemProduct.delete).toHaveBeenCalledWith({
+                where: { itemId_upc: { itemId: '1', upc: '123456789012' } },
+            })
+            expect(revalidatePath).toHaveBeenCalledWith('/email-planner/p1')
+        })
+
+        it('should return error if product not found on item for revalidation', async () => {
+            ; (prisma.emailItemProduct.findUnique as jest.Mock).mockResolvedValue(null)
+
+            const result = await removeItemProduct('1', '123456789012')
+
+            expect(result.success).toBe(false)
+            expect(result.error).toBe('Product not found on item')
+            expect(prisma.emailItemProduct.delete).not.toHaveBeenCalled()
+            expect(revalidatePath).not.toHaveBeenCalled()
+        })
+
+        it('should handle errors when removing product', async () => {
+            ; (prisma.emailItemProduct.findUnique as jest.Mock).mockImplementationOnce(async () => { throw new Error('DB Error') })
+
+            const result = await removeItemProduct('1', '123456789012')
+
+            expect(result.success).toBe(false)
+            expect(result.error).toBe('Failed to remove product from item')
+        })
+    })
+
     describe('reorderEmailItems', () => {
         it('should reorder items and revalidate successfully if items provided', async () => {
             ; (prisma.emailItem.findUnique as jest.Mock).mockResolvedValue({ planId: 'p1' })
+                ; (prisma.emailItem.update as jest.Mock).mockResolvedValue({})
                 ; (prisma.$transaction as jest.Mock).mockResolvedValue([{}, {}])
-
-            // Mock map implicitly by not overriding but capturing calls
 
             const itemsToReorder = [
                 { id: '1', order: 1 },

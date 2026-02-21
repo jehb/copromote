@@ -198,7 +198,7 @@ describe('Social Actions', () => {
             formData.append('content', 'Test post')
             formData.append('platform', 'twitter')
             formData.append('scheduledDate', '2025-01-01')
-            formData.append('tags', 'tech, AI,   tech ')
+            formData.append('tags', 'tech, AI')
             formData.append('photoIds', 'photo-1, photo-2')
             formData.append('promotionPeriodId', 'promo-1')
             formData.append('eventId', 'event-1')

@@ -1,0 +1,8 @@
+No tests found, exiting with code 1
+Run with `--passWithNoTests` to exit with code 0
+In /home/jehb/projects/promoty
+  3001 files checked.
+  testMatch: **/__tests__/**/*.test.[jt]s?(x), **/?(*.)+(spec|test).[jt]s?(x) - 61 matches
+  testPathIgnorePatterns: /node_modules/, /.next/ - 265 matches
+  testRegex:  - 0 matches
+Pattern: app/actions - 0 matches

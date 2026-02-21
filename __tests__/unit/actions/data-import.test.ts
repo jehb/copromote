@@ -41,12 +41,15 @@ describe('Data Import Actions', () => {
                     'Last Name': 'Doe',
                     Email: 'john@example.com',
                 },
+                {
+                    'First Name': 'Jane',
+                },
             ]
 
             const result = await importData('contacts', mockData)
 
             expect(result.success).toBe(true)
-            expect(result.message).toContain('Successfully processed 1 records')
+            expect(result.message).toContain('Successfully processed 2 records')
             expect(prisma.contact.upsert).toHaveBeenCalledWith({
                 where: { id: '1' },
                 update: expect.any(Object),
@@ -63,6 +66,9 @@ describe('Data Import Actions', () => {
                     Name: 'Acme Corp',
                     Category: 'Client',
                 },
+                {
+                    Name: 'No Category Corp',
+                },
             ]
 
             const result = await importData('organizations', mockData)
@@ -78,6 +84,13 @@ describe('Data Import Actions', () => {
                 {
                     Name: 'Project A',
                     'Start Date': '2023-01-01',
+                },
+                {
+                    Name: 'Project B',
+                    StartDate: new Date('2023-01-02'),
+                },
+                {
+                    Name: 'Project C',
                 },
             ]
 
@@ -180,7 +193,10 @@ describe('Data Import Actions', () => {
         it('should import hyperlinks successfully', async () => {
             ; (prisma.hyperlink.upsert as jest.Mock).mockResolvedValue({})
 
-            const mockData = [{ Title: 'Google', URL: 'google.com' }]
+            const mockData = [
+                { Title: 'Google', URL: 'google.com' },
+                { Title: 'Bing', Url: 'bing.com' },
+            ]
 
             const result = await importData('hyperlinks', mockData)
 

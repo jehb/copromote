@@ -1,0 +1,36 @@
+PASS __tests__/unit/actions/email-item.test.ts
+  Email Item Actions
+    createEmailItem
+      ✓ should create an email item successfully (3 ms)
+      ✓ should handle errors when creating an item (1 ms)
+    updateEmailItem
+      ✓ should update an email item successfully (1 ms)
+      ✓ should return error if item not found
+      ✓ should handle errors when updating an item
+    deleteEmailItem
+      ✓ should delete an email item successfully (1 ms)
+      ✓ should return error if item not found for deletion
+      ✓ should handle errors when deleting an item
+    addItemEvent
+      ✓ should add event to item successfully (1 ms)
+      ✓ should handle errors when adding event
+    removeItemEvent
+      ✓ should remove event from item successfully (1 ms)
+      ✓ should handle errors when removing event
+    addItemProduct
+      ✓ should add product to item successfully (3 ms)
+      ✓ should handle errors when adding product
+    removeItemProduct
+      ✓ should remove product from item successfully (1 ms)
+      ✓ should return error if product not found on item for revalidation
+      ✓ should handle errors when removing product
+    reorderEmailItems
+      ✓ should reorder items and revalidate successfully if items provided (1 ms)
+      ✓ should reorder successfully even if no items provided
+      ✓ should handle errors during reorder
+
+Test Suites: 1 passed, 1 total
+Tests:       20 passed, 20 total
+Snapshots:   0 total
+Time:        0.326 s, estimated 1 s
+Ran all test suites matching /__tests__\/unit\/actions\/email-item.test.ts/i.

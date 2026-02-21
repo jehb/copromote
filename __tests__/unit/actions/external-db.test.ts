@@ -1,4 +1,4 @@
-import { testExternalConnection, getExternalProducts, getExternalProductByUPC } from '@/app/actions/external-db'
+import { testExternalConnection, getExternalProducts, getExternalProductByUPC, getExternalProductsByUPCs, getExternalBrands, getExternalProductsByBrand } from '@/app/actions/external-db'
 import { getConfig } from '@/app/actions/settings'
 import sql from 'mssql'
 
@@ -57,6 +57,46 @@ describe('External DB Actions', () => {
             expect(result.success).toBe(true)
             expect(result.message).toContain('Successfully connected')
             expect(sql.connect).toHaveBeenCalled()
+        })
+
+        it('should handle jdbc style url for server extraction', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'jdbc:sqlserver://my-server.com:1433'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+            const mockRequest = { query: jest.fn().mockResolvedValue({}) }
+            const mockPool = { request: jest.fn().mockReturnValue(mockRequest), close: jest.fn() }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            const result = await testExternalConnection()
+            expect(result.success).toBe(true)
+            expect(sql.connect).toHaveBeenCalledWith(expect.objectContaining({
+                server: 'my-server.com'
+            }))
+        })
+
+        it('should handle missing user, password, and database config defaults', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return null
+            })
+
+            const mockRequest = { query: jest.fn().mockResolvedValue({}) }
+            const mockPool = {
+                request: jest.fn().mockReturnValue(mockRequest),
+                close: jest.fn(),
+            }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            const result = await testExternalConnection()
+            expect(result.success).toBe(true)
+            expect(sql.connect).toHaveBeenCalledWith(expect.objectContaining({
+                user: '',
+                password: '',
+                database: 'ProductsDB'
+            }))
         })
 
         it('should handle connection errors explicitly', async () => {
@@ -144,6 +184,43 @@ describe('External DB Actions', () => {
             await getExternalProducts(1, 10, 'search-term')
 
             expect(mockRequest.input).toHaveBeenCalledWith('search', 'NVarChar', '%search-term%')
+        })
+
+        it('should handle undefined fields gracefully', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+
+            const mockRequest = {
+                input: jest.fn().mockReturnThis(),
+                query: jest.fn(),
+            }
+            const mockPool = {
+                request: jest.fn().mockReturnValue(mockRequest),
+                close: jest.fn(),
+            }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            mockRequest.query
+                .mockResolvedValueOnce({
+                    recordset: [{}],
+                })
+                .mockResolvedValueOnce({
+                    recordset: [{ count: 1 }],
+                })
+
+            const result = await getExternalProducts(1, 10, '')
+
+            expect(result.products).toHaveLength(1)
+            expect(result.products[0]).toEqual({
+                upc: '',
+                brand: '',
+                size: '',
+                department: '',
+                name: 'Unknown Product'
+            })
         })
 
         it('should handle fetch errors gracefully and return mock error product', async () => {
@@ -241,6 +318,207 @@ describe('External DB Actions', () => {
             expect(console.error).toHaveBeenCalled()
         })
     })
-    // Need to import it at the top or dynamically, but we imported it at the top if we edit the import.
-    // Wait, I need to add it to the import at the top of the file as well. Let's do a multi_replace instead.
+
+    describe('getExternalBrands', () => {
+        it('should return empty array if config is invalid', async () => {
+            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            const result = await getExternalBrands()
+            expect(result).toEqual([])
+        })
+
+        it('should fetch external brands', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+
+            const mockRequest = { query: jest.fn() }
+            const mockPool = {
+                request: jest.fn().mockReturnValue(mockRequest),
+                close: jest.fn(),
+            }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            mockRequest.query.mockResolvedValueOnce({
+                recordset: [{ brand: 'Brand A' }, { brand: 'Brand B' }],
+            })
+
+            const result = await getExternalBrands()
+            expect(result).toEqual(['Brand A', 'Brand B'])
+        })
+
+        it('should handle fetch errors gracefully', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+                ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+
+            const result = await getExternalBrands()
+            expect(result).toEqual([])
+        })
+    })
+
+    describe('getExternalProductsByBrand', () => {
+        it('should return empty array if config is invalid', async () => {
+            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            const result = await getExternalProductsByBrand('Brand A')
+            expect(result).toEqual([])
+        })
+
+        it('should fetch external products by brand', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+
+            const mockRequest = { input: jest.fn().mockReturnThis(), query: jest.fn() }
+            const mockPool = {
+                request: jest.fn().mockReturnValue(mockRequest),
+                close: jest.fn(),
+            }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            mockRequest.query.mockResolvedValueOnce({
+                recordset: [{ upc: '123', brand: 'Brand A', name: 'Prod A', size: '', department: '' }],
+            })
+
+            const result = await getExternalProductsByBrand('Brand A')
+            expect(result).toHaveLength(1)
+            expect(mockRequest.input).toHaveBeenCalledWith('brand', 'NVarChar', 'Brand A')
+        })
+
+        it('should handle undefined fields gracefully in brand products', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+
+            const mockRequest = { input: jest.fn().mockReturnThis(), query: jest.fn() }
+            const mockPool = {
+                request: jest.fn().mockReturnValue(mockRequest),
+                close: jest.fn(),
+            }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            mockRequest.query.mockResolvedValueOnce({
+                recordset: [{}],
+            })
+
+            const result = await getExternalProductsByBrand('Brand A')
+            expect(result).toHaveLength(1)
+            expect(result[0].name).toBe('Unknown Product')
+        })
+
+        it('should handle fetch errors gracefully', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+                ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+
+            const result = await getExternalProductsByBrand('Brand A')
+            expect(result).toEqual([])
+        })
+    })
+})
+
+describe('getExternalProductsByUPCs', () => {
+    it('should return empty array if config is invalid', async () => {
+        ; (getConfig as jest.Mock).mockResolvedValue(null)
+
+        const result = await getExternalProductsByUPCs(['123', '456'])
+        expect(result).toEqual([])
+    })
+
+    it('should return empty array if no UPCs provided', async () => {
+        const result = await getExternalProductsByUPCs([])
+        expect(result).toEqual([])
+    })
+
+    it('should return empty array if over 2000 UPCs provided', async () => {
+        const result = await getExternalProductsByUPCs(Array(2001).fill('123'))
+        expect(result).toEqual([])
+    })
+
+    it('should fetch multiple external products by UPCs', async () => {
+        ; (getConfig as jest.Mock).mockImplementation((key) => {
+            if (key === 'EXTERNAL_DB_URL') return 'test-server'
+            if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+            return 'test-val'
+        })
+
+        const mockRequest = {
+            input: jest.fn().mockReturnThis(),
+            query: jest.fn(),
+        }
+        const mockPool = {
+            request: jest.fn().mockReturnValue(mockRequest),
+            close: jest.fn(),
+        }
+            ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+        const mockProducts = [
+            { upc: '123', brand: 'Brand A', name: 'Prod A', size: '', department: '' },
+            { upc: '456', brand: 'Brand B', name: 'Prod B', size: '', department: '' }
+        ]
+
+        mockRequest.query.mockResolvedValueOnce({
+            recordset: mockProducts,
+        })
+
+        const result = await getExternalProductsByUPCs(['123', '456'])
+
+        expect(result).toEqual(mockProducts)
+        expect(mockRequest.input).toHaveBeenCalledWith('upc0', 'NVarChar', '123')
+        expect(mockRequest.input).toHaveBeenCalledWith('upc1', 'NVarChar', '456')
+        expect(mockRequest.query).toHaveBeenCalledWith(expect.stringContaining("IN (@upc0,@upc1)"))
+    })
+
+    it('should handle undefined fields gracefully in UPC products', async () => {
+        ; (getConfig as jest.Mock).mockImplementation((key) => {
+            if (key === 'EXTERNAL_DB_URL') return 'test-server'
+            if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+            return 'test-val'
+        })
+
+        const mockRequest = {
+            input: jest.fn().mockReturnThis(),
+            query: jest.fn(),
+        }
+        const mockPool = {
+            request: jest.fn().mockReturnValue(mockRequest),
+            close: jest.fn(),
+        }
+            ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+        mockRequest.query.mockResolvedValueOnce({
+            recordset: [{}],
+        })
+
+        const result = await getExternalProductsByUPCs(['123'])
+
+        expect(result).toHaveLength(1)
+        expect(result[0].name).toBe('Unknown Product')
+    })
+
+    it('should handle fetch errors gracefully and return empty array', async () => {
+        ; (getConfig as jest.Mock).mockImplementation((key) => {
+            if (key === 'EXTERNAL_DB_URL') return 'test-server'
+            if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+            return 'test-val'
+        })
+
+            ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+
+        const result = await getExternalProductsByUPCs(['123'])
+
+        expect(result).toEqual([])
+        expect(console.error).toHaveBeenCalled()
+    })
 })

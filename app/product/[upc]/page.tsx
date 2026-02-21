@@ -53,7 +53,7 @@ export default async function ProductPage(props: ProductPageProps) {
                     </span>
                 }
                 description={
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                    <span className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
                         <span className="flex items-center gap-1.5 text-slate-600 font-medium">
                             Brand: <span className="text-slate-900">{brand}</span>
                         </span>
@@ -65,7 +65,7 @@ export default async function ProductPage(props: ProductPageProps) {
                         <span className="flex items-center gap-1.5 text-slate-600 font-medium">
                             UPC: <span className="font-mono text-slate-900">{upc}</span>
                         </span>
-                    </div>
+                    </span>
                 }
                 actions={
                     <Badge variant="secondary" className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200 border-none px-4 py-1.5 text-sm">

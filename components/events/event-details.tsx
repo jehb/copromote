@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
-import { Pencil, Calendar, MapPin, User, ArrowLeft, MessageSquare, Building2, UserCircle2, Trash2, Clock } from 'lucide-react'
+import { Pencil, Calendar, MapPin, User, ArrowLeft, MessageSquare, Building2, UserCircle2, Trash2, Clock, Library } from 'lucide-react'
 import { updateEvent, deleteEvent } from '@/app/actions/events'
 import { EventForm } from './event-form'
+import { Product } from '@/app/actions/external-db'
 
 const TIMEZONE = 'America/New_York'
 import { AuditInfo } from '@/components/common/audit-info'
@@ -33,6 +34,7 @@ interface EventDetailsProps {
     contacts: any[]
     organizations: any[]
     eventSeries: any[]
+    availableProducts?: Product[]
     isAdmin: boolean
 }
 
@@ -43,6 +45,7 @@ export function EventDetails({
     contacts,
     organizations,
     eventSeries,
+    availableProducts = [],
     isAdmin
 }: EventDetailsProps) {
     const [isEditing, setIsEditing] = useState(false)
@@ -71,6 +74,7 @@ export function EventDetails({
                             contacts={contacts}
                             organizations={organizations}
                             eventSeries={eventSeries}
+                            availableProducts={availableProducts}
                             action={async (formData) => {
                                 await updateEvent(event.id, formData)
                                 setIsEditing(false)
@@ -108,8 +112,8 @@ export function EventDetails({
                     </Button>
 
                     <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="outline" className="flex-1 md:flex-none gap-2 text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200">
+                        <AlertDialogTrigger asChild className="flex-1 md:flex-none">
+                            <Button variant="outline" className="gap-2 text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200" suppressHydrationWarning>
                                 <Trash2 className="h-4 w-4" /> Delete
                             </Button>
                         </AlertDialogTrigger>
@@ -213,7 +217,9 @@ export function EventDetails({
                                 <div className="flex flex-wrap gap-2">
                                     {event.contacts.map((contact: any) => (
                                         <Badge key={contact.id} variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200">
-                                            {contact.firstName} {contact.lastName}
+                                            <Link href={`/contacts/${contact.id}`} className="hover:underline">
+                                                {contact.firstName} {contact.lastName}
+                                            </Link>
                                         </Badge>
                                     ))}
                                 </div>
@@ -235,7 +241,9 @@ export function EventDetails({
                                 <div className="flex flex-wrap gap-2">
                                     {event.organizations.map((org: any) => (
                                         <Badge key={org.id} variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100">
-                                            {org.name}
+                                            <Link href={`/organizations/${org.id}`} className="hover:underline">
+                                                {org.name}
+                                            </Link>
                                         </Badge>
                                     ))}
                                 </div>
@@ -244,6 +252,33 @@ export function EventDetails({
                             )}
                         </CardContent>
                     </Card>
+
+                    {/* Linked Products */}
+                    {event.products && event.products.length > 0 && (
+                        <Card>
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                                    <Library className="h-4 w-4" /> Linked Products
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="flex flex-wrap gap-2">
+                                    {event.products.map((prod: any) => {
+                                        const fullProduct = availableProducts.find(ap => ap.upc === prod.upc)
+                                        return (
+                                            <Badge key={prod.upc} variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100">
+                                                <Link href={`/product/${prod.upc}`} className="hover:underline flex items-center">
+                                                    <span className="truncate max-w-[200px]" title={fullProduct?.name || prod.upc}>
+                                                        {fullProduct ? `${fullProduct.brand} - ${fullProduct.name}` : prod.upc}
+                                                    </span>
+                                                </Link>
+                                            </Badge>
+                                        )
+                                    })}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     {/* Social Media */}
                     <Card>

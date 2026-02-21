@@ -35,6 +35,8 @@ import {
     Library
 } from 'lucide-react'
 import { createEventSeries } from '@/app/actions/event-series'
+import { ProductSelector } from '@/components/email-planner/product-selector'
+import { Product } from '@/app/actions/external-db'
 
 interface EventFormProps {
     event?: any
@@ -43,18 +45,22 @@ interface EventFormProps {
     contacts: any[]
     organizations: any[]
     eventSeries?: any[]
+    availableProducts?: Product[]
     action: (formData: FormData) => Promise<void>
 }
 
 const TIMEZONE = 'America/New_York'
 
-export function EventForm({ event, locations, users, contacts, organizations, eventSeries = [], action }: EventFormProps) {
+export function EventForm({ event, locations, users, contacts, organizations, eventSeries = [], availableProducts = [], action }: EventFormProps) {
     const [isSaving, setIsSaving] = useState(false)
     const [selectedContacts, setSelectedContacts] = useState<string[]>(
         event?.contacts?.map((c: any) => c.id) || []
     )
     const [selectedOrgs, setSelectedOrgs] = useState<string[]>(
         event?.organizations?.map((o: any) => o.id) || []
+    )
+    const [selectedProducts, setSelectedProducts] = useState<string[]>(
+        event?.products?.map((p: any) => p.upc) || []
     )
 
     // Series state
@@ -100,6 +106,16 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
         setSelectedOrgs(prev =>
             prev.includes(id) ? prev.filter(o => o !== id) : [...prev, id]
         )
+    }
+
+    const handleAddProduct = (upc: string) => {
+        if (!selectedProducts.includes(upc)) {
+            setSelectedProducts(prev => [...prev, upc])
+        }
+    }
+
+    const removeProduct = (upc: string) => {
+        setSelectedProducts(prev => prev.filter(p => p !== upc))
     }
 
     const handleCreateSeries = async () => {
@@ -516,6 +532,56 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                     </Badge>
                                 ))
                             )}
+                        </div>
+                    </section>
+
+                    {/* Linked Products */}
+                    <section className="space-y-4">
+                        <div className="flex items-center justify-between border-b pb-2">
+                            <div className="flex items-center gap-2 text-slate-900 font-bold">
+                                <Library className="h-4 w-4 text-primary" /> Linked Products
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2 p-4 rounded-xl border border-dashed border-slate-200 bg-slate-50/30">
+                            {selectedProducts.length === 0 ? (
+                                <div className="w-full flex flex-col items-center justify-center text-slate-400 space-y-1 py-4">
+                                    <Library className="h-5 w-5 opacity-50" />
+                                    <p className="text-[10px] uppercase font-bold tracking-widest">No Products Selected</p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {selectedProducts.map(upc => {
+                                        const fullProduct = availableProducts.find(ap => ap.upc === upc)
+                                        return (
+                                            <Badge
+                                                key={upc}
+                                                variant="outline"
+                                                className="py-1 px-3 bg-blue-50/50 border-blue-100 shadow-sm text-blue-700 font-medium flex items-center gap-2 group cursor-default"
+                                            >
+                                                <span className="truncate max-w-[200px]" title={fullProduct?.name || upc}>
+                                                    {fullProduct ? `${fullProduct.brand} - ${fullProduct.name}` : upc}
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeProduct(upc)}
+                                                    className="opacity-50 hover:text-red-600 hover:opacity-100 transition-colors"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                                <input type="hidden" name="productUpcs" value={upc} />
+                                            </Badge>
+                                        )
+                                    })}
+                                </div>
+                            )}
+
+                            <div className="mt-2 w-full">
+                                <ProductSelector
+                                    availableProducts={selectedProducts.map(upc => availableProducts.find(ap => ap.upc === upc)).filter(Boolean) as Product[]}
+                                    onSelect={handleAddProduct}
+                                />
+                            </div>
                         </div>
                     </section>
                 </div>

@@ -5,6 +5,7 @@ import { getOrganizations } from '@/app/actions/organizations'
 import { getEventSeries } from '@/app/actions/event-series'
 import { getMyRole } from '@/app/actions/user-role'
 import { notFound } from 'next/navigation'
+import { getExternalProductsByUPCs } from '@/app/actions/external-db'
 
 interface PageProps {
     params: Promise<{ id: string }>
@@ -27,6 +28,9 @@ export default async function EventPage({ params }: PageProps) {
         getMyRole()
     ])
 
+    const attachedUPCs = (event as any).products?.map((p: any) => p.upc) || []
+    const availableProducts = attachedUPCs.length > 0 ? await getExternalProductsByUPCs(attachedUPCs) : []
+
     return (
         <EventDetails
             event={event}
@@ -35,6 +39,7 @@ export default async function EventPage({ params }: PageProps) {
             contacts={contacts}
             organizations={organizations}
             eventSeries={eventSeries}
+            availableProducts={availableProducts}
             isAdmin={role === 'ADMIN'}
         />
     )

@@ -1,0 +1,28 @@
+PASS __tests__/unit/actions/external-db.test.ts
+  External DB Actions
+    testExternalConnection
+      ✓ should return error if config is invalid (2 ms)
+      ✓ should test connection successfully (1 ms)
+      ✓ should handle connection errors explicitly
+    getExternalProducts
+      ✓ should return empty array if config is invalid
+      ✓ should fetch external products with pagination (2 ms)
+      ✓ should apply search filter and pass it to count query (1 ms)
+      ✓ should handle fetch errors gracefully and return mock error product
+    getExternalProductByUPC
+      ✓ should return null if config is invalid
+      ✓ should fetch single external product by UPC
+      ✓ should return null if no product found
+      ✓ should handle fetch errors gracefully and return null
+  getExternalProductsByUPCs
+    ✓ should return empty array if config is invalid
+    ✓ should return empty array if no UPCs provided
+    ✓ should return empty array if over 2000 UPCs provided
+    ✓ should fetch multiple external products by UPCs (1 ms)
+    ✓ should handle fetch errors gracefully and return empty array
+
+Test Suites: 1 passed, 1 total
+Tests:       16 passed, 16 total
+Snapshots:   0 total
+Time:        0.317 s, estimated 1 s
+Ran all test suites matching /__tests__\/unit\/actions\/external-db.test.ts/i.

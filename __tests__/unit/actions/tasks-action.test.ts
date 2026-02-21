@@ -45,6 +45,8 @@ describe('Task Actions', () => {
         it('should create task with assignee from session', async () => {
             const formData = new FormData()
             formData.append('title', 'New Task')
+            formData.append('dueDate', '2024-01-01')
+            formData.append('projectId', 'proj-1')
 
                 ; (getSession as jest.Mock).mockResolvedValue({ id: 'user-1' })
                 ; (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'user-1' })
@@ -56,6 +58,8 @@ describe('Task Actions', () => {
                     title: 'New Task',
                     assigneeId: 'user-1',
                     status: 'todo',
+                    dueDate: expect.any(Date),
+                    projectId: 'proj-1'
                 }),
             })
             expect(logActivity).toHaveBeenCalledWith('CREATE', 'Task', 'mock_task_id', expect.stringContaining('New Task'))
@@ -65,6 +69,7 @@ describe('Task Actions', () => {
         it('should create task without assignee if no session', async () => {
             const formData = new FormData()
             formData.append('title', 'New Task')
+            formData.append('projectId', 'none')
 
                 ; (getSession as jest.Mock).mockResolvedValue(null)
 
@@ -74,6 +79,8 @@ describe('Task Actions', () => {
                 data: expect.objectContaining({
                     title: 'New Task',
                     assigneeId: null,
+                    dueDate: null,
+                    projectId: null
                 }),
             })
         })
@@ -84,6 +91,8 @@ describe('Task Actions', () => {
             const formData = new FormData()
             formData.append('title', 'Updated Task')
             formData.append('assigneeId', 'user-2')
+            formData.append('dueDate', '2024-01-01')
+            formData.append('projectId', 'proj-1')
 
             await updateTask('task-1', formData)
 
@@ -92,6 +101,8 @@ describe('Task Actions', () => {
                 data: expect.objectContaining({
                     title: 'Updated Task',
                     assigneeId: 'user-2',
+                    dueDate: expect.any(Date),
+                    projectId: 'proj-1'
                 }),
             })
         })
@@ -100,6 +111,7 @@ describe('Task Actions', () => {
             const formData = new FormData()
             formData.append('title', 'Updated Task')
             formData.append('assigneeId', 'none')
+            formData.append('projectId', 'none')
 
             await updateTask('task-1', formData)
 
@@ -107,6 +119,8 @@ describe('Task Actions', () => {
                 where: { id: 'task-1' },
                 data: expect.objectContaining({
                     assigneeId: null,
+                    dueDate: null,
+                    projectId: null
                 }),
             })
         })

@@ -83,6 +83,7 @@ describe('Organizations Actions', () => {
             formData.append('description', 'A tech org')
             formData.append('website', 'https://tech.com')
             formData.append('primaryContactId', 'contact-1')
+            formData.append('externalBrand', 'Brand A')
 
                 ; (prisma.organization.create as jest.Mock).mockResolvedValue({ id: 'org-1' })
                 ; (redirect as unknown as jest.Mock).mockImplementation(() => { throw new Error('NEXT_REDIRECT') })
@@ -95,6 +96,7 @@ describe('Organizations Actions', () => {
                     category: 'Tech',
                     description: 'A tech org',
                     website: 'https://tech.com',
+                    externalBrand: 'Brand A',
                     primaryContactId: 'contact-1',
                     createdById: 'user-1',
                     updatedById: 'user-1'
@@ -110,6 +112,7 @@ describe('Organizations Actions', () => {
             formData.append('name', 'New Org')
             formData.append('category', 'Tech')
             formData.append('primaryContactId', 'none')
+            formData.append('externalBrand', 'none')
 
                 ; (prisma.organization.create as jest.Mock).mockResolvedValue({ id: 'org-2' })
                 ; (redirect as unknown as jest.Mock).mockImplementation(() => { throw new Error('NEXT_REDIRECT') })
@@ -133,6 +136,7 @@ describe('Organizations Actions', () => {
             formData.append('description', 'Updated desc')
             formData.append('website', 'https://newtech.com')
             formData.append('primaryContactId', 'contact-2')
+            formData.append('externalBrand', 'Brand B')
 
             const currentOrg = {
                 id: 'org-1',
@@ -156,6 +160,7 @@ describe('Organizations Actions', () => {
                     category: 'New Tech',
                     description: 'Updated desc',
                     website: 'https://newtech.com',
+                    externalBrand: 'Brand B',
                     primaryContactId: 'contact-2',
                     updatedById: 'user-1'
                 })
@@ -166,7 +171,8 @@ describe('Organizations Actions', () => {
                 category: { from: 'Old Tech', to: 'New Tech' },
                 description: { from: 'Old desc', to: 'Updated desc' },
                 website: { from: 'https://oldtech.com', to: 'https://newtech.com' },
-                primaryContact: { from: 'contact-1', to: 'contact-2' }
+                primaryContact: { from: 'contact-1', to: 'contact-2' },
+                externalBrand: { from: undefined, to: 'Brand B' }
             }
 
             expect(logActivity).toHaveBeenCalledWith(
@@ -186,6 +192,7 @@ describe('Organizations Actions', () => {
             formData.append('id', 'org-1')
             formData.append('name', 'Org')
             formData.append('primaryContactId', 'none')
+            formData.append('externalBrand', 'none')
 
                 ; (prisma.organization.findUnique as jest.Mock).mockResolvedValue(null) // Simulate getting diffs without a current org
                 ; (prisma.organization.update as jest.Mock).mockResolvedValue({ id: 'org-1' })
@@ -195,7 +202,8 @@ describe('Organizations Actions', () => {
 
             expect(prisma.organization.update).toHaveBeenCalledWith(expect.objectContaining({
                 data: expect.objectContaining({
-                    primaryContactId: null
+                    primaryContactId: null,
+                    externalBrand: null
                 })
             }))
         })

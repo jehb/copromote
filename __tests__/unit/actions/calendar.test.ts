@@ -25,6 +25,7 @@ describe('Calendar Actions', () => {
 
             const mockCalendarEvents = [
                 { id: 'ce1', title: 'Manual Event', date: new Date('2024-01-15'), projectId: 'p1' },
+                { id: 'ce2', title: 'Manual Event 2', date: new Date('2024-01-16') }
             ]
 
             const mockPromotions = [
@@ -53,6 +54,12 @@ describe('Calendar Actions', () => {
                     startTime: new Date('2024-01-18'),
                     description: 'Booth setup',
                     location: { name: 'Convention Center' },
+                },
+                {
+                    id: 'le2',
+                    title: 'Trade Show 2',
+                    startTime: new Date('2024-01-19'),
+                    location: { name: 'Convention Center' },
                 }
             ]
 
@@ -72,13 +79,13 @@ describe('Calendar Actions', () => {
 
             // Calculate expected number of events:
             // Projects: p1 (start + end = 2), p2 (start = 1) -> 3
-            // Calendar Events: ce1 -> 1
+            // Calendar Events: ce1, ce2 -> 2
             // Promotions: promo1 (start + end + live + image + publish = 5), promo2 (start + end = 2) -> 7
-            // Logistics: le1 -> 1
+            // Logistics: le1, le2 -> 2
             // Social: sp1 (sp2 skipped) -> 1
-            // Total: 3 + 1 + 7 + 1 + 1 = 13
+            // Total: 3 + 2 + 7 + 2 + 1 = 15
 
-            expect(events).toHaveLength(13)
+            expect(events).toHaveLength(15)
 
             // Verify a few specifically mapped events
             const projectAStart = events.find(e => e.id === 'p1')
