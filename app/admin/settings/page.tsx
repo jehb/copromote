@@ -587,6 +587,11 @@ function DatabaseConfig() {
                 <Button type="button" variant="outline" onClick={handleTest} disabled={saving}>
                     Test Connection
                 </Button>
+                {status && (
+                    <span className={`text-sm ${status.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                        {status.message}
+                    </span>
+                )}
             </div>
         </form>
     )

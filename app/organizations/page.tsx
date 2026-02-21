@@ -33,7 +33,7 @@ export default async function OrganizationsPage() {
                         Organizations
                     </span>
                 }
-                description="Manage partners, vendors, and community groups"
+                description="Manage partners, brands, and community groups"
                 actions={
                     <Button asChild>
                         <Link href="/organizations/new">
@@ -69,7 +69,7 @@ export default async function OrganizationsPage() {
                                     <TableCell colSpan={5} className="text-center py-20 text-muted-foreground">
                                         <div className="flex flex-col items-center gap-2">
                                             <Building2 className="h-10 w-10 text-slate-300" />
-                                            <p>No organizations found. Start by adding a partner or vendor.</p>
+                                            <p>No organizations found. Start by adding a partner or brand.</p>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -109,7 +109,7 @@ export default async function OrganizationsPage() {
                                             <Badge variant="outline" className={cn(
                                                 "capitalize font-bold text-[10px] py-0 px-2 h-5 tracking-tight",
                                                 org.category === 'Community Partner' && "bg-blue-50 text-blue-700 border-blue-100",
-                                                org.category === 'Vendor' && "bg-orange-50 text-orange-700 border-orange-100",
+                                                org.category === 'Brand' && "bg-orange-50 text-orange-700 border-orange-100",
                                                 org.category === 'Band' && "bg-purple-50 text-purple-700 border-purple-100",
                                                 org.category === 'Non-Profit' && "bg-green-50 text-green-700 border-green-100"
                                             )}>

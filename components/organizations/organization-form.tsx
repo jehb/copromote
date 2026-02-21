@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,17 +12,20 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Save, Loader2, Building2, Globe, FileText, UserPlus, Users } from 'lucide-react'
+import { Save, Loader2, Building2, Globe, FileText, UserPlus, Users, Tag } from 'lucide-react'
 
 interface OrganizationFormProps {
     organization?: any
     contacts: any[]
+    externalBrands?: string[]
     action: (formData: FormData) => Promise<void>
     defaultPrimaryContactId?: string
 }
 
-export function OrganizationForm({ organization, contacts, action, defaultPrimaryContactId }: OrganizationFormProps) {
+export function OrganizationForm({ organization, contacts, externalBrands = [], action, defaultPrimaryContactId }: OrganizationFormProps) {
     const [isSaving, setIsSaving] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState(organization?.category || 'Community Partner')
+
 
     return (
         <form action={action} onSubmit={() => setIsSaving(true)} className="space-y-8">
@@ -49,13 +52,13 @@ export function OrganizationForm({ organization, contacts, action, defaultPrimar
 
                     <div className="space-y-2">
                         <Label htmlFor="category">Category</Label>
-                        <Select name="category" defaultValue={organization?.category || 'Community Partner'}>
+                        <Select name="category" value={selectedCategory} onValueChange={setSelectedCategory}>
                             <SelectTrigger className="bg-slate-50/50 border-slate-200">
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="Community Partner">Community Partner</SelectItem>
-                                <SelectItem value="Vendor">Vendor</SelectItem>
+                                <SelectItem value="Brand">Brand</SelectItem>
                                 <SelectItem value="Band">Band</SelectItem>
                                 <SelectItem value="Non-Profit">Non-Profit</SelectItem>
                                 <SelectItem value="Government">Government</SelectItem>
@@ -63,6 +66,30 @@ export function OrganizationForm({ organization, contacts, action, defaultPrimar
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {selectedCategory === 'Brand' && (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                            <Label htmlFor="externalBrand" className="flex items-center gap-2">
+                                <Tag className="h-3.5 w-3.5 text-orange-400" /> Linked Product Brand
+                            </Label>
+                            <Select name="externalBrand" defaultValue={organization?.externalBrand || 'none'}>
+                                <SelectTrigger className="bg-orange-50/30 border-orange-200 focus:ring-orange-500/20">
+                                    <SelectValue placeholder="Select a brand from database..." />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-[300px]">
+                                    <SelectItem value="none">No external brand linked</SelectItem>
+                                    {externalBrands.map((brand) => (
+                                        <SelectItem key={brand} value={brand}>
+                                            {brand}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-[10px] text-slate-500 italic">
+                                Links this organization to products in the external database.
+                            </p>
+                        </div>
+                    )}
 
                     <div className="space-y-2">
                         <Label htmlFor="website" className="flex items-center gap-2">

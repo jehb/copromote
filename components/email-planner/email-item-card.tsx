@@ -13,6 +13,9 @@ import { Loader2 } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Link from 'next/link'
+import { ProductSelector } from './product-selector'
+import { Product } from '@/app/actions/external-db'
+import { addItemProduct, removeItemProduct } from '@/app/actions/email-item'
 
 interface Event {
     id: string
@@ -26,15 +29,17 @@ interface EmailItem {
     description: string | null
     order: number
     events: Event[]
+    products: { id: string, upc: string }[]
 }
 
 interface EmailItemCardProps {
     item: EmailItem
     availableEvents: { id: string, title: string, startTime: Date }[]
+    availableProducts: Product[]
     sortable?: boolean
 }
 
-export function EmailItemCard({ item, availableEvents, sortable }: EmailItemCardProps) {
+export function EmailItemCard({ item, availableEvents, availableProducts, sortable }: EmailItemCardProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -106,6 +111,22 @@ export function EmailItemCard({ item, availableEvents, sortable }: EmailItemCard
         }
     }
 
+    const handleAddProduct = async (upc: string) => {
+        try {
+            await addItemProduct(item.id, upc)
+        } catch (error) {
+            console.error('Failed to add product:', error)
+        }
+    }
+
+    const handleRemoveProduct = async (upc: string) => {
+        try {
+            await removeItemProduct(item.id, upc)
+        } catch (error) {
+            console.error('Failed to remove product:', error)
+        }
+    }
+
     return (
         <div ref={setNodeRef} style={style}>
             <Card className="mb-4">
@@ -165,7 +186,7 @@ export function EmailItemCard({ item, availableEvents, sortable }: EmailItemCard
                     )}
 
                     {(isEditing || item.events.length > 0) && (
-                        <div className="space-y-2">
+                        <div className="space-y-2 mb-4">
                             <h4 className="text-sm font-semibold">Attached Events</h4>
                             <div className="flex flex-wrap gap-2 mb-2">
                                 {item.events.map(event => (
@@ -191,6 +212,42 @@ export function EmailItemCard({ item, availableEvents, sortable }: EmailItemCard
                                     <EventSelector
                                         events={selectorEvents.filter(e => !item.events.find(ie => ie.id === e.id))}
                                         onSelect={handleAddEvent}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {(isEditing || (item.products && item.products.length > 0)) && (
+                        <div className="space-y-2">
+                            <h4 className="text-sm font-semibold">Attached Products</h4>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {item.products?.map(prod => {
+                                    const fullProduct = availableProducts.find(ap => ap.upc === prod.upc)
+                                    return (
+                                        <Badge key={prod.id} variant="outline" className="flex items-center gap-1 bg-blue-50/50">
+                                            <Link href={`/product/${prod.upc}`} className="hover:underline truncate max-w-[200px]" title={fullProduct?.name || prod.upc}>
+                                                {fullProduct ? `${fullProduct.brand} - ${fullProduct.name}` : prod.upc}
+                                            </Link>
+                                            {isEditing && (
+                                                <button
+                                                    onClick={() => handleRemoveProduct(prod.upc)}
+                                                    className="ml-1 hover:text-red-500"
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </button>
+                                            )}
+                                        </Badge>
+                                    )
+                                })}
+                                {(!item.products || item.products.length === 0) && isEditing && <span className="text-xs text-stone-500">No products attached</span>}
+                            </div>
+
+                            {isEditing && (
+                                <div className="w-[300px]">
+                                    <ProductSelector
+                                        availableProducts={item.products?.map(p => availableProducts.find(ap => ap.upc === p.upc)).filter(Boolean) as Product[]}
+                                        onSelect={handleAddProduct}
                                     />
                                 </div>
                             )}

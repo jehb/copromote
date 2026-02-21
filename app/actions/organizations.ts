@@ -62,6 +62,7 @@ export async function createOrganization(formData: FormData) {
     const description = formData.get('description') as string
     const website = formData.get('website') as string
     const primaryContactId = formData.get('primaryContactId') as string
+    const externalBrand = formData.get('externalBrand') as string
 
     const org = await prisma.organization.create({
         data: {
@@ -69,6 +70,7 @@ export async function createOrganization(formData: FormData) {
             category,
             description,
             website,
+            externalBrand: (externalBrand && externalBrand !== 'none') ? externalBrand : null,
             primaryContactId: (primaryContactId && primaryContactId !== 'none') ? primaryContactId : null,
             createdById: await getCurrentUserId(),
             updatedById: await getCurrentUserId()
@@ -88,6 +90,7 @@ export async function updateOrganization(formData: FormData) {
     const description = formData.get('description') as string
     const website = formData.get('website') as string
     const primaryContactId = formData.get('primaryContactId') as string
+    const externalBrand = formData.get('externalBrand') as string
 
     // Get current state for diffing
     const currentOrg = await prisma.organization.findUnique({
@@ -104,6 +107,7 @@ export async function updateOrganization(formData: FormData) {
             category,
             description,
             website,
+            externalBrand: (externalBrand && externalBrand !== 'none') ? externalBrand : null,
             primaryContactId: newPrimaryContactId,
             updatedById: await getCurrentUserId()
         }
@@ -116,6 +120,7 @@ export async function updateOrganization(formData: FormData) {
         if (currentOrg.category !== category) changes.category = { from: currentOrg.category, to: category }
         if (currentOrg.description !== description) changes.description = { from: currentOrg.description, to: description }
         if (currentOrg.website !== website) changes.website = { from: currentOrg.website, to: website }
+        if (currentOrg.externalBrand !== externalBrand) changes.externalBrand = { from: currentOrg.externalBrand, to: externalBrand }
         if (currentOrg.primaryContactId !== newPrimaryContactId) {
             changes.primaryContact = {
                 from: currentOrg.primaryContactId,

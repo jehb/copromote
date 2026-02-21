@@ -33,6 +33,7 @@ export async function getEmailPlan(id: string) {
                     },
                     include: {
                         events: true,
+                        products: true,
                     },
                 },
             },

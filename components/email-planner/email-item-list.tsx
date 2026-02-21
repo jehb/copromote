@@ -19,6 +19,7 @@ import {
 import { EmailItemCard } from './email-item-card'
 import { reorderEmailItems } from '@/app/actions/email-item'
 import { startTransition } from 'react'
+import { Product } from '@/app/actions/external-db'
 
 interface Event {
     id: string
@@ -32,14 +33,16 @@ interface EmailItem {
     description: string | null
     order: number
     events: Event[]
+    products: { id: string, upc: string }[]
 }
 
 interface EmailItemListProps {
     items: EmailItem[]
     availableEvents: { id: string, title: string, startTime: Date }[]
+    availableProducts: Product[]
 }
 
-export function EmailItemList({ items: initialItems, availableEvents }: EmailItemListProps) {
+export function EmailItemList({ items: initialItems, availableEvents, availableProducts }: EmailItemListProps) {
     // Local state for optimistic updates
     const [items, setItems] = useState(initialItems)
 
@@ -97,6 +100,7 @@ export function EmailItemList({ items: initialItems, availableEvents }: EmailIte
                             key={item.id}
                             item={item}
                             availableEvents={availableEvents}
+                            availableProducts={availableProducts}
                             sortable={true}
                         />
                     ))}

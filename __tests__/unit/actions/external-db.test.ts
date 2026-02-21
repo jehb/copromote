@@ -1,4 +1,4 @@
-import { testExternalConnection, getExternalProducts } from '@/app/actions/external-db'
+import { testExternalConnection, getExternalProducts, getExternalProductByUPC } from '@/app/actions/external-db'
 import { getConfig } from '@/app/actions/settings'
 import sql from 'mssql'
 
@@ -104,7 +104,7 @@ describe('External DB Actions', () => {
             mockRequest.query
                 .mockResolvedValueOnce({
                     recordset: [
-                        { id: 1, name: 'Prod A', price: 10, stock: 5, category: 'Cat 1', description: 'Desc 1' },
+                        { upc: '12345', brand: 'Brand A', size: '10 oz', department: 'Grocery', name: 'Prod A' },
                     ],
                 })
                 .mockResolvedValueOnce({
@@ -158,9 +158,89 @@ describe('External DB Actions', () => {
             const result = await getExternalProducts()
 
             expect(result.products).toHaveLength(1)
-            expect(result.products[0].id).toBe('ERR')
+            expect(result.products[0].upc).toBe('ERR')
             expect(result.totalCount).toBe(0)
             expect(console.error).toHaveBeenCalled()
         })
     })
+
+    describe('getExternalProductByUPC', () => {
+        it('should return null if config is invalid', async () => {
+            ; (getConfig as jest.Mock).mockResolvedValue(null)
+
+            const result = await getExternalProductByUPC('12345')
+            expect(result).toBeNull()
+        })
+
+        it('should fetch single external product by UPC', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+
+            const mockRequest = {
+                input: jest.fn().mockReturnThis(),
+                query: jest.fn(),
+            }
+            const mockPool = {
+                request: jest.fn().mockReturnValue(mockRequest),
+                close: jest.fn(),
+            }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            const mockProduct = { F01: '12345', F155: 'Brand A', F29: 'Prod A' }
+            mockRequest.query.mockResolvedValueOnce({
+                recordset: [mockProduct],
+            })
+
+            const result = await getExternalProductByUPC('12345')
+
+            expect(result).toEqual(mockProduct)
+            expect(mockRequest.input).toHaveBeenCalledWith('upc', 'NVarChar', '12345')
+        })
+
+        it('should return null if no product found', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+
+            const mockRequest = {
+                input: jest.fn().mockReturnThis(),
+                query: jest.fn(),
+            }
+            const mockPool = {
+                request: jest.fn().mockReturnValue(mockRequest),
+                close: jest.fn(),
+            }
+                ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
+
+            mockRequest.query.mockResolvedValueOnce({
+                recordset: [],
+            })
+
+            const result = await getExternalProductByUPC('99999')
+
+            expect(result).toBeNull()
+        })
+
+        it('should handle fetch errors gracefully and return null', async () => {
+            ; (getConfig as jest.Mock).mockImplementation((key) => {
+                if (key === 'EXTERNAL_DB_URL') return 'test-server'
+                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
+                return 'test-val'
+            })
+
+                ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+
+            const result = await getExternalProductByUPC('12345')
+
+            expect(result).toBeNull()
+            expect(console.error).toHaveBeenCalled()
+        })
+    })
+    // Need to import it at the top or dynamically, but we imported it at the top if we edit the import.
+    // Wait, I need to add it to the import at the top of the file as well. Let's do a multi_replace instead.
 })

@@ -2,7 +2,8 @@ import { getExternalProducts } from '@/app/actions/external-db'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Package, ExternalLink } from 'lucide-react'
+import { Package, ExternalLink, Eye } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
 import { ProductToolbar } from '@/components/products/product-toolbar'
@@ -56,41 +57,40 @@ export default async function ProductsPage(props: ProductsPageProps) {
                     <Table>
                         <TableHeader className="bg-slate-50/50">
                             <TableRow>
-                                <TableHead className="w-[100px]">ID</TableHead>
+                                <TableHead className="w-[120px]">UPC</TableHead>
+                                <TableHead>Brand</TableHead>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Stock</TableHead>
-                                <TableHead className="max-w-[300px]">Description</TableHead>
+                                <TableHead>Size</TableHead>
+                                <TableHead>Department</TableHead>
+                                <TableHead className="w-[80px]"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {products.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-32 text-center text-slate-500 italic">
+                                    <TableCell colSpan={5} className="h-32 text-center text-slate-500 italic">
                                         No products found. Please check your database connection in Settings.
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 products.map((product) => (
-                                    <TableRow key={product.id} className="hover:bg-slate-50/50 transition-colors">
-                                        <TableCell className="font-mono text-xs text-slate-500">{product.id}</TableCell>
+                                    <TableRow key={product.upc} className="hover:bg-slate-50/50 transition-colors">
+                                        <TableCell className="font-mono text-xs text-slate-500">{product.upc}</TableCell>
+                                        <TableCell className="font-medium text-slate-700">{product.brand}</TableCell>
                                         <TableCell className="font-semibold text-slate-900">{product.name}</TableCell>
+                                        <TableCell className="text-slate-600">{product.size}</TableCell>
                                         <TableCell>
                                             <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border-none font-medium">
-                                                {product.category}
+                                                {product.department}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="font-medium text-slate-900">
-                                            ${product.price.toFixed(2)}
-                                        </TableCell>
                                         <TableCell>
-                                            <span className={`text-sm font-medium ${product.stock < 10 ? 'text-red-600' : 'text-slate-600'}`}>
-                                                {product.stock} units
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="text-sm text-slate-500 truncate max-w-[300px]" title={product.description}>
-                                            {product.description}
+                                            <Button variant="ghost" size="icon" asChild>
+                                                <Link href={`/product/${product.upc}`}>
+                                                    <Eye className="h-4 w-4" />
+                                                    <span className="sr-only">View {product.name}</span>
+                                                </Link>
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))

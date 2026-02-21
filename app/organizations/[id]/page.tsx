@@ -1,10 +1,11 @@
 import { getOrganization, deleteOrganization } from '@/app/actions/organizations'
 import { getContacts } from '@/app/actions/contacts'
+import { getExternalProductsByBrand, type Product } from '@/app/actions/external-db'
 import { getCurrentUser } from '@/lib/user-util'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Pencil, Trash2, Building2, Globe, FileText, Users, User, ExternalLink, Eye, MoreHorizontal, Mail, Phone, Calendar } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2, Building2, Globe, FileText, Users, User, ExternalLink, Eye, MoreHorizontal, Mail, Phone, Calendar, Package } from 'lucide-react'
 import Link from 'next/link'
 import { AddPersonChoice } from '@/components/organizations/add-person-choice'
 import { notFound } from 'next/navigation'
@@ -32,6 +33,11 @@ export default async function OrganizationDetailPage({ params }: { params: { id:
         notFound()
     }
 
+    let externalProducts: Product[] = []
+    if (organization.category === 'Brand' && organization.externalBrand) {
+        externalProducts = await getExternalProductsByBrand(organization.externalBrand)
+    }
+
     return (
         <div className="p-8 max-w-6xl mx-auto space-y-8">
             <div className="flex flex-col gap-4">
@@ -50,7 +56,7 @@ export default async function OrganizationDetailPage({ params }: { params: { id:
                                 <Badge variant="secondary" className={cn(
                                     "capitalize font-bold text-[10px] py-0.5",
                                     organization.category === 'Community Partner' && "bg-blue-50 text-blue-700",
-                                    organization.category === 'Vendor' && "bg-orange-50 text-orange-700",
+                                    organization.category === 'Brand' && "bg-orange-50 text-orange-700",
                                     organization.category === 'Band' && "bg-purple-50 text-purple-700"
                                 )}>
                                     {organization.category}
@@ -88,6 +94,64 @@ export default async function OrganizationDetailPage({ params }: { params: { id:
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-8">
+                    {organization.category === 'Brand' && organization.externalBrand && (
+                        <Card className="border-slate-200 overflow-hidden shadow-sm">
+                            <CardHeader className="bg-orange-50/30 border-b border-orange-100 flex flex-row items-center justify-between pb-3">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2 text-lg text-orange-900">
+                                        <Package className="h-5 w-5 text-orange-500" /> Associated Products
+                                    </CardTitle>
+                                    <CardDescription className="text-orange-700/70 mt-1">
+                                        Products linked from {organization.externalBrand}
+                                    </CardDescription>
+                                </div>
+                                <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-200 border-orange-200">
+                                    {externalProducts.length} Items
+                                </Badge>
+                            </CardHeader>
+                            <CardContent className="p-0">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
+                                            <TableHead className="pl-6 w-[120px]">UPC</TableHead>
+                                            <TableHead>Product Name</TableHead>
+                                            <TableHead>Size</TableHead>
+                                            <TableHead>Department</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {externalProducts.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="h-32 text-center text-slate-500">
+                                                    No products found for this brand.
+                                                </TableCell>
+                                            </TableRow>
+                                        ) : (
+                                            externalProducts.map((product) => (
+                                                <TableRow key={product.upc} className="hover:bg-slate-50/80 transition-colors">
+                                                    <TableCell className="pl-6 font-mono text-xs text-slate-500">
+                                                        {product.upc}
+                                                    </TableCell>
+                                                    <TableCell className="font-medium text-slate-900">
+                                                        {product.name}
+                                                    </TableCell>
+                                                    <TableCell className="text-slate-600">
+                                                        <Badge variant="outline" className="font-normal bg-white">
+                                                            {product.size || 'N/A'}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-slate-600 text-sm">
+                                                        {product.department}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    )}
+
                     <Card className="border-slate-200 overflow-hidden">
                         <CardHeader className="bg-slate-50/50 border-b">
                             <CardTitle className="flex items-center gap-2 text-lg">

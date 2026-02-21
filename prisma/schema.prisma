@@ -270,6 +270,7 @@ model Organization {
   category         String
   description      String?   @db.Text
   website          String?
+  externalBrand    String?
   primaryContactId String?   @unique
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
@@ -348,12 +349,25 @@ model EmailItem {
   description String?   @db.Text
   planId      String
   order       Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  plan        EmailPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
-  events      Event[]   @relation("EmailItemEvents")
-
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  plan        EmailPlan          @relation(fields: [planId], references: [id], onDelete: Cascade)
+  events      Event[]            @relation("EmailItemEvents")
+  products    EmailItemProduct[]
+  
   @@index([planId], map: "EmailItem_planId_fkey")
+}
+
+model EmailItemProduct {
+  id        String    @id @default(uuid())
+  upc       String
+  itemId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  item      EmailItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, upc])
+  @@index([itemId], map: "EmailItemProduct_itemId_fkey")
 }
 
 enum EventStatus {

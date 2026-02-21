@@ -4,12 +4,11 @@ import sql from 'mssql'
 import { getConfig } from './settings'
 
 export interface Product {
-    id: string
+    upc: string
+    brand: string
+    size: string
+    department: string
     name: string
-    price: number
-    stock: number
-    category: string
-    description: string
 }
 
 async function getDBConfig() {
@@ -65,21 +64,21 @@ export async function getExternalProducts(
         const request = pool.request()
 
         // Base query - adapting to legacy schema (positems)
-        // F01: ID, F02: Name, F140: Price, F19: Stock, F1022: Category, F1023: Description
-        let query = 'SELECT F01 as id, F02 as name, F140 as price, F19 as stock, F1022 as category, F1023 as description FROM positems'
+        // F01: upc, F155: brand, F22: size, F238: department, F29: name
+        let query = 'SELECT F01 as upc, F155 as brand, F22 as size, F238 as department, F29 as name FROM positems'
         let countQuery = 'SELECT COUNT(*) as count FROM positems'
 
         // Add filtering if search is provided
         if (search) {
             request.input('search', sql.NVarChar, `%${search}%`)
-            const whereClause = ' WHERE F02 LIKE @search OR F1023 LIKE @search OR F1022 LIKE @search'
+            const whereClause = ' WHERE F29 LIKE @search OR F155 LIKE @search OR F01 LIKE @search OR F238 LIKE @search'
             query += whereClause
             countQuery += whereClause
         }
 
         // Add pagination
         // MSSQL requires ORDER BY for OFFSET/FETCH
-        query += ' ORDER BY F02 ASC OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY'
+        query += ' ORDER BY F29 ASC OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY'
 
         const offset = (page - 1) * pageSize
         request.input('offset', sql.Int, offset)
@@ -101,12 +100,11 @@ export async function getExternalProducts(
         await pool.close()
 
         const products = productsResult.recordset.map(row => ({
-            id: String(row.id),
-            name: row.name || 'Unknown Product',
-            price: Number(row.price) || 0,
-            stock: Number(row.stock) || 0,
-            category: row.category || 'Uncategorized',
-            description: row.description || ''
+            upc: String(row.upc || ''),
+            brand: row.brand || '',
+            size: row.size || '',
+            department: row.department || '',
+            name: row.name || 'Unknown Product'
         }))
 
         const totalCount = countResult.recordset[0].count
@@ -117,14 +115,128 @@ export async function getExternalProducts(
         // Return a mock error product if connection fails
         return {
             products: [{
-                id: 'ERR',
-                name: 'Connection Error',
-                price: 0,
-                stock: 0,
-                category: 'System',
-                description: 'Please check your database settings and connection.'
+                upc: 'ERR',
+                brand: 'System',
+                size: '',
+                department: 'Error',
+                name: 'Connection Error'
             }],
             totalCount: 0
         }
+    }
+}
+
+export async function getExternalProductByUPC(upc: string): Promise<Record<string, any> | null> {
+    const config = await getDBConfig()
+    if (!config) return null
+
+    try {
+        const pool = await sql.connect(config)
+        const request = pool.request()
+
+        const query = 'SELECT * FROM positems WHERE F01 = @upc'
+        request.input('upc', sql.NVarChar, upc)
+
+        console.log('Executing Single Product Query:', query)
+        console.log('UPC Param:', upc)
+
+        const result = await request.query(query)
+
+        await pool.close()
+
+        if (result.recordset.length === 0) {
+            return null
+        }
+
+        return result.recordset[0]
+    } catch (error) {
+        console.error(`Failed to fetch external product for UPC ${upc}:`, error)
+        return null
+    }
+}
+
+export async function getExternalBrands(): Promise<string[]> {
+    const config = await getDBConfig()
+    if (!config) return []
+
+    try {
+        const pool = await sql.connect(config)
+
+        const query = 'SELECT DISTINCT F155 as brand FROM positems WHERE F155 IS NOT NULL AND F155 != \'\' ORDER BY F155'
+
+        console.log('Executing Brands Query:', query)
+
+        const result = await pool.request().query(query)
+
+        await pool.close()
+
+        return result.recordset.map(row => row.brand)
+    } catch (error) {
+        console.error('Failed to fetch external brands:', error)
+        return []
+    }
+}
+
+export async function getExternalProductsByBrand(brand: string): Promise<Product[]> {
+    const config = await getDBConfig()
+    if (!config) return []
+
+    try {
+        const pool = await sql.connect(config)
+        const request = pool.request()
+
+        const query = 'SELECT F01 as upc, F155 as brand, F22 as size, F238 as department, F29 as name FROM positems WHERE F155 = @brand ORDER BY F29 ASC'
+        request.input('brand', sql.NVarChar, brand)
+
+        console.log('Executing Products By Brand Query:', query)
+        console.log('Brand Param:', brand)
+
+        const result = await request.query(query)
+
+        await pool.close()
+
+        return result.recordset.map(row => ({
+            upc: String(row.upc || ''),
+            brand: row.brand || '',
+            size: row.size || '',
+            department: row.department || '',
+            name: row.name || 'Unknown Product'
+        }))
+    } catch (error) {
+        console.error(`Failed to fetch external products for brand ${brand}:`, error)
+        return []
+    }
+}
+
+export async function getExternalProductsByUPCs(upcs: string[]): Promise<Product[]> {
+    if (!upcs.length) return []
+    const config = await getDBConfig()
+    if (!config) return []
+
+    try {
+        const pool = await sql.connect(config)
+        const request = pool.request()
+
+        const params = upcs.map((_, i) => `@upc${i}`).join(',')
+        upcs.forEach((upc, i) => {
+            request.input(`upc${i}`, sql.NVarChar, upc)
+        })
+
+        const query = `SELECT F01 as upc, F155 as brand, F22 as size, F238 as department, F29 as name FROM positems WHERE F01 IN (${params})`
+
+        const result = await request.query(query)
+
+        await pool.close()
+
+        return result.recordset.map(row => ({
+            upc: String(row.upc || ''),
+            brand: row.brand || '',
+            size: row.size || '',
+            department: row.department || '',
+            name: row.name || 'Unknown Product'
+        }))
+    } catch (error) {
+        console.error('Failed to fetch external products by UPCs:', error)
+        return []
     }
 }

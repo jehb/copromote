@@ -1,5 +1,6 @@
 import { getOrganization, updateOrganization } from '@/app/actions/organizations'
 import { getContacts } from '@/app/actions/contacts'
+import { getExternalBrands } from '@/app/actions/external-db'
 import { OrganizationForm } from '@/components/organizations/organization-form'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
@@ -8,9 +9,10 @@ import { notFound } from 'next/navigation'
 
 export default async function EditOrganizationPage({ params }: { params: { id: string } }) {
     const { id } = await params
-    const [organization, contacts] = await Promise.all([
+    const [organization, contacts, externalBrands] = await Promise.all([
         getOrganization(id),
-        getContacts()
+        getContacts(),
+        getExternalBrands()
     ])
 
     if (!organization) {
@@ -37,6 +39,7 @@ export default async function EditOrganizationPage({ params }: { params: { id: s
                     <OrganizationForm
                         organization={organization}
                         contacts={contacts}
+                        externalBrands={externalBrands}
                         action={updateOrganization}
                     />
                 </CardContent>

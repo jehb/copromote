@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 import { createOrganization } from '@/app/actions/organizations'
 import { getContacts } from '@/app/actions/contacts'
+import { getExternalBrands } from '@/app/actions/external-db'
 import { OrganizationForm } from '@/components/organizations/organization-form'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { ArrowLeft } from 'lucide-react'
@@ -12,8 +13,10 @@ export default async function NewOrganizationPage({
     searchParams: { primaryContactId?: string }
 }) {
     const { primaryContactId } = await searchParams
-    const contacts = await getContacts()
-
+    const [contacts, externalBrands] = await Promise.all([
+        getContacts(),
+        getExternalBrands()
+    ])
     return (
         <div className="p-8 max-w-4xl mx-auto space-y-6">
             <Link href="/organizations" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit">
@@ -33,6 +36,7 @@ export default async function NewOrganizationPage({
                 <CardContent className="p-8">
                     <OrganizationForm
                         contacts={contacts}
+                        externalBrands={externalBrands}
                         action={createOrganization}
                         defaultPrimaryContactId={primaryContactId}
                     />

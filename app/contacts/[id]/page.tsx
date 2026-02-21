@@ -43,7 +43,7 @@ export default async function ContactDetailPage({ params }: { params: { id: stri
                                 <Badge variant="outline" className={cn(
                                     "capitalize font-semibold",
                                     contact.type === 'Client' && "bg-blue-50 text-blue-700 border-blue-100",
-                                    contact.type === 'Vendor' && "bg-orange-50 text-orange-700 border-orange-100",
+                                    contact.type === 'Brand' && "bg-orange-50 text-orange-700 border-orange-100",
                                     contact.type === 'Performer' && "bg-purple-50 text-purple-700 border-purple-100",
                                     contact.type === 'Internal' && "bg-green-50 text-green-700 border-green-100"
                                 )}>

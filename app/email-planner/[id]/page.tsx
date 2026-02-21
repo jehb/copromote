@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { createEmailItem } from '@/app/actions/email-item'
 import { Plus } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
+import { getExternalProductsByUPCs } from '@/app/actions/external-db'
 
 export default async function EmailPlanDetailPage({ params }: { params: { id: string } }) {
     const { id } = await params
@@ -39,6 +40,11 @@ export default async function EmailPlanDetailPage({ params }: { params: { id: st
         },
     })
 
+    const planItems = (plan as any).items || []
+    const allUPCs: string[] = planItems.flatMap((item: any) => item.products?.map((p: any) => p.upc) || [])
+    const uniqueUPCs = Array.from(new Set(allUPCs))
+    const availableProducts = uniqueUPCs.length > 0 ? await getExternalProductsByUPCs(uniqueUPCs) : []
+
     return (
         <div className="container mx-auto py-8 space-y-8">
             <div className="max-w-4xl mx-auto space-y-8">
@@ -61,7 +67,7 @@ export default async function EmailPlanDetailPage({ params }: { params: { id: st
                             await createEmailItem(plan.id, {
                                 title: 'New Item',
                                 description: '',
-                                order: plan.items.length,
+                                order: planItems.length,
                             })
                         }}>
                             <Button type="submit" size="sm">
@@ -72,7 +78,7 @@ export default async function EmailPlanDetailPage({ params }: { params: { id: st
                     </div>
 
                     <div className="space-y-4">
-                        <EmailItemList items={plan.items} availableEvents={events} />
+                        <EmailItemList items={planItems} availableEvents={events} availableProducts={availableProducts} />
                     </div>
                 </section>
             </div>

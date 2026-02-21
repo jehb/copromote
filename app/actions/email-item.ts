@@ -157,3 +157,56 @@ export async function reorderEmailItems(items: { id: string; order: number }[]) 
         return { success: false, error: 'Failed to reorder items' }
     }
 }
+
+export async function addItemProduct(itemId: string, upc: string) {
+    try {
+        const item = await prisma.emailItemProduct.create({
+            data: {
+                itemId,
+                upc,
+            },
+            include: {
+                item: { select: { planId: true } },
+            },
+        })
+
+        revalidatePath(`/email-planner/${item.item.planId}`)
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to add product to item:', error)
+        return { success: false, error: 'Failed to add product to item' }
+    }
+}
+
+export async function removeItemProduct(itemId: string, upc: string) {
+    try {
+        const product = await prisma.emailItemProduct.findUnique({
+            where: {
+                itemId_upc: {
+                    itemId,
+                    upc,
+                }
+            },
+            include: {
+                item: { select: { planId: true } },
+            },
+        })
+
+        if (!product) return { success: false, error: 'Product not found on item' }
+
+        await prisma.emailItemProduct.delete({
+            where: {
+                itemId_upc: {
+                    itemId,
+                    upc,
+                }
+            },
+        })
+
+        revalidatePath(`/email-planner/${product.item.planId}`)
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to remove product from item:', error)
+        return { success: false, error: 'Failed to remove product from item' }
+    }
+}
