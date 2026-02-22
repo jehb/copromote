@@ -8,6 +8,7 @@ interface HeaderProps {
     onRedo: () => void;
     onDownloadImage: () => void;
     onDownloadJson: () => void;
+    onSaveTemplate: () => void;
 }
 
 export default function Header({
@@ -16,7 +17,8 @@ export default function Header({
     onUndo,
     onRedo,
     onDownloadImage,
-    onDownloadJson
+    onDownloadJson,
+    onSaveTemplate
 }: HeaderProps) {
     return (
         <header className="h-14 bg-white border-b flex items-center justify-between px-6 z-30 shadow-sm shrink-0">
@@ -50,6 +52,13 @@ export default function Header({
                 >
                     <Code size={16} />
                     Export JSON
+                </button>
+                <button
+                    onClick={onSaveTemplate}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+                >
+                    <Download size={16} /> {/* Placeholder icon, could be Save */}
+                    Save Template
                 </button>
                 <button
                     onClick={onDownloadImage}

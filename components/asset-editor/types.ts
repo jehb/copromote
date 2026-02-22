@@ -1,4 +1,4 @@
-export type ElementType = 'text' | 'rect' | 'circle' | 'image' | 'group';
+export type ElementType = 'text' | 'rect' | 'circle' | 'image' | 'group' | 'icon';
 
 export interface EditorElement {
     id: string;
@@ -19,6 +19,9 @@ export interface EditorElement {
     fontStyle?: string;
     align?: 'left' | 'center' | 'right';
     letterSpacing?: number;
+    isList?: boolean;
+    isCurved?: boolean;
+    curveRadius?: number;
     // Image specific
     src?: string;
     cropX?: number;
@@ -36,6 +39,8 @@ export interface EditorElement {
     shadowOpacity?: number;
     // Grouping
     children?: EditorElement[];
+    // Vector Icons
+    iconPath?: string;
 }
 
-export type SidebarTab = 'templates' | 'text' | 'shapes' | 'uploads' | 'background' | 'layers' | 'resize';
+export type SidebarTab = 'templates' | 'text' | 'shapes' | 'uploads' | 'background' | 'layers' | 'resize' | 'icons';

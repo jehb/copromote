@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Konva from 'konva';
-import { Stage, Layer, Rect, Text, Circle, Transformer, Image as KonvaImage, Group as KonvaGroup, Line } from 'react-konva';
+import { Stage, Layer, Rect, Text, TextPath, Circle, Transformer, Image as KonvaImage, Group as KonvaGroup, Line, Path } from 'react-konva';
 import useImage from 'use-image';
 import { EditorElement } from './types';
 
@@ -9,6 +9,8 @@ interface WorkspaceProps {
     setElements: (elements: EditorElement[]) => void;
     selectedIds: string[];
     setSelectedIds: (ids: string[] | ((prev: string[]) => string[])) => void;
+    croppingId?: string | null;
+    setCroppingId?: (id: string | null) => void;
     canvasBg: string;
     canvasSize: { width: number; height: number };
     onHistoryChange: (newElements: EditorElement[]) => void;
@@ -20,6 +22,8 @@ export default function Workspace({
     setElements,
     selectedIds,
     setSelectedIds,
+    croppingId,
+    setCroppingId,
     canvasBg,
     canvasSize,
     onHistoryChange,
@@ -219,12 +223,21 @@ export default function Workspace({
                                 const scaleY = node.scaleY();
                                 node.scaleX(1);
                                 node.scaleY(1);
+
+                                let newWidth = Math.max(5, node.width() * scaleX);
+                                let newHeight = Math.max(5, node.height() * scaleY);
+
+                                if (el.type === 'icon') {
+                                    newWidth = Math.max(5, scaleX * 24);
+                                    newHeight = Math.max(5, scaleY * 24);
+                                }
+
                                 handleModifyEnd({
                                     ...el,
                                     x: node.x(),
                                     y: node.y(),
-                                    width: Math.max(5, node.width() * scaleX),
-                                    height: Math.max(node.height() * scaleY),
+                                    width: newWidth,
+                                    height: newHeight,
                                     rotation: node.rotation()
                                 });
                             };
@@ -250,9 +263,9 @@ export default function Workspace({
                                 }
                             };
 
+                            const { key: _key, ...elWithoutKey } = (el as any);
                             const commonProps = {
-                                key: el.id,
-                                ...el,
+                                ...elWithoutKey,
                                 draggable: true,
                                 onClick: handleSelect,
                                 onTap: handleSelect,
@@ -261,26 +274,71 @@ export default function Workspace({
                                 onTransformEnd,
                                 name: el.id,
                                 opacity: el.opacity ?? 1,
+                                shadowColor: el.shadowColor || 'transparent',
+                                shadowBlur: el.shadowBlur || 0,
+                                shadowOffsetX: el.shadowOffsetX || 0,
+                                shadowOffsetY: el.shadowOffsetY || 0,
+                                shadowOpacity: el.shadowOpacity || 0,
+                                stroke: el.stroke,
+                                strokeWidth: el.strokeWidth || 0,
                             };
 
-                            if (el.type === 'rect') return <Rect {...commonProps} />;
-                            if (el.type === 'circle') return <Circle {...commonProps} radius={(el.width || 100) / 2} />;
-                            if (el.type === 'text') return <Text {...commonProps} />;
-                            if (el.type === 'image') return <UrlImage {...commonProps} onChange={handleModifyEnd} shapeProps={el} />;
+                            if (el.type === 'rect') return <Rect key={el.id} {...commonProps} cornerRadius={el.cornerRadius || 0} />;
+                            if (el.type === 'circle') return <Circle key={el.id} {...commonProps} radius={(el.width || 100) / 2} />;
+                            if (el.type === 'text') {
+                                let displayText = el.text || '';
+                                if (el.isList) {
+                                    displayText = displayText.split('\n').map(line => `• ${line.replace(/^•\s*/, '')}`).join('\n');
+                                }
+                                if (el.isCurved) {
+                                    const r = el.curveRadius || 150;
+                                    const pathData = `M 0,${r} A ${r},${r} 0 0,1 ${r * 2},${r}`;
+                                    return <TextPath key={el.id} {...commonProps} text={displayText} data={pathData} />;
+                                }
+                                return <Text key={el.id} {...commonProps} text={displayText} />;
+                            }
+                            if (el.type === 'image') return <UrlImage
+                                key={el.id}
+                                shapeProps={{ ...commonProps, ...el }}
+                                onChange={handleModifyEnd}
+                                onDblClick={() => {
+                                    if (setCroppingId) setCroppingId(el.id);
+                                }}
+                            />;
+                            if (el.type === 'icon' && el.iconPath) return <Path key={el.id} {...commonProps} data={el.iconPath} fill={el.fill} scaleX={((el.width || 100) / 24)} scaleY={((el.height || 100) / 24)} />;
                             if (el.type === 'group') return (
-                                <KonvaGroup {...commonProps}>
+                                <KonvaGroup key={el.id} {...commonProps}>
                                     {el.children?.map((child, j) => {
+                                        const { key: _childKey, ...childWithoutKey } = (child as any);
                                         const childProps = {
-                                            ...child,
-                                            key: child.id,
+                                            ...childWithoutKey,
                                             opacity: child.opacity ?? 1,
+                                            shadowColor: child.shadowColor || 'transparent',
+                                            shadowBlur: child.shadowBlur || 0,
+                                            shadowOffsetX: child.shadowOffsetX || 0,
+                                            shadowOffsetY: child.shadowOffsetY || 0,
+                                            shadowOpacity: child.shadowOpacity || 0,
+                                            stroke: child.stroke,
+                                            strokeWidth: child.strokeWidth || 0,
                                             // Children of groups are NOT directly draggable/selectable in this MVP
                                             // The whole group acts as one entity.
                                         };
-                                        if (child.type === 'rect') return <Rect {...childProps} />;
-                                        if (child.type === 'circle') return <Circle {...childProps} radius={(child.width || 100) / 2} />;
-                                        if (child.type === 'text') return <Text {...childProps} />;
-                                        if (child.type === 'image') return <UrlImage {...childProps} shapeProps={child} />;
+                                        if (child.type === 'rect') return <Rect key={child.id} {...childProps} cornerRadius={child.cornerRadius || 0} />;
+                                        if (child.type === 'circle') return <Circle key={child.id} {...childProps} radius={(child.width || 100) / 2} />;
+                                        if (child.type === 'text') {
+                                            let displayText = child.text || '';
+                                            if (child.isList) {
+                                                displayText = displayText.split('\n').map(line => `• ${line.replace(/^•\s*/, '')}`).join('\n');
+                                            }
+                                            if (child.isCurved) {
+                                                const r = child.curveRadius || 150;
+                                                const pathData = `M 0,${r} A ${r},${r} 0 0,1 ${r * 2},${r}`;
+                                                return <TextPath key={child.id} {...childProps} text={displayText} data={pathData} />;
+                                            }
+                                            return <Text key={child.id} {...childProps} text={displayText} />;
+                                        }
+                                        if (child.type === 'image') return <UrlImage key={child.id} {...childProps} shapeProps={child} />;
+                                        if (child.type === 'icon' && child.iconPath) return <Path key={child.id} {...childProps} data={child.iconPath} fill={child.fill} scaleX={((child.width || 100) / 24)} scaleY={((child.height || 100) / 24)} />;
                                         return null;
                                     })}
                                 </KonvaGroup>
@@ -289,8 +347,18 @@ export default function Workspace({
                             return null;
                         })}
 
-                        {selectedIds.length > 0 && (
+                        {selectedIds.length > 0 && !croppingId && (
                             <TransformerComponent selectedIds={selectedIds} stageRef={stageRef} />
+                        )}
+
+                        {croppingId && (
+                            <CropOverlay
+                                element={elements.find(e => e.id === croppingId)}
+                                onChange={(newAttrs: EditorElement) => {
+                                    onHistoryChange(elements.map(e => e.id === croppingId ? newAttrs : e));
+                                }}
+                                onClose={() => { if (setCroppingId) setCroppingId(null); }}
+                            />
                         )}
 
                         {selectionBox.visible && (
@@ -340,16 +408,55 @@ const UrlImage = (props: any) => {
         }
     }, [image, shapeProps.blurRadius, shapeProps.brightness, shapeProps.width, shapeProps.height]);
 
+    // Default crop to full bounding box
+    const cropX = shapeProps.cropX || 0;
+    const cropY = shapeProps.cropY || 0;
+    const cropWidth = shapeProps.cropWidth || shapeProps.width || 200;
+    const cropHeight = shapeProps.cropHeight || shapeProps.height || 200;
+
     return (
-        <KonvaImage
-            image={image}
-            ref={imageRef}
-            filters={[Konva.Filters.Blur, Konva.Filters.Brighten]}
-            blurRadius={shapeProps.blurRadius || 0}
-            brightness={shapeProps.brightness || 0}
-            {...rest}
-            {...shapeProps}
-        />
+        <KonvaGroup
+            x={shapeProps.x}
+            y={shapeProps.y}
+            width={shapeProps.width}
+            height={shapeProps.height}
+            rotation={shapeProps.rotation}
+            scaleX={shapeProps.scaleX}
+            scaleY={shapeProps.scaleY}
+            draggable={shapeProps.draggable}
+            onClick={shapeProps.onClick}
+            onTap={shapeProps.onTap}
+            onDragMove={shapeProps.onDragMove}
+            onDragEnd={shapeProps.onDragEnd}
+            onTransformEnd={shapeProps.onTransformEnd}
+            name={shapeProps.name}
+            clipX={cropX}
+            clipY={cropY}
+            clipWidth={cropWidth}
+            clipHeight={cropHeight}
+            onDblClick={shapeProps.onDblClick}
+        >
+            <KonvaImage
+                x={0}
+                y={0}
+                image={image}
+                ref={imageRef}
+                width={shapeProps.width}
+                height={shapeProps.height}
+                filters={[Konva.Filters.Blur, Konva.Filters.Brighten]}
+                blurRadius={shapeProps.blurRadius || 0}
+                brightness={shapeProps.brightness || 0}
+                opacity={shapeProps.opacity}
+                shadowColor={shapeProps.shadowColor}
+                shadowBlur={shapeProps.shadowBlur}
+                shadowOffsetX={shapeProps.shadowOffsetX}
+                shadowOffsetY={shapeProps.shadowOffsetY}
+                shadowOpacity={shapeProps.shadowOpacity}
+                stroke={shapeProps.stroke}
+                strokeWidth={shapeProps.strokeWidth}
+                {...rest}
+            />
+        </KonvaGroup>
     );
 };
 
@@ -374,5 +481,102 @@ const TransformerComponent = ({ selectedIds, stageRef }: { selectedIds: string[]
                 return newBox;
             }}
         />
+    );
+};
+
+const CropOverlay = ({ element, onChange, onClose }: any) => {
+    const trRef = useRef<any>(null);
+    const rectRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (trRef.current && rectRef.current) {
+            trRef.current.nodes([rectRef.current]);
+            trRef.current.getLayer().batchDraw();
+        }
+    }, [element]);
+
+    // Handle clicking outside to apply crop
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
+    if (!element || element.type !== 'image') return null;
+
+    const cropX = element.cropX || 0;
+    const cropY = element.cropY || 0;
+    const cropWidth = element.cropWidth || element.width || 200;
+    const cropHeight = element.cropHeight || element.height || 200;
+
+    return (
+        <KonvaGroup>
+            {/* Dark overlay backdrop to signify cropping */}
+            <Rect
+                x={-9999}
+                y={-9999}
+                width={19999}
+                height={19999}
+                fill="rgba(0,0,0,0.5)"
+                onClick={onClose}
+                onTap={onClose}
+            />
+
+            {/* The base image behind the crop window perfectly aligned */}
+            <UrlImage shapeProps={{ ...element, opacity: 0.5, cropX: 0, cropY: 0, cropWidth: element.width, cropHeight: element.height }} />
+
+            {/* The crop window itself */}
+            <KonvaGroup clipX={cropX} clipY={cropY} clipWidth={cropWidth} clipHeight={cropHeight} x={element.x} y={element.y} rotation={element.rotation} scaleX={element.scaleX} scaleY={element.scaleY}>
+                <UrlImage shapeProps={{ ...element, x: 0, y: 0, cropX: 0, cropY: 0, cropWidth: element.width, cropHeight: element.height }} />
+            </KonvaGroup>
+
+            <Rect
+                ref={rectRef}
+                x={element.x + cropX}
+                y={element.y + cropY}
+                width={cropWidth}
+                height={cropHeight}
+                rotation={element.rotation || 0}
+                stroke="#00A1FF"
+                strokeWidth={2}
+                draggable
+                onDragEnd={(e) => {
+                    const node = e.target;
+                    onChange({
+                        ...element,
+                        cropX: node.x() - element.x,
+                        cropY: node.y() - element.y,
+                    });
+                }}
+                onTransformEnd={(e) => {
+                    const node = e.target;
+                    const scaleX = node.scaleX();
+                    const scaleY = node.scaleY();
+                    node.scaleX(1);
+                    node.scaleY(1);
+
+                    onChange({
+                        ...element,
+                        cropX: node.x() - element.x,
+                        cropY: node.y() - element.y,
+                        cropWidth: Math.max(5, node.width() * scaleX),
+                        cropHeight: Math.max(5, node.height() * scaleY),
+                    });
+                }}
+            />
+            <Transformer
+                ref={trRef}
+                rotateEnabled={false}
+                keepRatio={false}
+                boundBoxFunc={(oldBox, newBox) => {
+                    if (newBox.width < 5 || newBox.height < 5) return oldBox;
+                    return newBox;
+                }}
+            />
+        </KonvaGroup>
     );
 };

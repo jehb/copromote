@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { SidebarTab, EditorElement } from './types';
+import TemplatesTab from './TemplatesTab';
 
 interface SidePanelProps {
     activeTab: SidebarTab | null;
@@ -11,10 +12,12 @@ interface SidePanelProps {
     setCanvasBg: (bg: string) => void;
     canvasSize: { width: number, height: number };
     setCanvasSize: (size: { width: number, height: number }) => void;
+    onAddIcon: (iconPath: string) => void;
     elements: EditorElement[];
     setElements: (elements: EditorElement[]) => void;
     selectedIds: string[];
     setSelectedIds: (ids: string[] | ((prev: string[]) => string[])) => void;
+    photos?: any[];
 }
 
 export default function SidePanel({
@@ -27,10 +30,12 @@ export default function SidePanel({
     setCanvasBg,
     canvasSize,
     setCanvasSize,
+    onAddIcon,
     elements,
     setElements,
     selectedIds,
-    setSelectedIds
+    setSelectedIds,
+    photos = []
 }: SidePanelProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,6 +88,32 @@ export default function SidePanel({
                     </div>
                 )}
 
+                {activeTab === 'icons' && (
+                    <div className="grid grid-cols-3 gap-3">
+                        <button
+                            onClick={() => onAddIcon("M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z")}
+                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
+                            title="Heart"
+                        >
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-600"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+                        </button>
+                        <button
+                            onClick={() => onAddIcon("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z")}
+                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
+                            title="Star"
+                        >
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-600"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                        </button>
+                        <button
+                            onClick={() => onAddIcon("M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z")}
+                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
+                            title="Cloud"
+                        >
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-600"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" /></svg>
+                        </button>
+                    </div>
+                )}
+
                 {activeTab === 'uploads' && (
                     <div className="flex flex-col gap-4">
                         <input
@@ -101,8 +132,52 @@ export default function SidePanel({
                         >
                             Upload Media
                         </button>
-                        <div className="text-center text-sm text-neutral-500 mt-4">
-                            Images will appear on canvas.
+
+                        <div className="w-full bg-neutral-200 h-px my-2" />
+                        <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Immich Gallery</h3>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            {photos.length === 0 ? (
+                                <div className="col-span-2 text-center text-sm text-neutral-500 py-4">
+                                    No photos found in library.
+                                </div>
+                            ) : (
+                                photos.map((photo) => (
+                                    <button
+                                        key={photo.id}
+                                        onClick={() => {
+                                            // Simulate a file upload event by fetching the blob from the proxy URL
+                                            // OR we can just add a Konva Image element directly skipping FileReader
+
+                                            // Since we already have a direct URL, it's cleaner to inject the element directly
+                                            // But for MVP, let's keep it consistent with the existing `onImageUpload` signature 
+                                            // by fetching and generating a Blob if possible, OR we refactor slightly.
+
+                                            // Actually, `src` can just be the URL natively in use-image. Let's just create an element.
+                                            const newElement = {
+                                                id: `image-${Date.now()}-${photo.id}`,
+                                                type: 'image' as const,
+                                                x: 50,
+                                                y: 50,
+                                                width: 200,
+                                                height: 200,
+                                                src: photo.url, // "/api/immich/asset/[id]"
+                                            };
+                                            // Quick hack: we don't have direct access to append in SidePanel without bypassing `onImageUpload`. 
+                                            // We do have `elements` and `setElements`. Just append it.
+                                            setElements([...elements, newElement]);
+                                        }}
+                                        className="relative aspect-square rounded overflow-hidden group border border-neutral-200 hover:border-blue-500 transition-colors bg-neutral-100"
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={`${photo.url}?w=200&h=200&fit=crop`}
+                                            alt={photo.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                        />
+                                    </button>
+                                ))
+                            )}
                         </div>
                     </div>
                 )}
@@ -137,35 +212,11 @@ export default function SidePanel({
                 )}
 
                 {activeTab === 'templates' && (
-                    <div className="flex flex-col gap-4">
-                        <button
-                            onClick={() => {
-                                setElements([
-                                    { id: `rect-${Date.now()}`, type: 'rect', x: 50, y: 50, width: 700, height: 500, fill: '#f3f4f6' },
-                                    { id: `text-${Date.now() + 1}`, type: 'text', x: 100, y: 100, text: 'Hello World', fontSize: 64, fontFamily: 'Arial', fill: '#111827', fontStyle: 'bold' }
-                                ]);
-                            }}
-                            className="w-full aspect-video bg-neutral-100 rounded-lg border hover:border-blue-500 overflow-hidden relative group transition-colors"
-                        >
-                            <div className="absolute inset-0 flex items-center justify-center p-4">
-                                <span className="text-2xl font-bold text-neutral-800">Hello World</span>
-                            </div>
-                        </button>
-
-                        <button
-                            onClick={() => {
-                                setElements([
-                                    { id: `circle-${Date.now()}`, type: 'circle', x: 400, y: 300, width: 400, height: 400, fill: '#3b82f6' },
-                                    { id: `text-${Date.now() + 1}`, type: 'text', x: 250, y: 280, text: 'Modern Design', fontSize: 48, fontFamily: 'Georgia', fill: '#ffffff' }
-                                ]);
-                            }}
-                            className="w-full aspect-video bg-blue-500 rounded-lg border hover:border-blue-700 overflow-hidden relative group transition-colors"
-                        >
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-xl font-serif text-white">Modern Design</span>
-                            </div>
-                        </button>
-                    </div>
+                    <TemplatesTab
+                        setElements={setElements}
+                        setCanvasBg={setCanvasBg}
+                        setCanvasSize={setCanvasSize}
+                    />
                 )}
 
                 {activeTab === 'layers' && (

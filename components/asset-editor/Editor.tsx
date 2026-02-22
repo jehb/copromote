@@ -7,17 +7,20 @@ import SidePanel from './SidePanel';
 import TopToolbar from './TopToolbar';
 import Workspace from './Workspace';
 import Header from './Header';
+import { createAssetTemplate } from '@/app/actions/asset-templates';
 
-export default function Editor() {
+export default function Editor({ photos = [] }: { photos?: any[] }) {
     // Global State
     const [activeTab, setActiveTab] = useState<SidebarTab | null>('shapes');
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [croppingId, setCroppingId] = useState<string | null>(null);
     const [canvasBg, setCanvasBg] = useState<string>('#ffffff');
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
 
     // History & Elements Data Structure (Undo/Redo implementation)
     const [history, setHistory] = useState<EditorElement[][]>([[]]);
     const [historyStep, setHistoryStep] = useState<number>(0);
+    const [isSavingTemplate, setIsSavingTemplate] = useState(false);
 
     // Stage ref for exports
     const stageRef = useRef<any>(null);
@@ -78,6 +81,48 @@ export default function Editor() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const saveAsTemplate = async () => {
+        if (!stageRef.current) return;
+
+        const templateName = prompt('Enter a name for this template:');
+        if (!templateName || templateName.trim() === '') return;
+
+        setIsSavingTemplate(true);
+        try {
+            // Deselect to hide transformer for preview image
+            const prevSelected = [...selectedIds];
+            setSelectedIds([]);
+
+            // Wait for React to re-render without transformer
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Generate a smaller preview image
+            const previewImage = stageRef.current.toDataURL({ pixelRatio: 0.5 });
+
+            // Restore selection
+            setSelectedIds(prevSelected);
+
+            const result = await createAssetTemplate({
+                name: templateName.trim(),
+                elements,
+                canvasSize,
+                canvasBg,
+                previewImage,
+            });
+
+            if (result.success) {
+                alert('Template saved successfully!');
+            } else {
+                alert('Failed to save template.');
+            }
+        } catch (error) {
+            console.error('Error saving template:', error);
+            alert('An error occurred while saving.');
+        } finally {
+            setIsSavingTemplate(false);
+        }
     };
 
     const updateSelectedElement = (newProps: Partial<EditorElement>) => {
@@ -212,6 +257,21 @@ export default function Editor() {
         updateHistory([...elements, newElement]);
     };
 
+    const onAddIcon = (iconPath: string) => {
+        const newElement: EditorElement = {
+            id: `icon-${Date.now()}`,
+            type: 'icon',
+            x: 200,
+            y: 200,
+            width: 100,
+            height: 100,
+            fill: '#475569', // text-neutral-600
+            iconPath,
+        };
+        updateHistory([...elements, newElement]);
+        setSelectedIds([newElement.id]);
+    };
+
     const onImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -257,6 +317,7 @@ export default function Editor() {
                 onRedo={redo}
                 onDownloadImage={downloadImage}
                 onDownloadJson={downloadJson}
+                onSaveTemplate={saveAsTemplate}
             />
             <div className="flex flex-1 overflow-hidden">
                 <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -265,6 +326,7 @@ export default function Editor() {
                     onAddText={onAddText}
                     onAddRect={onAddRect}
                     onAddCircle={onAddCircle}
+                    onAddIcon={onAddIcon}
                     onImageUpload={onImageUpload}
                     canvasBg={canvasBg}
                     setCanvasBg={setCanvasBg}
@@ -274,6 +336,7 @@ export default function Editor() {
                     setElements={updateHistory}
                     selectedIds={selectedIds}
                     setSelectedIds={setSelectedIds}
+                    photos={photos}
                 />
 
                 <div className="flex-1 flex flex-col h-full bg-neutral-200">
@@ -286,6 +349,7 @@ export default function Editor() {
                         sendBackward={sendBackward}
                         groupSelected={groupSelected}
                         ungroupSelected={ungroupSelected}
+                        onCrop={setCroppingId}
                     />
 
                     <Workspace
@@ -293,6 +357,8 @@ export default function Editor() {
                         setElements={updateHistory}
                         selectedIds={selectedIds}
                         setSelectedIds={setSelectedIds}
+                        croppingId={croppingId}
+                        setCroppingId={setCroppingId}
                         canvasBg={canvasBg}
                         canvasSize={canvasSize}
                         onHistoryChange={updateHistory}

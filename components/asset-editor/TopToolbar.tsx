@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditorElement } from './types';
-import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup } from 'lucide-react';
+import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup, Crop } from 'lucide-react';
 
 interface TopToolbarProps {
     selectedElements: EditorElement[];
@@ -11,6 +11,7 @@ interface TopToolbarProps {
     sendBackward: () => void;
     groupSelected: () => void;
     ungroupSelected: () => void;
+    onCrop?: (id: string) => void;
 }
 
 export default function TopToolbar({
@@ -21,7 +22,8 @@ export default function TopToolbar({
     bringForward,
     sendBackward,
     groupSelected,
-    ungroupSelected
+    ungroupSelected,
+    onCrop
 }: TopToolbarProps) {
     if (selectedElements.length === 0) {
         return (
@@ -42,7 +44,7 @@ export default function TopToolbar({
                 </div>
             )}
 
-            {selectedElement && (type === 'rect' || type === 'circle' || type === 'text') && (
+            {selectedElement && (type === 'rect' || type === 'circle' || type === 'text' || type === 'icon') && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Fill:</span>
                     <input
@@ -71,6 +73,20 @@ export default function TopToolbar({
                         min={0}
                         max={100}
                         title="Border Width"
+                    />
+                </div>
+            )}
+
+            {selectedElement && type === 'rect' && (
+                <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
+                    <span className="text-xs text-neutral-500 font-medium">Radius:</span>
+                    <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={selectedElement.cornerRadius || 0}
+                        onChange={(e) => updateSelectedElement({ cornerRadius: Number(e.target.value) })}
+                        className="w-16 accent-blue-600"
                     />
                 </div>
             )}
@@ -127,6 +143,87 @@ export default function TopToolbar({
                             }}
                         ><Underline size={14} /></button>
                     </div>
+
+                    <div className="flex bg-neutral-100 rounded-md p-0.5 ml-2 border border-neutral-200">
+                        <button
+                            className={`p-1.5 rounded transition-colors ${selectedElement.align === 'left' || !selectedElement.align ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
+                            onClick={() => updateSelectedElement({ align: 'left' })}
+                        ><AlignLeft size={14} /></button>
+                        <button
+                            className={`p-1.5 rounded transition-colors ${selectedElement.align === 'center' ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
+                            onClick={() => updateSelectedElement({ align: 'center' })}
+                        ><AlignCenter size={14} /></button>
+                        <button
+                            className={`p-1.5 rounded transition-colors ${selectedElement.align === 'right' ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
+                            onClick={() => updateSelectedElement({ align: 'right' })}
+                        ><AlignRight size={14} /></button>
+                        <button
+                            className={`p-1.5 rounded transition-colors border-l ml-1 ${selectedElement.isList ? 'bg-white shadow-sm text-blue-600' : 'hover:bg-white text-neutral-700'}`}
+                            title="Bullet List"
+                            onClick={() => updateSelectedElement({ isList: !selectedElement.isList })}
+                        ><span className="text-xs font-bold leading-none px-1">List</span></button>
+                    </div>
+
+                    <div className="flex items-center gap-2 ml-4">
+                        <label className="flex items-center gap-1.5 text-xs text-neutral-600 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={!!selectedElement.isCurved}
+                                onChange={(e) => updateSelectedElement({ isCurved: e.target.checked })}
+                                className="rounded text-blue-600"
+                            />
+                            Curved
+                        </label>
+                        {selectedElement.isCurved && (
+                            <input
+                                type="range"
+                                min="50"
+                                max="500"
+                                value={selectedElement.curveRadius || 150}
+                                onChange={(e) => updateSelectedElement({ curveRadius: Number(e.target.value) })}
+                                className="w-16 accent-blue-600"
+                            />
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {selectedElement && (type === 'rect' || type === 'circle' || type === 'text' || type === 'image') && (
+                <div className="flex flex-col gap-1 border-r pr-4 border-neutral-200 py-1">
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-neutral-500 font-medium">Shadow:</span>
+                        <input
+                            type="color"
+                            value={selectedElement.shadowColor || '#000000'}
+                            onChange={(e) => updateSelectedElement({ shadowColor: e.target.value, shadowOpacity: selectedElement.shadowOpacity || 0.5 })}
+                            className="w-4 h-4 rounded cursor-pointer border-0 p-0"
+                        />
+                        <span className="text-[10px] text-neutral-500 font-medium ml-1">Blur</span>
+                        <input
+                            type="number"
+                            min="0"
+                            max="50"
+                            value={selectedElement.shadowBlur || 0}
+                            onChange={(e) => updateSelectedElement({ shadowBlur: Number(e.target.value) })}
+                            className="w-10 h-5 text-[10px] p-0.5 border rounded-md bg-neutral-50"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-neutral-500 font-medium">X</span>
+                        <input
+                            type="number"
+                            value={selectedElement.shadowOffsetX || 0}
+                            onChange={(e) => updateSelectedElement({ shadowOffsetX: Number(e.target.value) })}
+                            className="w-10 h-5 text-[10px] p-0.5 border rounded-md bg-neutral-50"
+                        />
+                        <span className="text-[10px] text-neutral-500 font-medium">Y</span>
+                        <input
+                            type="number"
+                            value={selectedElement.shadowOffsetY || 0}
+                            onChange={(e) => updateSelectedElement({ shadowOffsetY: Number(e.target.value) })}
+                            className="w-10 h-5 text-[10px] p-0.5 border rounded-md bg-neutral-50"
+                        />
+                    </div>
                 </div>
             )}
 
@@ -156,6 +253,17 @@ export default function TopToolbar({
                             className="w-20 accent-blue-600"
                         />
                     </div>
+                    {onCrop && (
+                        <div className="flex items-center ml-2">
+                            <button
+                                onClick={() => onCrop(selectedElement.id)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-md transition-colors"
+                            >
+                                <Crop size={14} />
+                                Crop
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 

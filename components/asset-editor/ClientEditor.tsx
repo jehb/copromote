@@ -11,6 +11,6 @@ const Editor = dynamic(() => import('./Editor'), {
     ),
 });
 
-export default function ClientEditor() {
-    return <Editor />;
+export default function ClientEditor({ photos = [] }: { photos?: any[] }) {
+    return <Editor photos={photos} />;
 }
