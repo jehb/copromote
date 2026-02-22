@@ -120,6 +120,35 @@ export default function TopToolbar({
                 </div>
             )}
 
+            {type === 'image' && (
+                <div className="flex items-center gap-4 border-r pr-4 border-neutral-200">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-neutral-500 font-medium">Blur:</span>
+                        <input
+                            type="range"
+                            min="0"
+                            max="40"
+                            step="1"
+                            value={selectedElement.blurRadius || 0}
+                            onChange={(e) => updateSelectedElement({ blurRadius: parseFloat(e.target.value) })}
+                            className="w-20 accent-blue-600"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-neutral-500 font-medium">Bright:</span>
+                        <input
+                            type="range"
+                            min="-1"
+                            max="1"
+                            step="0.1"
+                            value={selectedElement.brightness || 0}
+                            onChange={(e) => updateSelectedElement({ brightness: parseFloat(e.target.value) })}
+                            className="w-20 accent-blue-600"
+                        />
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                 <span className="text-xs text-neutral-500 font-medium">Opacity:</span>
                 <input

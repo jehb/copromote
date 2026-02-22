@@ -13,6 +13,7 @@ export default function Editor() {
     const [activeTab, setActiveTab] = useState<SidebarTab | null>('shapes');
     const [selectedId, selectShape] = useState<string | null>(null);
     const [canvasBg, setCanvasBg] = useState<string>('#ffffff');
+    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
 
     // History & Elements Data Structure (Undo/Redo implementation)
     const [history, setHistory] = useState<EditorElement[][]>([[]]);
@@ -222,6 +223,12 @@ export default function Editor() {
                     onImageUpload={onImageUpload}
                     canvasBg={canvasBg}
                     setCanvasBg={setCanvasBg}
+                    canvasSize={canvasSize}
+                    setCanvasSize={setCanvasSize}
+                    elements={elements}
+                    setElements={updateHistory}
+                    selectedId={selectedId}
+                    selectShape={selectShape}
                 />
 
                 <div className="flex-1 flex flex-col h-full bg-neutral-200">
@@ -240,6 +247,7 @@ export default function Editor() {
                         selectedId={selectedId}
                         selectShape={selectShape}
                         canvasBg={canvasBg}
+                        canvasSize={canvasSize}
                         onHistoryChange={updateHistory}
                         stageRef={stageRef}
                     />

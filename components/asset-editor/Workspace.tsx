@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import Konva from 'konva';
 import { Stage, Layer, Rect, Text, Circle, Transformer, Image as KonvaImage } from 'react-konva';
 import useImage from 'use-image';
 import { EditorElement } from './types';
@@ -9,6 +10,7 @@ interface WorkspaceProps {
     selectedId: string | null;
     selectShape: (id: string | null) => void;
     canvasBg: string;
+    canvasSize: { width: number; height: number };
     onHistoryChange: (newElements: EditorElement[]) => void;
     stageRef: React.RefObject<any>;
 }
@@ -19,6 +21,7 @@ export default function Workspace({
     selectedId,
     selectShape,
     canvasBg,
+    canvasSize,
     onHistoryChange,
     stageRef
 }: WorkspaceProps) {
@@ -163,9 +166,28 @@ export default function Workspace({
 }
 
 const UrlImage = (props: any) => {
-    const { shapeProps, ...rest } = props;
+    const { shapeProps, onChange, ...rest } = props;
     const [image] = useImage(shapeProps.src, 'anonymous');
-    return <KonvaImage image={image} {...rest} />;
+    const imageRef = useRef<any>(null);
+
+    useEffect(() => {
+        if (image && imageRef.current) {
+            // Re-cache when image or filter props change
+            imageRef.current.cache();
+        }
+    }, [image, shapeProps.blurRadius, shapeProps.brightness, shapeProps.width, shapeProps.height]);
+
+    return (
+        <KonvaImage
+            image={image}
+            ref={imageRef}
+            filters={[Konva.Filters.Blur, Konva.Filters.Brighten]}
+            blurRadius={shapeProps.blurRadius || 0}
+            brightness={shapeProps.brightness || 0}
+            {...rest}
+            {...shapeProps}
+        />
+    );
 };
 
 const TransformerComponent = ({ selectedId, stageRef }: { selectedId: string; stageRef: React.RefObject<any> }) => {

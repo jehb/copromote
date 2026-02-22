@@ -25,6 +25,8 @@ export interface EditorElement {
     cropY?: number;
     cropWidth?: number;
     cropHeight?: number;
+    blurRadius?: number;
+    brightness?: number;
 }
 
 export type SidebarTab = 'templates' | 'text' | 'shapes' | 'uploads' | 'background' | 'layers' | 'resize';
