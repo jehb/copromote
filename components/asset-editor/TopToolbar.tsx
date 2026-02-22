@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditorElement } from './types';
-import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup, Crop } from 'lucide-react';
+import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup, Crop, ArrowRightLeft } from 'lucide-react';
 
 interface TopToolbarProps {
     selectedElements: EditorElement[];
@@ -35,6 +35,7 @@ export default function TopToolbar({
 
     const selectedElement = selectedElements.length === 1 ? selectedElements[0] : undefined;
     const type = selectedElement?.type;
+    const isNativeShape = selectedElement && ['rect', 'circle', 'text', 'icon', 'star', 'polygon', 'ring', 'arrow', 'line', 'path'].includes(type as string);
 
     return (
         <div className="h-14 bg-white border-b flex items-center px-4 w-full shadow-sm gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide shrink-0">
@@ -44,7 +45,7 @@ export default function TopToolbar({
                 </div>
             )}
 
-            {selectedElement && (type === 'rect' || type === 'circle' || type === 'text' || type === 'icon') && (
+            {isNativeShape && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Fill:</span>
                     <input
@@ -56,7 +57,7 @@ export default function TopToolbar({
                 </div>
             )}
 
-            {selectedElement && (type === 'rect' || type === 'circle' || type === 'text') && (
+            {isNativeShape && type !== 'text' && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Border:</span>
                     <input
@@ -74,6 +75,18 @@ export default function TopToolbar({
                         max={100}
                         title="Border Width"
                     />
+                    <button
+                        onClick={() => {
+                            updateSelectedElement({
+                                fill: selectedElement.stroke || 'transparent',
+                                stroke: selectedElement.fill || 'transparent'
+                            });
+                        }}
+                        className="p-1.5 ml-1 text-neutral-500 hover:text-blue-600 hover:bg-neutral-100 rounded-md transition-colors"
+                        title="Swap Fill & Border Colors"
+                    >
+                        <ArrowRightLeft size={14} />
+                    </button>
                 </div>
             )}
 

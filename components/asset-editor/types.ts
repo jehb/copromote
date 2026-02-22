@@ -1,4 +1,4 @@
-export type ElementType = 'text' | 'rect' | 'circle' | 'image' | 'group' | 'icon';
+export type ElementType = 'text' | 'rect' | 'circle' | 'image' | 'group' | 'icon' | 'star' | 'polygon' | 'ring' | 'arrow' | 'line' | 'path';
 
 export interface EditorElement {
     id: string;
@@ -39,8 +39,12 @@ export interface EditorElement {
     shadowOpacity?: number;
     // Grouping
     children?: EditorElement[];
-    // Vector Icons
+    // Vector Icons & Paths
     iconPath?: string;
+    points?: number[];
+    sides?: number; // For regular polygons
+    innerRadius?: number; // For rings
+    outerRadius?: number; // For rings
 }
 
 export type SidebarTab = 'templates' | 'text' | 'shapes' | 'uploads' | 'background' | 'layers' | 'resize' | 'icons';

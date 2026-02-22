@@ -1,12 +1,10 @@
 'use server'
 
-import { getConfig } from './settings'
-
 import Postiz from '@postiz/node'
 
 export async function getPostizClient() {
-    const url = await getConfig('POSTIZ_URL')
-    const apiKey = await getConfig('POSTIZ_API_KEY')
+    const url = process.env.POSTIZ_URL
+    const apiKey = process.env.POSTIZ_API_KEY
     if (!apiKey) return null
 
     // The Postiz node package takes (apiKey, path) but wait. Looking at the type: constructor(_apiKey: string, _path?: string);
@@ -174,8 +172,10 @@ export async function deletePostFromPostiz(postId: string) {
     }
 }
 
-export async function testPostizConnection(url: string, apiKey: string) {
+export async function testPostizConnection() {
     try {
+        const url = process.env.POSTIZ_URL
+        const apiKey = process.env.POSTIZ_API_KEY
         if (!apiKey) return { success: false, message: 'API Key is required' }
 
         const apiUrl = url ? (url.endsWith('/api') ? url : url.endsWith('/') ? `${url}api` : `${url}/api`) : undefined

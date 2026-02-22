@@ -15,10 +15,21 @@ export async function GET(
                 'Content-Type': blob.type || 'image/jpeg',
                 // Cache immich images locally for a week to save bandwidth
                 'Cache-Control': 'public, max-age=604800, immutable',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
             }
         })
     } catch (error) {
         console.error('Error fetching Immich asset:', error)
         return new Response('Asset not found', { status: 404 })
     }
+}
+
+export async function OPTIONS() {
+    return new Response(null, {
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        }
+    })
 }

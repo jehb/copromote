@@ -7,6 +7,12 @@ interface SidePanelProps {
     onAddText: (text: string, fontSize: number, fontFamily: string) => void;
     onAddRect: () => void;
     onAddCircle: () => void;
+    onAddStar: () => void;
+    onAddPolygon: (sides: number) => void;
+    onAddRing: () => void;
+    onAddLine: () => void;
+    onAddArrow: () => void;
+    onAddPath: (path: string, viewBox?: string) => void;
     onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
     canvasBg: string;
     setCanvasBg: (bg: string) => void;
@@ -25,6 +31,12 @@ export default function SidePanel({
     onAddText,
     onAddRect,
     onAddCircle,
+    onAddStar,
+    onAddPolygon,
+    onAddRing,
+    onAddLine,
+    onAddArrow,
+    onAddPath,
     onImageUpload,
     canvasBg,
     setCanvasBg,
@@ -72,19 +84,42 @@ export default function SidePanel({
                 )}
 
                 {activeTab === 'shapes' && (
-                    <div className="grid grid-cols-2 gap-3">
-                        <button
-                            onClick={onAddRect}
-                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
-                        >
-                            <div className="w-12 h-12 bg-neutral-400"></div>
-                        </button>
-                        <button
-                            onClick={onAddCircle}
-                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
-                        >
-                            <div className="w-12 h-12 bg-neutral-400 rounded-full"></div>
-                        </button>
+                    <div className="flex flex-col gap-6">
+                        <div>
+                            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Geometric</h3>
+                            <div className="grid grid-cols-3 gap-3">
+                                <button onClick={onAddRect} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Rectangle">
+                                    <div className="w-8 h-8 bg-neutral-400"></div>
+                                </button>
+                                <button onClick={onAddCircle} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Circle">
+                                    <div className="w-8 h-8 bg-neutral-400 rounded-full"></div>
+                                </button>
+                                <button onClick={() => onAddPolygon(3)} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Triangle">
+                                    <div className="w-0 h-0 border-l-[16px] border-l-transparent border-r-[16px] border-r-transparent border-b-[28px] border-b-neutral-400"></div>
+                                </button>
+                                <button onClick={() => onAddPolygon(6)} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Hexagon">
+                                    <div className="w-8 h-8 bg-neutral-400" style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' }}></div>
+                                </button>
+                                <button onClick={onAddRing} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Ring">
+                                    <div className="w-8 h-8 border-4 border-neutral-400 rounded-full"></div>
+                                </button>
+                                <button onClick={onAddStar} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Star">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-400"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Lines & Arrows</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button onClick={onAddLine} className="aspect-[2/1] bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Line">
+                                    <div className="w-12 h-0.5 bg-neutral-400"></div>
+                                </button>
+                                <button onClick={onAddArrow} className="aspect-[2/1] bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200 relative" title="Arrow">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" className="text-neutral-400"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4v3z" /></svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
 

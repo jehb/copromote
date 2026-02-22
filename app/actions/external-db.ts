@@ -1,7 +1,6 @@
 'use server'
 
 import sql from 'mssql'
-import { getConfig } from './settings'
 
 export interface Product {
     upc: string
@@ -12,11 +11,11 @@ export interface Product {
 }
 
 async function getDBConfig() {
-    const url = await getConfig('EXTERNAL_DB_URL')
-    const user = await getConfig('EXTERNAL_DB_USER')
-    const password = await getConfig('EXTERNAL_DB_PASSWORD')
-    const type = await getConfig('EXTERNAL_DB_TYPE')
-    const database = await getConfig('EXTERNAL_DB_NAME')
+    const url = process.env.EXTERNAL_DB_URL
+    const user = process.env.EXTERNAL_DB_USER
+    const password = process.env.EXTERNAL_DB_PASSWORD
+    const type = process.env.EXTERNAL_DB_TYPE
+    const database = process.env.EXTERNAL_DB_NAME
 
     if (!url || type !== 'mssql') return null
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Undo2, Redo2, Download, Code } from 'lucide-react';
+import { Undo2, Redo2, Download, Code, Globe } from 'lucide-react';
 
 interface HeaderProps {
     canUndo: boolean;
@@ -8,6 +8,7 @@ interface HeaderProps {
     onRedo: () => void;
     onDownloadImage: () => void;
     onDownloadJson: () => void;
+    onDownloadHtml: () => void;
     onSaveTemplate: () => void;
 }
 
@@ -18,6 +19,7 @@ export default function Header({
     onRedo,
     onDownloadImage,
     onDownloadJson,
+    onDownloadHtml,
     onSaveTemplate
 }: HeaderProps) {
     return (
@@ -52,6 +54,13 @@ export default function Header({
                 >
                     <Code size={16} />
                     Export JSON
+                </button>
+                <button
+                    onClick={onDownloadHtml}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+                >
+                    <Globe size={16} />
+                    Export HTML
                 </button>
                 <button
                     onClick={onSaveTemplate}

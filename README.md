@@ -71,6 +71,12 @@ npm run test
 npm run test -- dashboard
 ```
 
+## Documentation
+
+Refer to the included `docs/` folder for comprehensive structural documentation:
+- [Application Pages](docs/pages.md): Documentation on routing and interfaces.
+- [Database Models](docs/models.md): Documentation on Prisma models and schema relationships.
+
 ## Tech Stack
 
 - **Framework**: Next.js 14

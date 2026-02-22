@@ -2,7 +2,6 @@
 
 import { prisma } from '@/lib/db'
 import { getAISettings, getFinalBaseUrl } from './ai'
-import { getConfig } from './settings'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { OpenAI } from 'openai'
 
@@ -69,7 +68,7 @@ async function getChatContext(text: string) {
  */
 export async function sendChatMessage(messages: ChatMessage[]) {
     const settings = await getAISettings()
-    const globalInstructions = await getConfig('AI_CHAT_INSTRUCTIONS') || 'You are a helpful assistant for the Promoty workspace management system.'
+    const globalInstructions = process.env.AI_CHAT_INSTRUCTIONS || 'You are a helpful assistant for the Promoty workspace management system.'
 
     if (settings.provider !== 'local' && !settings.apiKey) {
         throw new Error('AI API Key not found. Please configure it in the Admin Settings.')

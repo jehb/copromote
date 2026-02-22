@@ -1,7 +1,6 @@
 'use server'
 
 import * as immich from '@immich/sdk'
-import { getConfig } from '@/app/actions/settings'
 import { randomUUID } from 'crypto'
 
 let isInitialized = false
@@ -9,8 +8,8 @@ let isInitialized = false
 export async function initImmich() {
     if (isInitialized) return true
 
-    const url = await getConfig('IMMICH_URL')
-    const apiKey = await getConfig('IMMICH_API_KEY')
+    const url = process.env.IMMICH_URL
+    const apiKey = process.env.IMMICH_API_KEY
 
     if (!url || !apiKey) {
         return false
@@ -28,8 +27,12 @@ export async function initImmich() {
     }
 }
 
-export async function testImmichConnection(url: string, apiKey: string) {
+export async function testImmichConnection() {
     try {
+        const url = process.env.IMMICH_URL
+        const apiKey = process.env.IMMICH_API_KEY
+        if (!url || !apiKey) return { success: false, message: 'Configuration missing' }
+
         immich.init({
             baseUrl: url,
             apiKey: apiKey,
@@ -85,8 +88,8 @@ export async function createImmichTag(name: string) {
 export async function uploadImmichAsset(file: File, tagIds?: string[]) {
     await initImmich()
 
-    const url = await getConfig('IMMICH_URL')
-    const apiKey = await getConfig('IMMICH_API_KEY')
+    const url = process.env.IMMICH_URL
+    const apiKey = process.env.IMMICH_API_KEY
 
     if (!url || !apiKey) {
         throw new Error('Immich credentials not configured')

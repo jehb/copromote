@@ -8,15 +8,15 @@ export async function getWordPressConfig() {
     const session = await verifySession()
     if (!session) throw new Error('Unauthorized')
 
-    const url = await prisma.config.findUnique({ where: { key: 'WORDPRESS_URL' } })
-    const username = await prisma.config.findUnique({ where: { key: 'WORDPRESS_USERNAME' } })
+    const url = process.env.WORDPRESS_URL
+    const username = process.env.WORDPRESS_USERNAME
     // We don't return the password for security
-    const hasPassword = await prisma.config.findUnique({ where: { key: 'WORDPRESS_APP_PASSWORD' } })
+    const hasPassword = !!process.env.WORDPRESS_APP_PASSWORD
 
     return {
-        url: url?.value || '',
-        username: username?.value || '',
-        hasPassword: !!hasPassword
+        url: url || '',
+        username: username || '',
+        hasPassword
     }
 }
 
@@ -24,48 +24,27 @@ export async function saveWordPressConfig(data: { url: string, username: string,
     const session = await verifySession()
     if (!session) throw new Error('Unauthorized')
 
-    await prisma.config.upsert({
-        where: { key: 'WORDPRESS_URL' },
-        update: { value: data.url },
-        create: { key: 'WORDPRESS_URL', value: data.url }
-    })
-
-    await prisma.config.upsert({
-        where: { key: 'WORDPRESS_USERNAME' },
-        update: { value: data.username },
-        create: { key: 'WORDPRESS_USERNAME', value: data.username }
-    })
-
-    if (data.appPassword && data.appPassword.trim() !== '') {
-        await prisma.config.upsert({
-            where: { key: 'WORDPRESS_APP_PASSWORD' },
-            update: { value: data.appPassword },
-            create: { key: 'WORDPRESS_APP_PASSWORD', value: data.appPassword }
-        })
-    }
-
-    revalidatePath('/admin/settings')
-    return { success: true }
+    throw new Error('WordPress configuration is now managed via environment variables')
 }
 
 export async function testWordPressConnection() {
     const session = await verifySession()
     if (!session) throw new Error('Unauthorized')
 
-    const urlConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_URL' } })
-    const usernameConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_USERNAME' } })
-    const passwordConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_APP_PASSWORD' } })
+    const urlConfig = process.env.WORDPRESS_URL
+    const usernameConfig = process.env.WORDPRESS_USERNAME
+    const passwordConfig = process.env.WORDPRESS_APP_PASSWORD
 
-    if (!urlConfig?.value || !usernameConfig?.value || !passwordConfig?.value) {
+    if (!urlConfig || !usernameConfig || !passwordConfig) {
         return { success: false, message: 'Missing configuration' }
     }
 
     try {
         // Ensure URL doesn't end with slash
-        const baseUrl = urlConfig.value.replace(/\/$/, '')
+        const baseUrl = urlConfig.replace(/\/$/, '')
 
         // Basic auth for WordPress Application Passwords
-        const auth = Buffer.from(`${usernameConfig.value}:${passwordConfig.value}`).toString('base64')
+        const auth = Buffer.from(`${usernameConfig}:${passwordConfig}`).toString('base64')
 
         console.log(`Testing connection to: ${baseUrl}/wp-json/wp/v2/users/me`)
 
@@ -92,18 +71,18 @@ export async function searchWordPressPosts(query: string) {
     const session = await verifySession()
     if (!session) throw new Error('Unauthorized')
 
-    const urlConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_URL' } })
-    const usernameConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_USERNAME' } })
-    const passwordConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_APP_PASSWORD' } })
+    const urlConfig = process.env.WORDPRESS_URL
+    const usernameConfig = process.env.WORDPRESS_USERNAME
+    const passwordConfig = process.env.WORDPRESS_APP_PASSWORD
 
-    if (!urlConfig?.value || !query) return []
+    if (!urlConfig || !query) return []
 
     try {
-        const baseUrl = urlConfig.value.replace(/\/$/, '')
+        const baseUrl = urlConfig.replace(/\/$/, '')
         let headers: HeadersInit = {}
 
-        if (usernameConfig?.value && passwordConfig?.value) {
-            const auth = Buffer.from(`${usernameConfig.value}:${passwordConfig.value}`).toString('base64')
+        if (usernameConfig && passwordConfig) {
+            const auth = Buffer.from(`${usernameConfig}:${passwordConfig}`).toString('base64')
             headers['Authorization'] = `Basic ${auth}`
         }
 
@@ -130,18 +109,18 @@ export async function searchWordPressEvents(query: string) {
     const session = await verifySession()
     if (!session) throw new Error('Unauthorized')
 
-    const urlConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_URL' } })
-    const usernameConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_USERNAME' } })
-    const passwordConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_APP_PASSWORD' } })
+    const urlConfig = process.env.WORDPRESS_URL
+    const usernameConfig = process.env.WORDPRESS_USERNAME
+    const passwordConfig = process.env.WORDPRESS_APP_PASSWORD
 
-    if (!urlConfig?.value || !query) return []
+    if (!urlConfig || !query) return []
 
     try {
-        const baseUrl = urlConfig.value.replace(/\/$/, '')
+        const baseUrl = urlConfig.replace(/\/$/, '')
         let headers: HeadersInit = {}
 
-        if (usernameConfig?.value && passwordConfig?.value) {
-            const auth = Buffer.from(`${usernameConfig.value}:${passwordConfig.value}`).toString('base64')
+        if (usernameConfig && passwordConfig) {
+            const auth = Buffer.from(`${usernameConfig}:${passwordConfig}`).toString('base64')
             headers['Authorization'] = `Basic ${auth}`
         }
 

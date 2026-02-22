@@ -1,6 +1,8 @@
 import ClientEditor from '@/components/asset-editor/ClientEditor';
 import { getPhotos } from '@/app/actions/photos';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Asset Editor',
   description: 'Design your assets seamlessly',

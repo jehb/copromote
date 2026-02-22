@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Konva from 'konva';
-import { Stage, Layer, Rect, Text, TextPath, Circle, Transformer, Image as KonvaImage, Group as KonvaGroup, Line, Path } from 'react-konva';
+import { Stage, Layer, Rect, Text, TextPath, Circle, Transformer, Image as KonvaImage, Group as KonvaGroup, Line, Path, Star, RegularPolygon, Ring, Arrow } from 'react-konva';
 import useImage from 'use-image';
 import { EditorElement } from './types';
 
@@ -285,6 +285,12 @@ export default function Workspace({
 
                             if (el.type === 'rect') return <Rect key={el.id} {...commonProps} cornerRadius={el.cornerRadius || 0} />;
                             if (el.type === 'circle') return <Circle key={el.id} {...commonProps} radius={(el.width || 100) / 2} />;
+                            if (el.type === 'star') return <Star key={el.id} {...commonProps} innerRadius={(el.width || 100) / 4} outerRadius={(el.width || 100) / 2} numPoints={5} />;
+                            if (el.type === 'polygon') return <RegularPolygon key={el.id} {...commonProps} sides={el.sides || 3} radius={(el.width || 100) / 2} />;
+                            if (el.type === 'ring') return <Ring key={el.id} {...commonProps} innerRadius={el.innerRadius || 30} outerRadius={el.outerRadius || 50} />;
+                            if (el.type === 'line') return <Line key={el.id} {...commonProps} points={el.points || [0, 0, 100, 0]} />;
+                            if (el.type === 'arrow') return <Arrow key={el.id} {...commonProps} points={el.points || [0, 0, 100, 0]} />;
+                            if (el.type === 'path' && el.iconPath) return <Path key={el.id} {...commonProps} data={el.iconPath} />;
                             if (el.type === 'text') {
                                 let displayText = el.text || '';
                                 if (el.isList) {
@@ -325,6 +331,12 @@ export default function Workspace({
                                         };
                                         if (child.type === 'rect') return <Rect key={child.id} {...childProps} cornerRadius={child.cornerRadius || 0} />;
                                         if (child.type === 'circle') return <Circle key={child.id} {...childProps} radius={(child.width || 100) / 2} />;
+                                        if (child.type === 'star') return <Star key={child.id} {...childProps} innerRadius={(child.width || 100) / 4} outerRadius={(child.width || 100) / 2} numPoints={5} />;
+                                        if (child.type === 'polygon') return <RegularPolygon key={child.id} {...childProps} sides={child.sides || 3} radius={(child.width || 100) / 2} />;
+                                        if (child.type === 'ring') return <Ring key={child.id} {...childProps} innerRadius={child.innerRadius || 30} outerRadius={child.outerRadius || 50} />;
+                                        if (child.type === 'line') return <Line key={child.id} {...childProps} points={child.points || [0, 0, 100, 0]} />;
+                                        if (child.type === 'arrow') return <Arrow key={child.id} {...childProps} points={child.points || [0, 0, 100, 0]} />;
+                                        if (child.type === 'path' && child.iconPath) return <Path key={child.id} {...childProps} data={child.iconPath} />;
                                         if (child.type === 'text') {
                                             let displayText = child.text || '';
                                             if (child.isList) {
