@@ -75,7 +75,7 @@ npm run test -- dashboard
 
 - **Framework**: Next.js 14
 - **Language**: TypeScript
-- **Database**: SQLite (via Prisma ORM)
+- **Database**: MariaDB/MySQL (via Prisma ORM)
 - **UI Components**: Shadcn UI (Radix Primitives + Tailwind CSS)
 - **State Management**: React Query
 - **Testing**: Jest, React Testing Library

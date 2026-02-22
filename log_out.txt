@@ -1,0 +1,5 @@
+commit 5f63b77823b3ad9d9b13ad753c9782f4b64e9be4
+Author: Jehb <jehb@example.com>
+Date:   Sat Feb 21 21:11:51 2026 -0500
+
+    Refactor Immich integration, fix test suite, update docs

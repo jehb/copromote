@@ -12,7 +12,7 @@ This document serves as a blueprint for building **[App Name]**, a self-manageme
 - **Frontend/Backend:** [Next.js 15 (App Router)](https://nextjs.org/) for server-side rendering and API routes.
 - **Language:** TypeScript for type safety across the entire stack.
 - **Database ORM:** [Prisma](https://www.prisma.io/) for type-safe database access.
-- **Database:** SQLite (Development) / PostgreSQL or MSSQL (Production).
+- **Database:** MariaDB/MySQL.
 - **Authentication:** Custom implementation using `jose` (JWT) and `bcryptjs` (or NextAuth.js).
 
 ### UI & Styling
