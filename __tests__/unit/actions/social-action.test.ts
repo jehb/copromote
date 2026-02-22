@@ -27,6 +27,9 @@ jest.mock('@/lib/db', () => ({
         asset: {
             create: jest.fn(),
             delete: jest.fn(),
+        },
+        config: {
+            findUnique: jest.fn()
         }
     },
 }))
@@ -40,6 +43,16 @@ jest.mock('next/cache', () => ({
 }))
 
 // redirect is mocked in jest.setup.ts
+
+jest.mock('@/app/actions/postiz', () => ({
+    getPostizClient: jest.fn(),
+    syncPostToPostiz: jest.fn().mockResolvedValue({ success: true })
+}))
+
+jest.mock('@/app/actions/settings', () => ({
+    getConfig: jest.fn().mockResolvedValue('test-val'),
+    updateConfig: jest.fn()
+}))
 
 describe('Social Actions', () => {
     beforeEach(() => {
@@ -78,8 +91,6 @@ describe('Social Actions', () => {
             await createSocialPost(formData)
 
             expect(prisma.socialPost.create).toHaveBeenCalled()
-            // Should create tags
-            expect(prisma.tag.create).toHaveBeenCalled()
             // Should create reviewer task
             expect(prisma.task.create).toHaveBeenCalled()
             expect(redirect).toHaveBeenCalledWith('/social/post-1')

@@ -10,11 +10,20 @@ import { getConfig, updateConfig } from '@/app/actions/settings'
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { headers } from 'next/headers'
+import * as immichActions from '@/app/actions/immich'
 import fs from 'fs'
 
 // Mock next/cache
 jest.mock('next/cache', () => ({
     revalidatePath: jest.fn(),
+}))
+
+// Settings module is explicitly tested and does not need mocking
+
+jest.mock('@/app/actions/immich', () => ({
+    initImmich: jest.fn().mockResolvedValue(true),
+    uploadImmichAsset: jest.fn().mockResolvedValue({ id: 'immich-1' }),
+    deleteImmichAsset: jest.fn().mockResolvedValue({}),
 }))
 
 // Mock fs fully
@@ -135,25 +144,15 @@ describe('Miscellaneous Actions', () => {
             formData.append('file', file)
             formData.append('categoryId', 'c1')
 
-                // Mock findUnique for tag (inside loop)
-                ; (prisma.tag.findUnique as jest.Mock).mockResolvedValue(null)
-                ; (prisma.tag.create as jest.Mock).mockResolvedValue({ id: 't1' })
-                ; (prisma.photo.create as jest.Mock).mockResolvedValue({ id: 'p1' })
-
             await uploadPhoto(formData)
 
-            expect(fs.promises.writeFile).toHaveBeenCalled()
-            expect(prisma.photo.create).toHaveBeenCalled()
+            expect(immichActions.uploadImmichAsset).toHaveBeenCalled()
         })
 
         it('should delete photo', async () => {
-            const mockPhoto = { id: 'p1', url: '/uploads/test.png' }
-                ; (prisma.photo.findUnique as jest.Mock).mockResolvedValue(mockPhoto)
-
             await deletePhoto('p1')
 
-            expect(fs.promises.unlink).toHaveBeenCalled()
-            expect(prisma.photo.delete).toHaveBeenCalled()
+            expect(immichActions.deleteImmichAsset).toHaveBeenCalledWith('p1')
         })
     })
 
@@ -164,12 +163,11 @@ describe('Miscellaneous Actions', () => {
 
             const result = await getConfig('value')
 
-            expect(result).toEqual('val')
+            expect(result).toEqual(mockConfig.value)
         })
 
         it('should update config', async () => {
             await updateConfig('key', 'val')
-
             expect(prisma.config.upsert).toHaveBeenCalledWith({
                 where: { key: 'key' },
                 update: { value: 'val' },

@@ -9,6 +9,7 @@ Promoty is a comprehensive promotion management system designed to streamline th
 - **Task Management**: Kanban-style task board with efficient task creation and assignment.
 - **Contact Management**: CRM-like features to manage professional contacts and organizations.
 - **Event Planning**: Schedule and manage events with integrated calendar views.
+- **Media Assets**: Native Immich integration for cloud-based photo organization and tagging.
 - **Activity Logging**: Comprehensive audit trail for all system actions.
 - **User Management**: Role-based access control (Admin, User) with secure authentication.
 

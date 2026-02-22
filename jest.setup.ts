@@ -273,3 +273,16 @@ jest.mock('fs/promises', () => ({
     unlink: jest.fn(),
     mkdir: jest.fn(),
 }))
+
+// Mock @immich/sdk directly so it doesn't fail import maps setup
+jest.mock('@immich/sdk', () => ({
+    init: jest.fn(),
+    deleteAssets: jest.fn().mockResolvedValue({}),
+    uploadAsset: jest.fn().mockResolvedValue({ id: 'immich-1' }),
+    getAllTags: jest.fn().mockResolvedValue({}),
+    createTag: jest.fn().mockResolvedValue({ id: 'tag-1' }),
+    bulkTagAssets: jest.fn().mockResolvedValue({}),
+    searchAssets: jest.fn().mockResolvedValue({ assets: { items: [] } })
+}))
+
+
