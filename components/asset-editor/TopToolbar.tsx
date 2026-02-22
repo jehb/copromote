@@ -1,25 +1,29 @@
 import React from 'react';
 import { EditorElement } from './types';
-import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline } from 'lucide-react';
+import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup } from 'lucide-react';
 
 interface TopToolbarProps {
-    selectedElement?: EditorElement;
+    selectedElements: EditorElement[];
     updateSelectedElement: (newProps: Partial<EditorElement>) => void;
     deleteSelected: () => void;
     duplicateSelected: () => void;
     bringForward: () => void;
     sendBackward: () => void;
+    groupSelected: () => void;
+    ungroupSelected: () => void;
 }
 
 export default function TopToolbar({
-    selectedElement,
+    selectedElements,
     updateSelectedElement,
     deleteSelected,
     duplicateSelected,
     bringForward,
-    sendBackward
+    sendBackward,
+    groupSelected,
+    ungroupSelected
 }: TopToolbarProps) {
-    if (!selectedElement) {
+    if (selectedElements.length === 0) {
         return (
             <div className="h-14 bg-white border-b flex items-center px-4 w-full shadow-sm shrink-0">
                 <span className="text-sm text-neutral-400 italic">Select an element to edit properties</span>
@@ -27,12 +31,18 @@ export default function TopToolbar({
         );
     }
 
-    const { type } = selectedElement;
+    const selectedElement = selectedElements.length === 1 ? selectedElements[0] : undefined;
+    const type = selectedElement?.type;
 
     return (
         <div className="h-14 bg-white border-b flex items-center px-4 w-full shadow-sm gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide shrink-0">
+            {selectedElements.length > 1 && (
+                <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
+                    <span className="text-sm font-medium text-blue-600">{selectedElements.length} Elements Selected</span>
+                </div>
+            )}
 
-            {(type === 'rect' || type === 'circle' || type === 'text') && (
+            {selectedElement && (type === 'rect' || type === 'circle' || type === 'text') && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Fill:</span>
                     <input
@@ -44,7 +54,7 @@ export default function TopToolbar({
                 </div>
             )}
 
-            {(type === 'rect' || type === 'circle' || type === 'text') && (
+            {selectedElement && (type === 'rect' || type === 'circle' || type === 'text') && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Border:</span>
                     <input
@@ -65,7 +75,7 @@ export default function TopToolbar({
                 </div>
             )}
 
-            {type === 'text' && (
+            {selectedElement && type === 'text' && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Font:</span>
                     <select
@@ -120,7 +130,7 @@ export default function TopToolbar({
                 </div>
             )}
 
-            {type === 'image' && (
+            {selectedElement && type === 'image' && (
                 <div className="flex items-center gap-4 border-r pr-4 border-neutral-200">
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-neutral-500 font-medium">Blur:</span>
@@ -149,23 +159,44 @@ export default function TopToolbar({
                 </div>
             )}
 
-            <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
-                <span className="text-xs text-neutral-500 font-medium">Opacity:</span>
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={selectedElement.opacity !== undefined ? selectedElement.opacity : 1}
-                    onChange={(e) => updateSelectedElement({ opacity: parseFloat(e.target.value) })}
-                    className="w-24 accent-blue-600"
-                />
-            </div>
+            {selectedElement && (
+                <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
+                    <span className="text-xs text-neutral-500 font-medium">Opacity:</span>
+                    <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={selectedElement.opacity !== undefined ? selectedElement.opacity : 1}
+                        onChange={(e) => updateSelectedElement({ opacity: parseFloat(e.target.value) })}
+                        className="w-24 accent-blue-600"
+                    />
+                </div>
+            )}
 
             <div className="flex-1"></div>
 
             {/* Universal Actions */}
             <div className="flex items-center gap-2">
+                {selectedElements.length > 1 && (
+                    <button
+                        onClick={groupSelected}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-md transition-colors"
+                    >
+                        <Group size={14} />
+                        Group
+                    </button>
+                )}
+                {selectedElement && type === 'group' && (
+                    <button
+                        onClick={ungroupSelected}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-md transition-colors"
+                    >
+                        <Ungroup size={14} />
+                        Ungroup
+                    </button>
+                )}
+                <div className="w-px h-6 bg-neutral-200 mx-1"></div>
                 <button
                     onClick={bringForward}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-600 hover:bg-neutral-100 rounded-md transition-colors"

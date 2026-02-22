@@ -13,8 +13,8 @@ interface SidePanelProps {
     setCanvasSize: (size: { width: number, height: number }) => void;
     elements: EditorElement[];
     setElements: (elements: EditorElement[]) => void;
-    selectedId: string | null;
-    selectShape: (id: string | null) => void;
+    selectedIds: string[];
+    setSelectedIds: (ids: string[] | ((prev: string[]) => string[])) => void;
 }
 
 export default function SidePanel({
@@ -29,8 +29,8 @@ export default function SidePanel({
     setCanvasSize,
     elements,
     setElements,
-    selectedId,
-    selectShape
+    selectedIds,
+    setSelectedIds
 }: SidePanelProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -176,12 +176,25 @@ export default function SidePanel({
                             [...elements].reverse().map((el, index) => {
                                 // Calculate actual index in original array
                                 const realIndex = elements.length - 1 - index;
-                                const isSelected = el.id === selectedId;
+                                const isSelected = selectedIds.includes(el.id);
+
+                                const handleSelect = (e: React.MouseEvent) => {
+                                    const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
+                                    if (metaPressed) {
+                                        if (isSelected) {
+                                            setSelectedIds(selectedIds.filter(id => id !== el.id));
+                                        } else {
+                                            setSelectedIds([...selectedIds, el.id]);
+                                        }
+                                    } else {
+                                        setSelectedIds([el.id]);
+                                    }
+                                };
 
                                 return (
                                     <div
                                         key={el.id}
-                                        onClick={() => selectShape(el.id)}
+                                        onClick={handleSelect}
                                         className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-neutral-200 bg-white hover:bg-neutral-50'}`}
                                     >
                                         <div className="flex items-center gap-3 overflow-hidden">
@@ -200,7 +213,7 @@ export default function SidePanel({
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setElements(elements.filter(e => e.id !== el.id));
-                                                if (isSelected) selectShape(null);
+                                                if (isSelected) setSelectedIds(selectedIds.filter(id => id !== el.id));
                                             }}
                                             className="p-1 text-neutral-400 hover:text-red-600 transition-colors"
                                             title="Delete Layer"

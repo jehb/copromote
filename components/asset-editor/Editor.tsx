@@ -11,7 +11,7 @@ import Header from './Header';
 export default function Editor() {
     // Global State
     const [activeTab, setActiveTab] = useState<SidebarTab | null>('shapes');
-    const [selectedId, selectShape] = useState<string | null>(null);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [canvasBg, setCanvasBg] = useState<string>('#ffffff');
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
 
@@ -34,29 +34,30 @@ export default function Editor() {
         setHistoryStep(newHistory.length - 1);
     }, [history, historyStep]);
 
-    // Derived selected element
-    const selectedElement = elements.find((el) => el.id === selectedId);
+    const selectedElements = elements.filter((el) => selectedIds.includes(el.id));
+    // Provide a single selected element backward compatibility for Toolbar
+    const selectedElement = selectedElements.length === 1 ? selectedElements[0] : undefined;
 
     // --- Actions --- //
 
     const undo = () => {
         if (historyStep > 0) {
             setHistoryStep(historyStep - 1);
-            selectShape(null);
+            setSelectedIds([]);
         }
     };
 
     const redo = () => {
         if (historyStep < history.length - 1) {
             setHistoryStep(historyStep + 1);
-            selectShape(null);
+            setSelectedIds([]);
         }
     };
 
     const downloadImage = () => {
         if (!stageRef.current) return;
         // Temporarily deselect to hide transformer
-        selectShape(null);
+        setSelectedIds([]);
         // Add minimal delay to let React re-render without transformer
         setTimeout(() => {
             const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
@@ -80,35 +81,44 @@ export default function Editor() {
     };
 
     const updateSelectedElement = (newProps: Partial<EditorElement>) => {
-        if (!selectedId) return;
-        const newElements = elements.map((el) => (el.id === selectedId ? { ...el, ...newProps } : el));
+        if (selectedIds.length === 0) return;
+        const newElements = elements.map((el) => (selectedIds.includes(el.id) ? { ...el, ...newProps } : el));
         updateHistory(newElements);
     };
 
     const deleteSelected = () => {
-        if (!selectedId) return;
-        const newElements = elements.filter((el) => el.id !== selectedId);
+        if (selectedIds.length === 0) return;
+        const newElements = elements.filter((el) => !selectedIds.includes(el.id));
         updateHistory(newElements);
-        selectShape(null);
+        setSelectedIds([]);
     };
 
     const duplicateSelected = () => {
-        if (!selectedElement) return;
-        const newId = `${selectedElement.type}-${Date.now()}`;
-        const newElement = {
-            ...selectedElement,
-            id: newId,
-            x: selectedElement.x + 20,
-            y: selectedElement.y + 20,
-        };
-        updateHistory([...elements, newElement]);
-        selectShape(newId);
+        if (selectedIds.length === 0) return;
+        const toAdd: EditorElement[] = [];
+        const newSelection: string[] = [];
+
+        selectedElements.forEach(el => {
+            const newId = `${el.type}-${Date.now()}-${Math.random()}`;
+            toAdd.push({
+                ...el,
+                id: newId,
+                x: el.x + 20,
+                y: el.y + 20,
+            });
+            newSelection.push(newId);
+        });
+
+        updateHistory([...elements, ...toAdd]);
+        setSelectedIds(newSelection);
     };
 
+    // Layering is currently simplified for multi-select (only moves first selected)
     const bringForward = () => {
-        if (!selectedId) return;
-        const currentIndex = elements.findIndex((el) => el.id === selectedId);
-        if (currentIndex === elements.length - 1) return; // Already at top
+        if (selectedIds.length === 0) return;
+        const idToMove = selectedIds[0];
+        const currentIndex = elements.findIndex((el) => el.id === idToMove);
+        if (currentIndex >= elements.length - 1 || currentIndex === -1) return;
         const newElements = [...elements];
         const [removed] = newElements.splice(currentIndex, 1);
         newElements.splice(currentIndex + 1, 0, removed);
@@ -116,13 +126,48 @@ export default function Editor() {
     };
 
     const sendBackward = () => {
-        if (!selectedId) return;
-        const currentIndex = elements.findIndex((el) => el.id === selectedId);
-        if (currentIndex === 0) return; // Already at bottom
+        if (selectedIds.length === 0) return;
+        const idToMove = selectedIds[0];
+        const currentIndex = elements.findIndex((el) => el.id === idToMove);
+        if (currentIndex <= 0) return;
         const newElements = [...elements];
         const [removed] = newElements.splice(currentIndex, 1);
         newElements.splice(currentIndex - 1, 0, removed);
         updateHistory(newElements);
+    };
+
+    const groupSelected = () => {
+        if (selectedIds.length < 2) return;
+        const newGroupId = `group-${Date.now()}`;
+        const remainingElements = elements.filter(el => !selectedIds.includes(el.id));
+        const groupedElements = elements.filter(el => selectedIds.includes(el.id));
+
+        const newGroupElement: EditorElement = {
+            id: newGroupId,
+            type: 'group',
+            x: 0,
+            y: 0,
+            children: groupedElements,
+        };
+        updateHistory([...remainingElements, newGroupElement]);
+        setSelectedIds([newGroupId]);
+    };
+
+    const ungroupSelected = () => {
+        if (selectedIds.length !== 1) return;
+        const groupElement = elements.find(el => el.id === selectedIds[0]);
+        if (!groupElement || groupElement.type !== 'group' || !groupElement.children) return;
+
+        const remainingElements = elements.filter(el => el.id !== groupElement.id);
+        const extractedChildren = groupElement.children.map(child => ({
+            ...child,
+            x: child.x + (groupElement.x || 0),
+            y: child.y + (groupElement.y || 0),
+            // We ignore scale translation for now as MVP
+        }));
+
+        updateHistory([...remainingElements, ...extractedChildren]);
+        setSelectedIds(extractedChildren.map(c => c.id));
     };
 
     // --- Add Element Handlers --- //
@@ -193,14 +238,14 @@ export default function Editor() {
             if (e.key === 'Backspace' || e.key === 'Delete') {
                 // Ensure we aren't typing in an input field before deleting shape
                 const isTyping = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName);
-                if (!isTyping && selectedId) {
+                if (!isTyping && selectedIds.length > 0) {
                     deleteSelected();
                 }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedId, deleteSelected]);
+    }, [selectedIds, deleteSelected]);
 
 
     return (
@@ -227,25 +272,27 @@ export default function Editor() {
                     setCanvasSize={setCanvasSize}
                     elements={elements}
                     setElements={updateHistory}
-                    selectedId={selectedId}
-                    selectShape={selectShape}
+                    selectedIds={selectedIds}
+                    setSelectedIds={setSelectedIds}
                 />
 
                 <div className="flex-1 flex flex-col h-full bg-neutral-200">
                     <TopToolbar
-                        selectedElement={selectedElement}
+                        selectedElements={selectedElements}
                         updateSelectedElement={updateSelectedElement}
                         deleteSelected={deleteSelected}
                         duplicateSelected={duplicateSelected}
                         bringForward={bringForward}
                         sendBackward={sendBackward}
+                        groupSelected={groupSelected}
+                        ungroupSelected={ungroupSelected}
                     />
 
                     <Workspace
                         elements={elements}
                         setElements={updateHistory}
-                        selectedId={selectedId}
-                        selectShape={selectShape}
+                        selectedIds={selectedIds}
+                        setSelectedIds={setSelectedIds}
                         canvasBg={canvasBg}
                         canvasSize={canvasSize}
                         onHistoryChange={updateHistory}

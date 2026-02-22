@@ -1,4 +1,4 @@
-export type ElementType = 'text' | 'rect' | 'circle' | 'image';
+export type ElementType = 'text' | 'rect' | 'circle' | 'image' | 'group';
 
 export interface EditorElement {
     id: string;
@@ -27,6 +27,15 @@ export interface EditorElement {
     cropHeight?: number;
     blurRadius?: number;
     brightness?: number;
+    // Styling
+    cornerRadius?: number;
+    shadowColor?: string;
+    shadowBlur?: number;
+    shadowOffsetX?: number;
+    shadowOffsetY?: number;
+    shadowOpacity?: number;
+    // Grouping
+    children?: EditorElement[];
 }
 
 export type SidebarTab = 'templates' | 'text' | 'shapes' | 'uploads' | 'background' | 'layers' | 'resize';
