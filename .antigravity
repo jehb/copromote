@@ -1,4 +1,5 @@
 # Reminders
 
-- Always write command output to a temporary file when running complex commands or reviewing large logs.
+- ALWAYS write command output to a temporary file when running commands. NEVER FORGET THIS.
+- Examples: `git branch > temp_branch.txt`, `npm test > temp_test.txt`
 - Always clean up (delete) any temporary files after the task is completed or the information is no longer needed.
