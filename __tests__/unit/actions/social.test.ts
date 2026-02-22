@@ -26,10 +26,6 @@ jest.mock('@/lib/db', () => ({
             update: jest.fn(),
             create: jest.fn(),
         },
-        tag: {
-            findUnique: jest.fn(),
-            create: jest.fn(),
-        },
         asset: {
             create: jest.fn(),
             delete: jest.fn(),
@@ -47,6 +43,11 @@ jest.mock('next/navigation', () => ({
 
 jest.mock('@/app/actions/activity-logs', () => ({
     logActivity: jest.fn(),
+}))
+
+jest.mock('@/app/actions/postiz', () => ({
+    syncPostToPostiz: jest.fn(),
+    deletePostFromPostiz: jest.fn(),
 }))
 
 describe('Social Actions', () => {
@@ -198,30 +199,24 @@ describe('Social Actions', () => {
             formData.append('content', 'Test post')
             formData.append('platform', 'twitter')
             formData.append('scheduledDate', '2025-01-01')
-            formData.append('tags', 'tech, AI')
-            formData.append('photoIds', 'photo-1, photo-2')
             formData.append('promotionPeriodId', 'promo-1')
             formData.append('eventId', 'event-1')
-
-                ; (prisma.tag.findUnique as jest.Mock).mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 'tag-1' })
-                ; (prisma.tag.create as jest.Mock).mockResolvedValue({ id: 'tag-new' })
                 ; (prisma.socialPost.create as jest.Mock).mockResolvedValue({ id: 'post-1' })
                 ; (redirect as unknown as jest.Mock).mockImplementation(() => { throw new Error('NEXT_REDIRECT') })
 
             await expect(createSocialPost(formData)).rejects.toThrow('NEXT_REDIRECT')
 
-            expect(prisma.tag.create).toHaveBeenCalledWith({ data: { name: 'tech' } })
             expect(prisma.socialPost.create).toHaveBeenCalledWith({
                 data: expect.objectContaining({
                     content: 'Test post',
                     platform: 'twitter',
                     status: 'draft',
                     scheduledDate: new Date('2025-01-01'),
-                    tags: { connect: [{ id: 'tag-new' }, { id: 'tag-1' }] },
-                    photos: { connect: [{ id: 'photo-1' }, { id: 'photo-2' }] },
                     promotionPeriod: { connect: { id: 'promo-1' } },
-                    event: { connect: { id: 'event-1' } }
-                })
+                    event: { connect: { id: 'event-1' } },
+                    assets: undefined
+                }),
+                include: { assets: true }
             })
             expect(logActivity).toHaveBeenCalledWith('CREATE', 'SocialPost', 'post-1', 'Created twitter post')
             expect(redirect).toHaveBeenCalledWith('/social/post-1')
@@ -273,9 +268,9 @@ describe('Social Actions', () => {
                     platform: 'twitter',
                     status: 'draft',
                     reviewerId: 'reviewer-2',
-                    tags: { set: [], connect: [] },
-                    photos: { set: [], connect: [] },
-                })
+                    assets: { set: [], connect: [] }
+                }),
+                include: { assets: true }
             })
             expect(logActivity).toHaveBeenCalledWith('UPDATE', 'SocialPost', 'post-1', 'Updated twitter post')
             expect(revalidatePath).toHaveBeenCalledWith('/social')

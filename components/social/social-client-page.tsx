@@ -111,16 +111,16 @@ export function SocialClientPage({ initialData, initialFilters }: SocialClientPa
                                     <span className="sr-only">View Post</span>
                                 </Link>
 
-                                {(post.photos && post.photos.length > 0) && (
+                                {(post.assets && post.assets.length > 0) && (
                                     <div className="h-48 w-full overflow-hidden border-b bg-slate-50 relative z-10">
                                         <img
-                                            src={post.photos[0].url}
-                                            alt={post.photos[0].name || 'Post preview'}
+                                            src={post.assets[0].url}
+                                            alt={post.assets[0].name || 'Post preview'}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
-                                        {post.photos.length > 1 && (
+                                        {post.assets.length > 1 && (
                                             <div className="absolute bottom-3 right-3 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded-lg backdrop-blur-md border border-white/20 shadow-lg">
-                                                +{post.photos.length - 1} more
+                                                +{post.assets.length - 1} more
                                             </div>
                                         )}
                                     </div>
@@ -165,9 +165,6 @@ export function SocialClientPage({ initialData, initialFilters }: SocialClientPa
                                     )}
 
                                     <div className="flex flex-wrap gap-1.5">
-                                        {post.tags.map((tag: any) => (
-                                            <span key={tag.id} className="text-[10px] font-bold text-blue-600 bg-blue-50/50 px-2.5 py-1 rounded-lg border border-blue-100/50 hover:bg-blue-100 transition-colors">#{tag.name}</span>
-                                        ))}
                                     </div>
 
                                     <div className="pt-4 border-t border-slate-50 text-[11px] text-slate-400 flex justify-between items-center font-bold uppercase tracking-wider">

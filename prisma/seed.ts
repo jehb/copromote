@@ -20,10 +20,7 @@ async function main() {
         await prisma.socialPost.deleteMany().catch(e => log('Safe delete socialPost failed: ' + e.message))
         await prisma.asset.deleteMany().catch(e => log('Safe delete asset failed: ' + e.message))
 
-        // Cleanup Tags/Photos
-        await prisma.tag.deleteMany().catch(e => log('Safe delete tag failed: ' + e.message))
-        await prisma.photo.deleteMany().catch(e => log('Safe delete photo failed: ' + e.message))
-        await prisma.photoCategory.deleteMany().catch(e => log('Safe delete photoCategory failed: ' + e.message))
+        // Cleanup Tags/Photos omitted as models removed
 
         await prisma.event.deleteMany().catch(e => log('Safe delete event failed: ' + e.message))
         await prisma.contact.deleteMany().catch(e => log('Safe delete contact failed: ' + e.message))
@@ -130,7 +127,6 @@ async function main() {
                 platform: 'Instagram',
                 status: 'scheduled',
                 scheduledDate: new Date('2026-09-28T10:00:00Z'),
-                tags: { create: [{ name: 'FallFair' }, { name: 'LocalApples' }] },
                 eventId: eventFairLaunch.id
             }
         })

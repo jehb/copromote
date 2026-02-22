@@ -7,17 +7,17 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus, Tag, Link as LinkIcon, Loader2 } from 'lucide-react'
-import { uploadPhoto, createPhotoCategory } from '@/app/actions/photos'
+import { uploadPhoto, createPhotoTag } from '@/app/actions/photos'
 
 interface UploadModalProps {
-    categories: any[]
+    tags: any[]
 }
 
-export function UploadModal({ categories }: UploadModalProps) {
+export function UploadModal({ tags }: UploadModalProps) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [isCreatingCategory, setIsCreatingCategory] = useState(false)
-    const [newCategory, setNewCategory] = useState('')
+    const [isCreatingTag, setIsCreatingTag] = useState(false)
+    const [newTag, setNewTag] = useState('')
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -37,15 +37,15 @@ export function UploadModal({ categories }: UploadModalProps) {
         }
     }
 
-    async function handleAddCategory() {
-        if (!newCategory.trim()) return
+    async function handleAddTag() {
+        if (!newTag.trim()) return
         try {
-            await createPhotoCategory(newCategory)
-            setNewCategory('')
-            setIsCreatingCategory(false)
+            await createPhotoTag(newTag)
+            setNewTag('')
+            setIsCreatingTag(false)
         } catch (err) {
             console.error(err)
-            alert('Failed to create category')
+            alert('Failed to create tag')
         }
     }
 
@@ -83,55 +83,46 @@ export function UploadModal({ categories }: UploadModalProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="name">Photo Name (Optional)</Label>
-                        <Input id="name" name="name" placeholder="Summer 2024 Launch" />
-                    </div>
-
-                    <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                            <Label htmlFor="categoryId">Category</Label>
+                            <Label htmlFor="tagIds">Label / Tag</Label>
                             <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 className="h-7 text-[10px] uppercase tracking-wider"
-                                onClick={() => setIsCreatingCategory(!isCreatingCategory)}
+                                onClick={() => setIsCreatingTag(!isCreatingTag)}
                             >
-                                {isCreatingCategory ? 'Cancel' : 'New Category'}
+                                {isCreatingTag ? 'Cancel' : 'New Tag'}
                             </Button>
                         </div>
 
-                        {isCreatingCategory ? (
+                        {isCreatingTag ? (
                             <div className="flex gap-2">
                                 <Input
-                                    placeholder="Enter category name"
-                                    value={newCategory}
-                                    onChange={(e) => setNewCategory(e.target.value)}
+                                    placeholder="Enter tag name"
+                                    value={newTag}
+                                    onChange={(e) => setNewTag(e.target.value)}
                                     className="h-10"
                                 />
-                                <Button type="button" onClick={handleAddCategory}>Add</Button>
+                                <Button type="button" onClick={handleAddTag}>Add</Button>
                             </div>
                         ) : (
-                            <Select name="categoryId" required>
+                            <Select name="tagIds">
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select a category" />
+                                    <SelectValue placeholder="Select a tag" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {categories.map((category) => (
-                                        <SelectItem key={category.id} value={category.id}>
-                                            {category.name}
+                                    {tags.map((tag) => (
+                                        <SelectItem key={tag.id} value={tag.id}>
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: tag.color || '#94a3b8' }} />
+                                                {tag.name}
+                                            </div>
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         )}
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="tags" className="flex items-center gap-2">
-                            <Tag className="h-4 w-4" /> Tags (comma separated)
-                        </Label>
-                        <Input id="tags" name="tags" placeholder="organic, fresh, summer" />
                     </div>
 
                     <Button type="submit" className="w-full" disabled={loading}>

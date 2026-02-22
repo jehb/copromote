@@ -11,18 +11,18 @@ import { cn } from '@/lib/utils'
 
 interface GalleryClientProps {
     initialPhotos: any[]
-    categories: any[]
+    tags: any[]
 }
 
-export function GalleryClient({ initialPhotos, categories }: GalleryClientProps) {
-    const [selectedCategory, setSelectedCategory] = useState('all')
+export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
+    const [selectedTag, setSelectedTag] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
     const filteredPhotos = initialPhotos.filter(photo => {
-        const matchesCategory = selectedCategory === 'all' || photo.categoryId === selectedCategory
+        const matchesTag = selectedTag === 'all' || photo.tags.some((t: any) => t.id === selectedTag)
         const matchesSearch = photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             photo.tags.some((t: any) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        return matchesCategory && matchesSearch
+        return matchesTag && matchesSearch
     })
 
     async function handleDelete(id: string) {
@@ -39,32 +39,34 @@ export function GalleryClient({ initialPhotos, categories }: GalleryClientProps)
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar Filters */}
             <div className="w-full lg:w-64 space-y-6">
-                <UploadModal categories={categories} />
+                <UploadModal tags={tags} />
 
                 <div className="space-y-4">
-                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Categories</div>
+                    <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Tags</div>
                     <div className="flex flex-col gap-1">
                         <button
-                            onClick={() => setSelectedCategory('all')}
+                            onClick={() => setSelectedTag('all')}
                             className={cn(
                                 "flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                                selectedCategory === 'all' ? "bg-primary text-primary-foreground" : "text-slate-600 hover:bg-slate-100"
+                                selectedTag === 'all' ? "bg-primary text-primary-foreground" : "text-slate-600 hover:bg-slate-100"
                             )}
                         >
-                            <span>All Photos</span>
+                            <span className="flex items-center gap-2"><TagIcon className="h-4 w-4" /> All Photos</span>
                             <span className="text-[10px] opacity-70">{initialPhotos.length}</span>
                         </button>
-                        {categories.map((category) => (
+                        {tags.map((tag) => (
                             <button
-                                key={category.id}
-                                onClick={() => setSelectedCategory(category.id)}
+                                key={tag.id}
+                                onClick={() => setSelectedTag(tag.id)}
                                 className={cn(
                                     "flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg transition-colors",
-                                    selectedCategory === category.id ? "bg-primary text-primary-foreground" : "text-slate-600 hover:bg-slate-100"
+                                    selectedTag === tag.id ? "bg-primary text-primary-foreground" : "text-slate-600 hover:bg-slate-100"
                                 )}
                             >
-                                <span className="truncate">{category.name}</span>
-                                <span className="text-[10px] opacity-70">{category._count.photos}</span>
+                                <span className="flex items-center gap-2 truncate">
+                                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: tag.color || '#94a3b8' }} />
+                                    {tag.name}
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -118,9 +120,13 @@ export function GalleryClient({ initialPhotos, categories }: GalleryClientProps)
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
-                                    <Badge className="absolute top-2 left-2 bg-white/90 text-slate-900 hover:bg-white pointer-events-none border-0">
-                                        {photo.category.name}
-                                    </Badge>
+                                    {photo.tags.length > 0 && (
+                                        <Badge className="absolute top-2 left-2 bg-white/90 text-slate-900 hover:bg-white pointer-events-none border-0 shadow-sm flex gap-1 items-center">
+                                            <TagIcon className="h-3 w-3 text-muted-foreground" />
+                                            {photo.tags[0]?.name}
+                                            {photo.tags.length > 1 && <span className="text-[10px] text-muted-foreground ml-1">+{photo.tags.length - 1}</span>}
+                                        </Badge>
+                                    )}
                                 </CardContent>
                                 <div className="p-4 bg-white">
                                     <div className="font-semibold text-sm truncate mb-2">
@@ -128,8 +134,8 @@ export function GalleryClient({ initialPhotos, categories }: GalleryClientProps)
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {photo.tags.map((tag: any) => (
-                                            <div key={tag.id} className="flex items-center gap-1 text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-600">
-                                                <TagIcon className="h-2.5 w-2.5" />
+                                            <div key={tag.id} className="flex items-center gap-1.5 text-[10px] bg-slate-50 border px-2 py-0.5 rounded-full text-slate-600 font-medium">
+                                                <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: tag.color || '#cbd5e1' }} />
                                                 {tag.name}
                                             </div>
                                         ))}

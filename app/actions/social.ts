@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { logActivity } from '@/app/actions/activity-logs'
+import { syncPostToPostiz, deletePostFromPostiz } from './postiz'
 
 export async function getSocialPosts(filters: {
     platform?: string,
@@ -41,14 +42,7 @@ export async function getSocialPosts(filters: {
         where,
         orderBy: { scheduledDate: 'asc' },
         include: {
-            tags: true,
             assets: true,
-            photos: {
-                include: {
-                    category: true,
-                    tags: true
-                }
-            },
             promotionPeriod: true,
             reviewer: true,
             event: true
@@ -138,18 +132,9 @@ export async function createSocialPost(formData: FormData) {
     const promotionPeriodId = formData.get('promotionPeriodId') as string
     const reviewerId = formData.get('reviewerId') as string
     const eventId = formData.get('eventId') as string
-    const tagNames = (formData.get('tags') as string || '').split(',').map(t => t.trim()).filter(Boolean)
-    const photoIds = (formData.get('photoIds') as string || '').split(',').map(t => t.trim()).filter(Boolean)
 
-    // Handle tags: create if not exists
-    const tagsConnect = []
-    for (const tagName of tagNames) {
-        let tag = await prisma.tag.findUnique({ where: { name: tagName } })
-        if (!tag) {
-            tag = await prisma.tag.create({ data: { name: tagName } })
-        }
-        tagsConnect.push({ id: tag.id })
-    }
+    const assetIdsStr = formData.get('assetIds') as string
+    const assetIds = assetIdsStr ? assetIdsStr.split(',').filter(Boolean) : []
 
     const post = await prisma.socialPost.create({
         data: {
@@ -157,19 +142,35 @@ export async function createSocialPost(formData: FormData) {
             platform,
             status,
             scheduledDate,
-            tags: {
-                connect: tagsConnect
-            },
-            photos: {
-                connect: photoIds.map(id => ({ id }))
-            },
             promotionPeriod: (promotionPeriodId && promotionPeriodId !== 'unlinked') ? { connect: { id: promotionPeriodId } } : undefined,
             reviewer: (reviewerId && reviewerId !== 'none') ? { connect: { id: reviewerId } } : undefined,
-            event: (eventId && eventId !== 'none') ? { connect: { id: eventId } } : undefined
+            event: (eventId && eventId !== 'none') ? { connect: { id: eventId } } : undefined,
+            assets: assetIds.length > 0 ? { connect: assetIds.map(id => ({ id })) } : undefined
+        },
+        include: {
+            assets: true
         }
     })
 
     await logActivity('CREATE', 'SocialPost', post.id, `Created ${platform} post`)
+
+    let postizIdResult: string | null = null
+    if (status === 'scheduled' || status === 'published' || status === 'draft') {
+        postizIdResult = await syncPostToPostiz({
+            platforms: [platform],
+            content,
+            scheduledDate,
+            status,
+            assets: post.assets
+        })
+
+        if (postizIdResult) {
+            await prisma.socialPost.update({
+                where: { id: post.id },
+                data: { postizId: postizIdResult }
+            })
+        }
+    }
 
     if (status === 'ready-for-review' && reviewerId && reviewerId !== 'none') {
         await syncReviewerTask(reviewerId)
@@ -197,17 +198,24 @@ export async function updateSocialPost(formData: FormData) {
     const reviewerId = (reviewerIdInput && reviewerIdInput !== 'none') ? reviewerIdInput : null
     const eventIdInput = formData.get('eventId') as string
     const eventId = (eventIdInput && eventIdInput !== 'none') ? eventIdInput : null
-    const tagNames = (formData.get('tags') as string || '').split(',').map(t => t.trim()).filter(Boolean)
-    const photoIds = (formData.get('photoIds') as string || '').split(',').map(t => t.trim()).filter(Boolean)
+    const assetIdsStr = formData.get('assetIds') as string
+    const assetIds = assetIdsStr ? assetIdsStr.split(',').filter(Boolean) : []
 
-    // Handle tags
-    const tagsConnect = []
-    for (const tagName of tagNames) {
-        let tag = await prisma.tag.findUnique({ where: { name: tagName } })
-        if (!tag) {
-            tag = await prisma.tag.create({ data: { name: tagName } })
-        }
-        tagsConnect.push({ id: tag.id })
+    // Delete old postiz post to re-create it (Postiz API does not easily support updating posts directly yet)
+    if (oldPost?.postizId) {
+        await deletePostFromPostiz(oldPost.postizId)
+    }
+
+    let postizIdResult: string | null = null
+    if (status === 'scheduled' || status === 'published' || status === 'draft') {
+        const assetsForPostiz = assetIds.length > 0 ? await prisma.asset.findMany({ where: { id: { in: assetIds } } }) : []
+        postizIdResult = await syncPostToPostiz({
+            platforms: [platform],
+            content,
+            scheduledDate,
+            status,
+            assets: assetsForPostiz
+        })
     }
 
     await prisma.socialPost.update({
@@ -217,17 +225,17 @@ export async function updateSocialPost(formData: FormData) {
             platform,
             scheduledDate,
             status,
-            tags: {
-                set: [], // Clear existing relations
-                connect: tagsConnect
-            },
-            photos: {
-                set: [], // Clear existing relations
-                connect: photoIds.map(id => ({ id }))
-            },
+            postizId: postizIdResult,
             promotionPeriodId: (promotionPeriodId && promotionPeriodId !== 'unlinked') ? promotionPeriodId : null,
             reviewerId,
-            eventId
+            eventId,
+            assets: {
+                set: [], // Clear existing
+                connect: assetIds.map(id => ({ id })) // Connect new
+            }
+        },
+        include: {
+            assets: true
         }
     })
 
@@ -251,6 +259,11 @@ export async function updateSocialPost(formData: FormData) {
 }
 
 export async function deleteSocialPost(id: string) {
+    const post = await prisma.socialPost.findUnique({ where: { id } })
+    if (post?.postizId) {
+        await deletePostFromPostiz(post.postizId)
+    }
+
     await prisma.socialPost.delete({ where: { id } })
     await logActivity('DELETE', 'SocialPost', id, 'Deleted social post')
     revalidatePath('/social')
@@ -260,14 +273,7 @@ export async function getSocialPost(id: string) {
     return await prisma.socialPost.findUnique({
         where: { id },
         include: {
-            tags: true,
             assets: true,
-            photos: {
-                include: {
-                    category: true,
-                    tags: true
-                }
-            },
             promotionPeriod: true,
             reviewer: true,
             event: true

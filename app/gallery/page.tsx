@@ -1,12 +1,12 @@
 export const dynamic = "force-dynamic"
-import { getPhotos, getPhotoCategories } from '@/app/actions/photos'
+import { getPhotos, getPhotoTags } from '@/app/actions/photos'
 import { GalleryClient } from '@/components/gallery/gallery-client'
 import { PageHeader } from '@/components/ui/page-header'
 import { Images } from 'lucide-react'
 
 export default async function GalleryPage() {
     const photos = await getPhotos()
-    const categories = await getPhotoCategories()
+    const tags = await getPhotoTags()
 
     return (
         <div className="p-4 md:p-8 space-y-8 w-full">
@@ -22,7 +22,7 @@ export default async function GalleryPage() {
 
             <GalleryClient
                 initialPhotos={photos}
-                categories={categories}
+                tags={tags}
             />
         </div>
     )

@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic"
 import { createSocialPost } from '@/app/actions/social'
 import { getPromotions } from '@/app/actions/promotions'
 import { getUsers, getEvents } from '@/app/actions/events'
+import { getAvailablePlatforms } from '@/app/actions/postiz'
 import { SocialPostForm } from '@/components/social/social-post-form'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -11,6 +12,7 @@ export default async function NewPostPage() {
     const promotions = await getPromotions()
     const users = await getUsers()
     const events = await getEvents()
+    const platforms = await getAvailablePlatforms()
 
     return (
         <div className="p-8 max-w-2xl mx-auto space-y-8">
@@ -30,6 +32,7 @@ export default async function NewPostPage() {
                         promotions={promotions}
                         users={users}
                         events={events}
+                        availablePlatforms={platforms}
                         action={createSocialPost}
                     />
                 </CardContent>

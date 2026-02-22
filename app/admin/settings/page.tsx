@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Check, Sparkles, Globe, Key, Cpu, Loader2, MessageSquare } from 'lucide-react'
 import { getConfig, updateConfig } from '@/app/actions/settings'
 import { testAIConnection, fetchLocalModels, fetchGeminiModels } from '@/app/actions/ai'
+import { Link2 } from 'lucide-react'
 import {
     Select,
     SelectContent,
@@ -133,6 +134,30 @@ export default function SettingsPage() {
                     </CardHeader>
                     <CardContent>
                         <WordPressConfig />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Immich Integration</CardTitle>
+                        <CardDescription>
+                            Connect your Immich server for native gallery integration.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ImmichConfig />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Postiz Integration</CardTitle>
+                        <CardDescription>
+                            Connect your Postiz instance for social media scheduling.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <PostizConfig />
                     </CardContent>
                 </Card>
 
@@ -699,6 +724,230 @@ function WordPressConfig() {
                     {saving ? 'Saving...' : 'Save Settings'}
                 </Button>
                 <Button type="button" variant="outline" onClick={handleTest} disabled={saving}>
+                    Test Connection
+                </Button>
+                {status && (
+                    <span className={`text-sm ${status.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                        {status.message}
+                    </span>
+                )}
+            </div>
+        </form>
+    )
+}
+
+function ImmichConfig() {
+    const [url, setUrl] = useState('')
+    const [apiKey, setApiKey] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
+    const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+    const [hasApiKey, setHasApiKey] = useState(false)
+
+    useEffect(() => {
+        async function loadConfig() {
+            try {
+                const u = await getConfig('IMMICH_URL')
+                const k = await getConfig('IMMICH_API_KEY')
+                if (u) setUrl(u)
+                if (k) {
+                    setHasApiKey(true)
+                }
+            } catch (err) {
+                console.error('Failed to load Immich config', err)
+            } finally {
+                setLoading(false)
+            }
+        }
+        loadConfig()
+    }, [])
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setSaving(true)
+        setStatus(null)
+        try {
+            await updateConfig('IMMICH_URL', url)
+            if (apiKey) {
+                await updateConfig('IMMICH_API_KEY', apiKey)
+                setHasApiKey(true)
+                setApiKey('')
+            }
+            setStatus({ type: 'success', message: 'Immich configuration saved.' })
+        } catch (err) {
+            setStatus({ type: 'error', message: 'Failed to save configuration.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    const handleTest = async () => {
+        setSaving(true)
+        setStatus(null)
+        try {
+            const { testImmichConnection } = await import('@/app/actions/immich')
+            const currentKey = apiKey || await getConfig('IMMICH_API_KEY')
+            if (!currentKey) throw new Error('API Key required for testing')
+
+            const res = await testImmichConnection(url, currentKey)
+            setStatus({ type: res.success ? 'success' : 'error', message: res.message })
+        } catch (err: any) {
+            setStatus({ type: 'error', message: err.message || 'Failed to run test.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    if (loading) return (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Immich configuration...
+        </div>
+    )
+
+    return (
+        <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Immich Server URL</Label>
+                    <Input
+                        placeholder="https://immich.example.com/api"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground">The API URL of your Immich instance (must include /api if applicable).</p>
+                </div>
+                <div className="space-y-2">
+                    <Label>API Key</Label>
+                    <Input
+                        type="password"
+                        placeholder={hasApiKey ? "•••••••• (Saved)" : "Enter API Key"}
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                        Generate this in your Immich Account Settings.
+                    </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <Button type="submit" disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {saving ? 'Saving...' : 'Save Settings'}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleTest} disabled={saving || (!url) || (!apiKey && !hasApiKey)}>
+                    Test Connection
+                </Button>
+                {status && (
+                    <span className={`text-sm ${status.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                        {status.message}
+                    </span>
+                )}
+            </div>
+        </form>
+    )
+}
+
+function PostizConfig() {
+    const [url, setUrl] = useState('')
+    const [apiKey, setApiKey] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
+    const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+    const [hasApiKey, setHasApiKey] = useState(false)
+
+    useEffect(() => {
+        async function loadConfig() {
+            try {
+                const u = await getConfig('POSTIZ_URL')
+                const k = await getConfig('POSTIZ_API_KEY')
+                if (u) setUrl(u)
+                if (k) {
+                    setHasApiKey(true)
+                }
+            } catch (err) {
+                console.error('Failed to load Postiz config', err)
+            } finally {
+                setLoading(false)
+            }
+        }
+        loadConfig()
+    }, [])
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setSaving(true)
+        setStatus(null)
+        try {
+            await updateConfig('POSTIZ_URL', url)
+            if (apiKey) {
+                await updateConfig('POSTIZ_API_KEY', apiKey)
+                setHasApiKey(true)
+                setApiKey('') // Clear the input field for security
+            }
+            setStatus({ type: 'success', message: 'Postiz configuration saved.' })
+        } catch (err) {
+            setStatus({ type: 'error', message: 'Failed to save configuration.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    const handleTest = async () => {
+        setSaving(true)
+        setStatus(null)
+        try {
+            const { testPostizConnection } = await import('@/app/actions/postiz')
+            const currentKey = apiKey || await getConfig('POSTIZ_API_KEY')
+            if (!currentKey) throw new Error('API Key required for testing')
+
+            const res = await testPostizConnection(url, currentKey)
+            setStatus({ type: res.success ? 'success' : 'error', message: res.message })
+        } catch (err: any) {
+            setStatus({ type: 'error', message: err.message || 'Failed to run test.' })
+        } finally {
+            setSaving(false)
+        }
+    }
+
+    if (loading) return (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading Postiz configuration...
+        </div>
+    )
+
+    return (
+        <form onSubmit={handleSave} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Postiz Self-Hosted URL</Label>
+                    <Input
+                        placeholder="https://postiz.yourdomain.com"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground">Leave blank if using the official Postiz SaaS.</p>
+                </div>
+                <div className="space-y-2">
+                    <Label>API Key</Label>
+                    <Input
+                        type="password"
+                        placeholder={hasApiKey ? "•••••••• (Saved)" : "Enter API Key"}
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                    />
+                    <p className="text-[10px] text-muted-foreground">
+                        Generate this in your Postiz Account Settings.
+                    </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-4">
+                <Button type="submit" disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    {saving ? 'Saving...' : 'Save Settings'}
+                </Button>
+                <Button type="button" variant="outline" onClick={handleTest} disabled={saving || (!apiKey && !hasApiKey)}>
                     Test Connection
                 </Button>
                 {status && (

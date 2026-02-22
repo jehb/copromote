@@ -31,25 +31,27 @@ interface SocialPostFormProps {
     promotions: any[]
     users: any[]
     events: any[]
+    availablePlatforms: { value: string, label: string }[]
     action: (formData: FormData) => Promise<void>
 }
 
-export function SocialPostForm({ post, promotions, users, events, action }: SocialPostFormProps) {
+export function SocialPostForm({ post, promotions, users, events, availablePlatforms, action }: SocialPostFormProps) {
+    const defaultPlatform = post?.platform || availablePlatforms?.[0]?.value || 'Twitter'
     const [status, setStatus] = useState(post?.status || 'draft')
     const [content, setContent] = useState(post?.content || '')
-    const [platform, setPlatform] = useState(post?.platform || 'Instagram')
+    const [platform, setPlatform] = useState(defaultPlatform)
     const [alternatives, setAlternatives] = useState<string[]>([])
     const [isGenerating, setIsGenerating] = useState(false)
     const [showSuggestions, setShowSuggestions] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [selectedPhotos, setSelectedPhotos] = useState<any[]>(post?.photos || [])
+    const [selectedPhotos, setSelectedPhotos] = useState<any[]>(post?.assets || [])
 
     const photoIds = selectedPhotos.map(p => p.id).join(',')
 
     return (
         <form action={action} className="space-y-6">
             {post?.id && <input type="hidden" name="id" value={post.id} />}
-            <input type="hidden" name="photoIds" value={photoIds} />
+            <input type="hidden" name="assetIds" value={photoIds} />
 
             <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -206,10 +208,9 @@ export function SocialPostForm({ post, promotions, users, events, action }: Soci
                             <SelectValue placeholder="Select platform" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="Instagram">Instagram</SelectItem>
-                            <SelectItem value="Facebook">Facebook</SelectItem>
-                            <SelectItem value="LinkedIn">LinkedIn</SelectItem>
-                            <SelectItem value="Twitter">Twitter</SelectItem>
+                            {availablePlatforms.map((p) => (
+                                <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
@@ -295,15 +296,7 @@ export function SocialPostForm({ post, promotions, users, events, action }: Soci
                 </div>
             </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="tags">Tags (comma separated)</Label>
-                <Input
-                    id="tags"
-                    name="tags"
-                    defaultValue={post?.tags?.map((t: any) => t.name).join(', ')}
-                    placeholder="e.g. sale, summer, organic"
-                />
-            </div>
+
 
             <div className="pt-4 flex justify-end gap-2">
                 <Button type="submit" className="gap-2">

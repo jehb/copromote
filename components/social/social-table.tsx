@@ -65,14 +65,6 @@ export function SocialTable({ posts }: SocialTableProps) {
                                 <div className="max-w-[300px] truncate text-slate-600" title={post.content}>
                                     {post.content}
                                 </div>
-                                <div className="flex gap-1 mt-1">
-                                    {post.tags.slice(0, 2).map((tag: any) => (
-                                        <span key={tag.id} className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-full">
-                                            #{tag.name}
-                                        </span>
-                                    ))}
-                                    {post.tags.length > 2 && <span className="text-[10px] text-slate-400">+{post.tags.length - 2} more</span>}
-                                </div>
                             </TableCell>
                             <TableCell className="whitespace-nowrap">
                                 {post.scheduledDate ? (
@@ -120,6 +112,6 @@ export function SocialTable({ posts }: SocialTableProps) {
                     ))}
                 </TableBody>
             </Table>
-        </div>
+        </div >
     )
 }

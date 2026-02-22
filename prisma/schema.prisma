@@ -80,6 +80,7 @@ model SocialPost {
   platform          String
   scheduledDate     DateTime?
   status            String           @default("draft")
+  postizId          String?
   promotionPeriodId String?
   reviewerId        String?
   eventId           String?
@@ -89,42 +90,12 @@ model SocialPost {
   event             Event?           @relation(fields: [eventId], references: [id])
   promotionPeriod   PromotionPeriod? @relation(fields: [promotionPeriodId], references: [id])
   reviewer          User?            @relation("PostReviewer", fields: [reviewerId], references: [id])
-  photos            Photo[]          @relation("PhotoToSocialPost")
-  tags              Tag[]            @relation("SocialPostToTag")
 
   @@index([eventId], map: "SocialPost_eventId_fkey")
   @@index([promotionPeriodId], map: "SocialPost_promotionPeriodId_fkey")
   @@index([reviewerId], map: "SocialPost_reviewerId_fkey")
 }
 
-model Tag {
-  id     String       @id @default(uuid())
-  name   String       @unique
-  photos Photo[]      @relation("PhotoToTag")
-  posts  SocialPost[] @relation("SocialPostToTag")
-}
-
-model PhotoCategory {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  photos    Photo[]
-}
-
-model Photo {
-  id         String        @id @default(uuid())
-  url        String
-  name       String?
-  categoryId String
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  category   PhotoCategory @relation(fields: [categoryId], references: [id])
-  posts      SocialPost[]  @relation("PhotoToSocialPost")
-  tags       Tag[]         @relation("PhotoToTag")
-
-  @@index([categoryId], map: "Photo_categoryId_fkey")
-}
 
 model User {
   id                   String         @id @default(uuid())

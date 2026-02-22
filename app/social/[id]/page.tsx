@@ -1,6 +1,7 @@
 import { getSocialPost, updateSocialPost, addAssetToSocialPost, deleteSocialPostAsset } from '@/app/actions/social'
 import { getPromotions } from '@/app/actions/promotions'
 import { getUsers, getEvents } from '@/app/actions/events'
+import { getAvailablePlatforms } from '@/app/actions/postiz'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -32,10 +33,19 @@ export default async function SocialPostDetailPage({
     const { edit } = await searchParams
     const isEditing = edit === 'true'
 
-    const post = await getSocialPost(id)
-    const promotions = await getPromotions()
-    const users = await getUsers()
-    const events = await getEvents()
+    const postPromise = getSocialPost(id)
+    const promotionsPromise = getPromotions()
+    const usersPromise = getUsers()
+    const eventsPromise = getEvents()
+    const platformsPromise = getAvailablePlatforms()
+
+    const [post, promotions, users, events, platforms] = await Promise.all([
+        postPromise,
+        promotionsPromise,
+        usersPromise,
+        eventsPromise,
+        platformsPromise
+    ])
 
     if (!post) notFound()
 
@@ -88,6 +98,7 @@ export default async function SocialPostDetailPage({
                                     promotions={promotions}
                                     users={users}
                                     events={events}
+                                    availablePlatforms={platforms}
                                     action={updateSocialPost}
                                 />
                             </CardContent>
@@ -118,11 +129,6 @@ export default async function SocialPostDetailPage({
                                     </div>
 
                                     <div className="mt-8 flex flex-wrap gap-2 pt-6 border-t">
-                                        {post.tags.map((tag: any) => (
-                                            <Badge key={tag.id} variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100">
-                                                #{tag.name}
-                                            </Badge>
-                                        ))}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -163,30 +169,6 @@ export default async function SocialPostDetailPage({
 
                 {/* Sidebar Assets */}
                 <div className="space-y-8">
-                    {post.photos.length > 0 && (
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">Gallery Media</CardTitle>
-                                <CardDescription>{post.photos.length} image{post.photos.length !== 1 ? 's' : ''} from gallery</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {post.photos.map((photo: any) => (
-                                        <div key={photo.id} className="relative aspect-square rounded-lg overflow-hidden border bg-white group ring-offset-2 hover:ring-2 hover:ring-primary/20 transition-all">
-                                            <img
-                                                src={photo.url}
-                                                alt={photo.name || 'Post Media'}
-                                                className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                                            />
-                                            <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1.5 text-[10px] text-white truncate opacity-0 group-hover:opacity-100 transition-opacity">
-                                                {photo.category?.name || 'Uncategorized'}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
 
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">

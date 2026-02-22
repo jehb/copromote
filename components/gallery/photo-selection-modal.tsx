@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Check, Search, Images as ImagesIcon, Filter } from 'lucide-react'
-import { getPhotos, getPhotoCategories } from '@/app/actions/photos'
+import { getPhotos, getPhotoTags } from '@/app/actions/photos'
 import { cn } from '@/lib/utils'
 
 interface PhotoSelectionModalProps {
@@ -17,8 +17,8 @@ interface PhotoSelectionModalProps {
 export function PhotoSelectionModal({ selectedPhotoIds, onSelect }: PhotoSelectionModalProps) {
     const [open, setOpen] = useState(false)
     const [photos, setPhotos] = useState<any[]>([])
-    const [categories, setCategories] = useState<any[]>([])
-    const [selectedCategory, setSelectedCategory] = useState('all')
+    const [tags, setTags] = useState<any[]>([])
+    const [selectedTag, setSelectedTag] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [tempSelectedIds, setTempSelectedIds] = useState<string[]>(selectedPhotoIds)
     const [loading, setLoading] = useState(false)
@@ -40,9 +40,9 @@ export function PhotoSelectionModal({ selectedPhotoIds, onSelect }: PhotoSelecti
     async function loadData() {
         setLoading(true)
         try {
-            const [p, c] = await Promise.all([getPhotos(), getPhotoCategories()])
+            const [p, t] = await Promise.all([getPhotos(), getPhotoTags()])
             setPhotos(p)
-            setCategories(c)
+            setTags(t)
         } catch (err) {
             console.error('Failed to load gallery photos:', err)
         } finally {
@@ -51,10 +51,10 @@ export function PhotoSelectionModal({ selectedPhotoIds, onSelect }: PhotoSelecti
     }
 
     const filteredPhotos = photos.filter(photo => {
-        const matchesCategory = selectedCategory === 'all' || photo.categoryId === selectedCategory
+        const matchesTag = selectedTag === 'all' || photo.tags.some((t: any) => t.id === selectedTag)
         const matchesSearch = photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             photo.tags.some((t: any) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        return matchesCategory && matchesSearch
+        return matchesTag && matchesSearch
     })
 
     const togglePhoto = (id: string) => {
@@ -89,27 +89,28 @@ export function PhotoSelectionModal({ selectedPhotoIds, onSelect }: PhotoSelecti
                     {/* Filters */}
                     <div className="w-full md:w-48 space-y-4 shrink-0 overflow-y-auto pr-2">
                         <div className="space-y-2">
-                            <Label>Category</Label>
+                            <Label>Tags</Label>
                             <div className="flex flex-wrap md:flex-col gap-1">
                                 <Button
                                     type="button"
-                                    variant={selectedCategory === 'all' ? 'default' : 'ghost'}
+                                    variant={selectedTag === 'all' ? 'default' : 'ghost'}
                                     size="sm"
                                     className="justify-start h-8"
-                                    onClick={() => setSelectedCategory('all')}
+                                    onClick={() => setSelectedTag('all')}
                                 >
                                     All
                                 </Button>
-                                {categories.map(c => (
+                                {tags.map(t => (
                                     <Button
-                                        key={c.id}
+                                        key={t.id}
                                         type="button"
-                                        variant={selectedCategory === c.id ? 'default' : 'ghost'}
+                                        variant={selectedTag === t.id ? 'default' : 'ghost'}
                                         size="sm"
-                                        className="justify-start h-8"
-                                        onClick={() => setSelectedCategory(c.id)}
+                                        className="justify-start h-8 flex items-center gap-2"
+                                        onClick={() => setSelectedTag(t.id)}
                                     >
-                                        <span className="truncate">{c.name}</span>
+                                        <div className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: t.color || '#94a3b8' }} />
+                                        <span className="truncate">{t.name}</span>
                                     </Button>
                                 ))}
                             </div>
