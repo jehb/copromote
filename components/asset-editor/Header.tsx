@@ -1,5 +1,5 @@
 import React from 'react';
-import { Undo2, Redo2, Download, Code, Globe } from 'lucide-react';
+import { Undo2, Redo2, Download, Code, Globe, FolderHeart } from 'lucide-react';
 
 interface HeaderProps {
     canUndo: boolean;
@@ -7,7 +7,7 @@ interface HeaderProps {
     onUndo: () => void;
     onRedo: () => void;
     onDownloadImage: () => void;
-    onDownloadJson: () => void;
+    onSaveAssetDialog: () => void;
     onDownloadHtml: () => void;
     onSaveTemplate: () => void;
 }
@@ -18,14 +18,14 @@ export default function Header({
     onUndo,
     onRedo,
     onDownloadImage,
-    onDownloadJson,
+    onSaveAssetDialog,
     onDownloadHtml,
     onSaveTemplate
 }: HeaderProps) {
     return (
         <header className="h-14 bg-white border-b flex items-center justify-between px-6 z-30 shadow-sm shrink-0">
             <div className="flex items-center gap-4">
-                <h1 className="text-lg font-bold text-neutral-800 tracking-tight">Promoty Assets</h1>
+                <h1 className="text-lg font-bold text-neutral-800 tracking-tight">Co+promote Assets</h1>
 
                 <div className="flex items-center gap-1 border-l pl-4 ml-2">
                     <button
@@ -49,11 +49,11 @@ export default function Header({
 
             <div className="flex items-center gap-3">
                 <button
-                    onClick={onDownloadJson}
+                    onClick={onSaveAssetDialog}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
                 >
-                    <Code size={16} />
-                    Export JSON
+                    <FolderHeart size={16} />
+                    Save Asset
                 </button>
                 <button
                     onClick={onDownloadHtml}

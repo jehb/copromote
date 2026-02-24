@@ -1,7 +1,7 @@
 
-# Promoty
+# Co+promote
 
-Promoty is a comprehensive promotion management system designed to streamline the organization of projects, tasks, contacts, and events.
+Co+promote is a comprehensive promotion management system designed to streamline the organization of projects, tasks, contacts, and events.
 
 ## Features
 
@@ -11,7 +11,7 @@ Promoty is a comprehensive promotion management system designed to streamline th
 - **Event Planning**: Schedule and manage events with integrated calendar views.
 - **Media Assets**: Native Immich integration for cloud-based photo organization and tagging.
 - **Activity Logging**: Comprehensive audit trail for all system actions.
-- **User Management**: Role-based access control (Admin, User) with secure authentication.
+- **User Management**: Dynamic custom roles with granular permission control and secure authentication.
 
 ## Getting Started
 
@@ -24,8 +24,8 @@ Promoty is a comprehensive promotion management system designed to streamline th
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/promoty.git
-    cd promoty
+    git clone https://github.com/yourusername/copromote.git
+    cd copromote
     ```
 
 2.  Install dependencies:
@@ -59,7 +59,7 @@ To run the application using Docker (simulation of production environment):
 
 ## Testing
 
-Promoty maintains high test coverage using Jest and React Testing Library.
+Co+promote maintains high test coverage using Jest and React Testing Library.
 
 To run the test suite:
 

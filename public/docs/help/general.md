@@ -1,8 +1,8 @@
-# Promoty Help
+# Co+promote Help
 
-## Welcome to Promoty
+## Welcome to Co+promote
 
-Promoty is your all-in-one promotional campaign management platform. Manage contacts, events, social media, and projects—all with offline-first capabilities.
+Co+promote is your all-in-one promotional campaign management platform. Manage contacts, events, social media, and projects—all with offline-first capabilities.
 
 ## Key Features
 
@@ -33,12 +33,12 @@ Promoty is your all-in-one promotional campaign management platform. Manage cont
 ### 1. Install the App
 
 **On Desktop:**
-1. Visit Promoty in Chrome, Edge, or Safari
+1. Visit Co+promote in Chrome, Edge, or Safari
 2. Click the install icon in the address bar
 3. Click "Install"
 
 **On Mobile:**
-1. Visit Promoty in your browser
+1. Visit Co+promote in your browser
 2. Tap the share button
 3. Select "Add to Home Screen"
 
@@ -60,7 +60,7 @@ Promoty is your all-in-one promotional campaign management platform. Manage cont
 
 ### How It Works
 
-Promoty stores data locally on your device:
+Co+promote stores data locally on your device:
 - All data is cached for offline access
 - Changes are queued when offline
 - Automatic sync when reconnected

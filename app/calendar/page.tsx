@@ -3,6 +3,7 @@ import { getCalendarEvents } from '@/app/actions/calendar'
 import { CalendarView } from '@/components/calendar/calendar-view'
 import { PageHeader } from '@/components/ui/page-header'
 import { Calendar } from 'lucide-react'
+import { ProtectedRoute } from '@/components/layout/protected-route'
 
 export default async function CalendarPage({
     searchParams,
@@ -13,18 +14,20 @@ export default async function CalendarPage({
     const events = await getCalendarEvents()
 
     return (
-        <div className="p-8 h-full flex flex-col">
-            <PageHeader
-                title={
-                    <span className="flex items-center gap-2">
-                        <Calendar className="h-6 w-6" />
-                        Calendar
-                    </span>
-                }
-                className="mb-2"
-            />
-            <CalendarView initialEvents={events} dateStr={dateStr} />
-        </div>
+        <ProtectedRoute pageName="calendar">
+            <div className="p-8 h-full flex flex-col">
+                <PageHeader
+                    title={
+                        <span className="flex items-center gap-2">
+                            <Calendar className="h-6 w-6" />
+                            Calendar
+                        </span>
+                    }
+                    className="mb-2"
+                />
+                <CalendarView initialEvents={events} dateStr={dateStr} />
+            </div>
+        </ProtectedRoute>
     )
 }
 

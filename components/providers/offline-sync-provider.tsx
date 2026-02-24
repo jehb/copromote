@@ -20,7 +20,7 @@ interface OfflineSyncContextType {
 
 const OfflineSyncContext = createContext<OfflineSyncContextType | undefined>(undefined)
 
-const QUEUE_KEY = 'promoty-offline-queue'
+const QUEUE_KEY = 'copromote-offline-queue'
 
 export function OfflineSyncProvider({ children }: { children: React.ReactNode }) {
     const [isOnline, setIsOnline] = useState(true)

@@ -41,9 +41,10 @@ interface User {
 interface EditUserDialogProps {
     user: User
     contacts: Contact[]
+    roles: { id: string, name: string }[]
 }
 
-export function EditUserDialog({ user, contacts }: EditUserDialogProps) {
+export function EditUserDialog({ user, contacts, roles }: EditUserDialogProps) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -104,16 +105,19 @@ export function EditUserDialog({ user, contacts }: EditUserDialogProps) {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="role">Role</Label>
-                            <Select name="role" defaultValue={user.role}>
+                            <Select name="role" defaultValue={user.role} disabled={user.username === 'admin'}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select a role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="USER">User (Standard)</SelectItem>
-                                    <SelectItem value="EDITOR">Editor</SelectItem>
-                                    <SelectItem value="ADMIN">Admin</SelectItem>
+                                    {roles.map(r => (
+                                        <SelectItem key={r.id} value={r.name}>{r.name}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
+                            {user.username === 'admin' && (
+                                <p className="text-[0.8rem] text-muted-foreground">The primary admin role cannot be changed.</p>
+                            )}
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="contactId">Linked Contact</Label>

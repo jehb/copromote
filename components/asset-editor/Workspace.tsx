@@ -35,6 +35,7 @@ export default function Workspace({
     const [scale, setScale] = useState(1);
     const [selectionBox, setSelectionBox] = useState<{ visible: boolean, x1: number, y1: number, x2: number, y2: number }>({ visible: false, x1: 0, y1: 0, x2: 0, y2: 0 });
     const [guides, setGuides] = useState<{ type: 'v' | 'h', position: number }[]>([]);
+    const [editingTextId, setEditingTextId] = useState<string | null>(null);
 
     useEffect(() => {
         const updateSize = () => {
@@ -224,20 +225,25 @@ export default function Workspace({
                                 node.scaleX(1);
                                 node.scaleY(1);
 
+                                const isScaling = Math.abs(scaleX - 1) > 0.001 || Math.abs(scaleY - 1) > 0.001;
+
                                 let newWidth = Math.max(5, node.width() * scaleX);
                                 let newHeight = Math.max(5, node.height() * scaleY);
 
                                 if (el.type === 'icon') {
                                     newWidth = Math.max(5, scaleX * 24);
                                     newHeight = Math.max(5, scaleY * 24);
+                                } else if (el.type === 'text') {
+                                    // Slight padding to avoid wrapping the last word due to floating point precision lost during transform
+                                    newWidth += 2;
                                 }
 
                                 handleModifyEnd({
                                     ...el,
                                     x: node.x(),
                                     y: node.y(),
-                                    width: newWidth,
-                                    height: newHeight,
+                                    width: isScaling ? newWidth : (el.width ?? newWidth),
+                                    height: isScaling ? newHeight : (el.height ?? newHeight),
                                     rotation: node.rotation()
                                 });
                             };
@@ -299,9 +305,10 @@ export default function Workspace({
                                 if (el.isCurved) {
                                     const r = el.curveRadius || 150;
                                     const pathData = `M 0,${r} A ${r},${r} 0 0,1 ${r * 2},${r}`;
-                                    return <TextPath key={el.id} {...commonProps} text={displayText} data={pathData} />;
+                                    // Don't hide the text, let the transparent textarea overlay it for direct-editing feel
+                                    return <TextPath key={el.id} {...commonProps} text={displayText} data={pathData} onDblClick={() => setEditingTextId(el.id)} />;
                                 }
-                                return <Text key={el.id} {...commonProps} text={displayText} />;
+                                return <Text key={el.id} {...commonProps} text={displayText} wrap={el.wrap || 'none'} onDblClick={() => setEditingTextId(el.id)} />;
                             }
                             if (el.type === 'image') return <UrlImage
                                 key={el.id}
@@ -345,9 +352,9 @@ export default function Workspace({
                                             if (child.isCurved) {
                                                 const r = child.curveRadius || 150;
                                                 const pathData = `M 0,${r} A ${r},${r} 0 0,1 ${r * 2},${r}`;
-                                                return <TextPath key={child.id} {...childProps} text={displayText} data={pathData} />;
+                                                return <TextPath key={child.id} {...childProps} text={displayText} data={pathData} onDblClick={() => setEditingTextId(child.id)} />;
                                             }
-                                            return <Text key={child.id} {...childProps} text={displayText} />;
+                                            return <Text key={child.id} {...childProps} text={displayText} wrap={child.wrap || 'none'} onDblClick={() => setEditingTextId(child.id)} />;
                                         }
                                         if (child.type === 'image') return <UrlImage key={child.id} {...childProps} shapeProps={child} />;
                                         if (child.type === 'icon' && child.iconPath) return <Path key={child.id} {...childProps} data={child.iconPath} fill={child.fill} scaleX={((child.width || 100) / 24)} scaleY={((child.height || 100) / 24)} />;
@@ -398,6 +405,96 @@ export default function Workspace({
                         ))}
                     </Layer>
                 </Stage>
+                {editingTextId && (() => {
+                    // Try to find the element in flat elements array
+                    let el = elements.find(e => e.id === editingTextId);
+                    // If not found, check inside groups (for template elements)
+                    if (!el) {
+                        for (const group of elements) {
+                            if (group.type === 'group' && group.children) {
+                                const found = group.children.find(c => c.id === editingTextId);
+                                if (found) {
+                                    el = found as any;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!el || el.type !== 'text') return null;
+
+                    // Use Konva node absolute position and scale
+                    const textNode = layerRef.current?.findOne(`.${editingTextId}`);
+                    const absolutePos = textNode ? textNode.getAbsolutePosition() : { x: 0, y: 0 };
+
+                    // The stage container itself might be scaled by CSS (the container's inline style)
+                    // We need to account for zooming and CSS scaling.
+                    // const viewportScale = Math.min((containerSize.width * 0.8) / canvasSize.width, (containerSize.height * 0.8) / canvasSize.height);
+
+                    const computedWidth = textNode ? Math.max(textNode.width(), el.wrap === 'word' ? 0 : (textNode.getTextWidth?.() || 0)) * textNode.scaleX() * scale : (el.width || 200);
+                    const computedHeight = textNode ? Math.max(textNode.height(), el.wrap === 'word' ? 0 : (textNode.getTextHeight?.() || 0)) * textNode.scaleY() * scale : (el.height || 50);
+
+                    const style: React.CSSProperties = {
+                        position: 'absolute',
+                        top: absolutePos.y,
+                        left: absolutePos.x,
+                        width: computedWidth + 20, // add a bit of buffer
+                        height: computedHeight + 20,
+                        minWidth: 100,
+                        minHeight: 30,
+                        fontSize: (el.fontSize || 24) * scale,
+                        fontFamily: el.fontFamily || 'Arial',
+                        color: 'transparent', // Make text transparent so it doesn't clash with canvas text
+                        caretColor: el.fill || '#000000', // Visible blinking cursor
+                        transform: `rotate(${el.rotation || 0}deg)`,
+                        transformOrigin: 'top left',
+                        border: 'none',
+                        padding: '0px',
+                        margin: '0px',
+                        overflow: 'hidden',
+                        background: 'transparent',
+                        outline: 'none',
+                        resize: 'none',
+                        lineHeight: 1,
+                        fontStyle: el.fontStyle?.includes('italic') ? 'italic' : 'normal',
+                        fontWeight: el.fontStyle?.includes('bold') ? 'bold' : 'normal',
+                        textDecoration: el.fontStyle?.includes('underline') ? 'underline' : 'none',
+                        textAlign: (el.align as any) || 'left',
+                        whiteSpace: el.wrap === 'word' ? 'pre-wrap' : 'pre',
+                        zIndex: 1000,
+                    };
+                    return (
+                        <textarea
+                            value={el.text || ''}
+                            onChange={(e) => {
+                                const newText = e.target.value;
+                                const newElements = elements.map(item => {
+                                    if (item.id === editingTextId) return { ...item, text: newText };
+                                    if (item.type === 'group' && item.children) {
+                                        return {
+                                            ...item,
+                                            children: item.children.map(child => child.id === editingTextId ? { ...child, text: newText } : child)
+                                        };
+                                    }
+                                    return item;
+                                });
+                                setElements(newElements);
+                            }}
+                            onBlur={() => {
+                                setEditingTextId(null);
+                                onHistoryChange(elements);
+                            }}
+                            onKeyDown={(e) => {
+                                e.stopPropagation();
+                                if (e.key === 'Escape') {
+                                    setEditingTextId(null);
+                                    onHistoryChange(elements);
+                                }
+                            }}
+                            style={style}
+                            autoFocus
+                        />
+                    );
+                })()}
             </div>
 
             {/* Zoom overlay indicator */}

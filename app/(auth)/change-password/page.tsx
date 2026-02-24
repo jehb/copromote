@@ -99,7 +99,7 @@ export default function ChangePasswordPage() {
                     </form>
                 </CardContent>
                 <CardFooter className="justify-center border-t border-slate-100 py-4">
-                    <p className="text-xs text-slate-400">Promoty Secure Access</p>
+                    <p className="text-xs text-slate-400">Co+promote Secure Access</p>
                 </CardFooter>
             </Card>
         </div>

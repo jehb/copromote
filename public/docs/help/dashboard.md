@@ -1,6 +1,6 @@
 # Dashboard
 
-Welcome to the Promoty Dashboard! This is your central hub for monitoring your marketing activities.
+Welcome to the Co+promote Dashboard! This is your central hub for monitoring your marketing activities.
 
 ## Stats Overview
 At the top of the page, you'll see a quick overview of your current status:

@@ -1,6 +1,6 @@
 # Database Models
 
-This document outlines the core data structures used in Promoty, defined via Prisma ORM (`prisma/schema.prisma`).
+This document outlines the core data structures used in Co+promote, defined via Prisma ORM (`prisma/schema.prisma`).
 
 ## Core Entities
 - **Project**: The top-level container for organizing work, assets, and tasks.
@@ -10,7 +10,7 @@ This document outlines the core data structures used in Promoty, defined via Pri
 - **Location**: Physical or virtual spaces where Events occur.
 
 ## CRM & Contacts
-- **Organization**: External brands, companies, or partners managed within Promoty.
+- **Organization**: External brands, companies, or partners managed within Co+promote.
 - **Contact**: Individual people linked to Organizations or managed independently.
 
 ## Media & Social
@@ -25,7 +25,7 @@ This document outlines the core data structures used in Promoty, defined via Pri
 - **EmailItemProduct**: A bridge table linking specific UPCs (products) to an Email Item.
 
 ## External Data
-- **EventProduct**: A bridge linking external catalog products (via UPC) to Promoty Events.
+- **EventProduct**: A bridge linking external catalog products (via UPC) to Co+promote Events.
 
 ## System & Auth
 - **User**: System accounts with role-based access control (Admin, User).

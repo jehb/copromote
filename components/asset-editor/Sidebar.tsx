@@ -1,5 +1,5 @@
 import React from 'react';
-import { Type, Square, Image as ImageIcon, LayoutTemplate, Layers, Palette, MousePointer2, Smile } from 'lucide-react';
+import { Type, Square, Image as ImageIcon, LayoutTemplate, Layers, Palette, MousePointer2, Smile, FolderHeart } from 'lucide-react';
 import { SidebarTab } from './types';
 
 interface SidebarProps {
@@ -10,6 +10,7 @@ interface SidebarProps {
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     const tabs: { id: SidebarTab; icon: React.ReactNode; label: string }[] = [
         { id: 'templates', icon: <LayoutTemplate size={20} />, label: 'Templates' },
+        { id: 'saved-assets', icon: <FolderHeart size={20} />, label: 'Saved' },
         { id: 'text', icon: <Type size={20} />, label: 'Text' },
         { id: 'shapes', icon: <Square size={20} />, label: 'Shapes' },
         { id: 'icons', icon: <Smile size={20} />, label: 'Icons' },

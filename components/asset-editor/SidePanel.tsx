@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { SidebarTab, EditorElement } from './types';
 import TemplatesTab from './TemplatesTab';
+import SavedAssetsTab from './SavedAssetsTab';
 
 interface SidePanelProps {
     activeTab: SidebarTab | null;
@@ -248,6 +249,14 @@ export default function SidePanel({
 
                 {activeTab === 'templates' && (
                     <TemplatesTab
+                        setElements={setElements}
+                        setCanvasBg={setCanvasBg}
+                        setCanvasSize={setCanvasSize}
+                    />
+                )}
+
+                {activeTab === 'saved-assets' && (
+                    <SavedAssetsTab
                         setElements={setElements}
                         setCanvasBg={setCanvasBg}
                         setCanvasSize={setCanvasSize}

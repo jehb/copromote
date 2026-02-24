@@ -34,15 +34,20 @@ interface EmailItem {
     order: number
     events: Event[]
     products: { id: string, upc: string }[]
+    photos?: { photoId: string }[]
+    savedAssetId: string | null
+    savedAsset: { id: string, name: string, previewImage: string | null } | null
 }
 
 interface EmailItemListProps {
     items: EmailItem[]
     availableEvents: { id: string, title: string, startTime: Date }[]
     availableProducts: Product[]
+    availableAssets: { id: string, name: string, previewImage: string | null }[]
+    availablePhotos: { id: string, url: string, name: string }[]
 }
 
-export function EmailItemList({ items: initialItems, availableEvents, availableProducts }: EmailItemListProps) {
+export function EmailItemList({ items: initialItems, availableEvents, availableProducts, availableAssets, availablePhotos }: EmailItemListProps) {
     // Local state for optimistic updates
     const [items, setItems] = useState(initialItems)
 
@@ -101,6 +106,8 @@ export function EmailItemList({ items: initialItems, availableEvents, availableP
                             item={item}
                             availableEvents={availableEvents}
                             availableProducts={availableProducts}
+                            availableAssets={availableAssets}
+                            availablePhotos={availablePhotos}
                             sortable={true}
                         />
                     ))}

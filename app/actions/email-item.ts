@@ -210,3 +210,74 @@ export async function removeItemProduct(itemId: string, upc: string) {
         return { success: false, error: 'Failed to remove product from item' }
     }
 }
+
+export async function updateItemAsset(itemId: string, assetId: string | null) {
+    try {
+        const item = await prisma.emailItem.update({
+            where: { id: itemId },
+            data: {
+                savedAssetId: assetId,
+            },
+            select: { planId: true },
+        })
+
+        revalidatePath(`/email-planner/${item.planId}`)
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to update asset on item:', error)
+        return { success: false, error: 'Failed to update asset on item' }
+    }
+}
+
+export async function addItemPhoto(itemId: string, photoId: string) {
+    try {
+        const item = await prisma.emailItemPhoto.create({
+            data: {
+                itemId,
+                photoId,
+            },
+            include: {
+                item: { select: { planId: true } },
+            },
+        })
+
+        revalidatePath(`/email-planner/${item.item.planId}`)
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to add photo to item:', error)
+        return { success: false, error: 'Failed to add photo to item' }
+    }
+}
+
+export async function removeItemPhoto(itemId: string, photoId: string) {
+    try {
+        const photo = await prisma.emailItemPhoto.findUnique({
+            where: {
+                itemId_photoId: {
+                    itemId,
+                    photoId,
+                }
+            },
+            include: {
+                item: { select: { planId: true } },
+            },
+        })
+
+        if (!photo) return { success: false, error: 'Photo not found on item' }
+
+        await prisma.emailItemPhoto.delete({
+            where: {
+                itemId_photoId: {
+                    itemId,
+                    photoId,
+                }
+            },
+        })
+
+        revalidatePath(`/email-planner/${photo.item.planId}`)
+        return { success: true }
+    } catch (error) {
+        console.error('Failed to remove photo from item:', error)
+        return { success: false, error: 'Failed to remove photo from item' }
+    }
+}

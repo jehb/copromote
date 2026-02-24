@@ -8,11 +8,15 @@ let isInitialized = false
 export async function initImmich() {
     if (isInitialized) return true
 
-    const url = process.env.IMMICH_URL
+    let url = process.env.IMMICH_URL
     const apiKey = process.env.IMMICH_API_KEY
 
     if (!url || !apiKey) {
         return false
+    }
+
+    if (!url.endsWith('/api') && !url.endsWith('/api/')) {
+        url = url.replace(/\/$/, '') + '/api';
     }
 
     try {
@@ -29,9 +33,13 @@ export async function initImmich() {
 
 export async function testImmichConnection() {
     try {
-        const url = process.env.IMMICH_URL
+        let url = process.env.IMMICH_URL
         const apiKey = process.env.IMMICH_API_KEY
         if (!url || !apiKey) return { success: false, message: 'Configuration missing' }
+
+        if (!url.endsWith('/api') && !url.endsWith('/api/')) {
+            url = url.replace(/\/$/, '') + '/api';
+        }
 
         immich.init({
             baseUrl: url,
@@ -51,7 +59,8 @@ export async function getImmichTags() {
     const ready = await initImmich()
     if (!ready) return []
     try {
-        return await immich.getAllTags({})
+        const response = await immich.getAllTags({})
+        return Array.isArray(response) ? response : []
     } catch (e) {
         return []
     }
@@ -68,7 +77,7 @@ export async function getImmichAssets(tagId?: string) {
                 tagIds: tagId && tagId !== 'all' ? [tagId] : undefined
             }
         })
-        return res.assets.items
+        return res?.assets?.items ?? []
     } catch (e: any) {
         console.error('Failed to get Immich assets:', e)
         return []
@@ -95,7 +104,7 @@ export async function uploadImmichAsset(file: File, tagIds?: string[]) {
         throw new Error('Immich credentials not configured')
     }
 
-    const deviceId = 'promoty-server'
+    const deviceId = 'copromote-server'
     const deviceAssetId = randomUUID()
 
     // Correctly reconstruct the File back into a Node Blob since Next server actions 

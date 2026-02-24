@@ -8,6 +8,9 @@ import TopToolbar from './TopToolbar';
 import Workspace from './Workspace';
 import Header from './Header';
 import { createAssetTemplate } from '@/app/actions/asset-templates';
+import { createSavedAsset } from '@/app/actions/saved-assets';
+import { uploadPhoto } from '@/app/actions/photos';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 
 export default function Editor({ photos = [] }: { photos?: any[] }) {
     // Global State
@@ -21,6 +24,12 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
     const [history, setHistory] = useState<EditorElement[][]>([[]]);
     const [historyStep, setHistoryStep] = useState<number>(0);
     const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+
+    // Save Asset State
+    const [isSavingAssetDialog, setIsSavingAssetDialog] = useState(false);
+    const [assetName, setAssetName] = useState('');
+    const [assetCategory, setAssetCategory] = useState('');
+    const [isSavingAsset, setIsSavingAsset] = useState(false);
 
     // Stage ref for exports
     const stageRef = useRef<any>(null);
@@ -65,7 +74,7 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
         setTimeout(() => {
             const dataURL = stageRef.current.toDataURL({ pixelRatio: 2 });
             const link = document.createElement('a');
-            link.download = 'promoty-asset.png';
+            link.download = 'copromote-asset.png';
             link.href = dataURL;
             document.body.appendChild(link);
             link.click();
@@ -77,7 +86,7 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(elements));
         const link = document.createElement('a');
         link.setAttribute("href", dataStr);
-        link.setAttribute("download", "promoty-asset.json");
+        link.setAttribute("download", "copromote-asset.json");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -206,7 +215,7 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Promoty Asset Preview</title>
+    <title>Co+promote Asset Preview</title>
     <style>
         body, html { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f3f4f6; font-family: sans-serif; }
         .canvas-container { 
@@ -231,7 +240,7 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
         const dataStr = "data:text/html;charset=utf-8," + encodeURIComponent(htmlContent.trim());
         const link = document.createElement('a');
         link.setAttribute("href", dataStr);
-        link.setAttribute("download", "promoty-asset.html");
+        link.setAttribute("download", "copromote-asset.html");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -276,6 +285,50 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
             alert('An error occurred while saving.');
         } finally {
             setIsSavingTemplate(false);
+        }
+    };
+
+    const saveAsAsset = async () => {
+        if (!stageRef.current) return;
+        if (!assetName.trim() || !assetCategory.trim()) return;
+
+        setIsSavingAsset(true);
+        try {
+            // Deselect to hide transformer for preview image
+            const prevSelected = [...selectedIds];
+            setSelectedIds([]);
+
+            // Wait for React to re-render without transformer
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Generate a smaller preview image
+            const previewImage = stageRef.current.toDataURL({ pixelRatio: 0.5 });
+
+            // Restore selection
+            setSelectedIds(prevSelected);
+
+            const result = await createSavedAsset({
+                name: assetName.trim(),
+                category: assetCategory.trim(),
+                elements,
+                canvasSize,
+                canvasBg,
+                previewImage,
+            });
+
+            if (result.success) {
+                alert('Asset saved successfully!');
+                setIsSavingAssetDialog(false);
+                setAssetName('');
+                setAssetCategory('');
+            } else {
+                alert('Failed to save asset.');
+            }
+        } catch (error) {
+            console.error('Error saving asset:', error);
+            alert('An error occurred while saving.');
+        } finally {
+            setIsSavingAsset(false);
         }
     };
 
@@ -506,9 +559,19 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
         setSelectedIds([newElement.id]);
     };
 
-    const onImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        // Save to Immich in the background
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            await uploadPhoto(formData);
+        } catch (error) {
+            console.error('Failed to upload image to Immich:', error);
+            // We continue to load the image into canvas even if the Immich background upload fails
+        }
 
         const reader = new FileReader();
         reader.onload = () => {
@@ -550,7 +613,7 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
                 onUndo={undo}
                 onRedo={redo}
                 onDownloadImage={downloadImage}
-                onDownloadJson={downloadJson}
+                onSaveAssetDialog={() => setIsSavingAssetDialog(true)}
                 onDownloadHtml={downloadHtml}
                 onSaveTemplate={saveAsTemplate}
             />
@@ -607,6 +670,52 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
                     />
                 </div>
             </div>
+
+            <Dialog open={isSavingAssetDialog} onOpenChange={setIsSavingAssetDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Save Asset</DialogTitle>
+                        <DialogDescription>
+                            Enter a name and category to save this asset.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4 py-4">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-medium text-neutral-700">Name</label>
+                            <input
+                                value={assetName}
+                                onChange={(e) => setAssetName(e.target.value)}
+                                className="w-full px-3 py-2 border rounded-md"
+                                placeholder="Asset Name"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-sm font-medium text-neutral-700">Category</label>
+                            <input
+                                value={assetCategory}
+                                onChange={(e) => setAssetCategory(e.target.value)}
+                                className="w-full px-3 py-2 border rounded-md"
+                                placeholder="e.g. Backgrounds, Logos, etc."
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <button
+                            onClick={() => setIsSavingAssetDialog(false)}
+                            className="px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={saveAsAsset}
+                            disabled={isSavingAsset || !assetName.trim()}
+                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-sm transition-colors disabled:opacity-50"
+                        >
+                            {isSavingAsset ? 'Saving...' : 'Save'}
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

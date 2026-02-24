@@ -7,6 +7,8 @@ import { OfflineSyncProvider } from "@/components/providers/offline-sync-provide
 import { ConnectionStatus } from "@/components/layout/connection-status";
 import { HelpDrawer } from "@/components/help/help-drawer";
 import { Toaster } from "@/components/ui/sonner";
+import { getCurrentUser } from "@/lib/user-util";
+import { getDisabledPages } from "@/app/actions/admin-permissions";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,24 +21,28 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Promoty - Marketing Management",
+  title: "Co+promote - Marketing Management",
   description: "Manage your marketing projects and assets.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Promoty",
+    title: "Co+promote",
   },
   formatDetection: {
     telephone: false,
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
+  const role = user?.role || 'USER';
+  const disabledPages = await getDisabledPages(role);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
@@ -61,7 +67,7 @@ export default function RootLayout({
           <QueryProvider>
             <ConnectionStatus />
             <div className="flex h-screen bg-slate-50 flex-col lg:flex-row">
-              <Sidebar />
+              <Sidebar disabledPages={disabledPages} />
               <main className="flex-1 overflow-auto w-full">
                 {children}
               </main>

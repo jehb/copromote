@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/select'
 import { createUser } from '@/app/actions/admin-users'
 
-export function NewUserDialog() {
+export function NewUserDialog({ roles }: { roles: { id: string, name: string }[] }) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -83,9 +83,9 @@ export function NewUserDialog() {
                                     <SelectValue placeholder="Select a role" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="USER">User (Standard)</SelectItem>
-                                    <SelectItem value="EDITOR">Editor</SelectItem>
-                                    <SelectItem value="ADMIN">Admin</SelectItem>
+                                    {roles.map(r => (
+                                        <SelectItem key={r.id} value={r.name}>{r.name}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>

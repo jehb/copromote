@@ -7,27 +7,27 @@ async function main() {
     console.log('Seeding users...')
 
     const users = [
-        'Sylwia',
-        'Jason',
-        'Brenda',
-        'Portia',
-        'Linda',
-        'Alli',
-        'Carolyn',
-        'Lisa',
-        'Peg',
-        'Julie'
+        'sylwia.s',
+        'brenda.c',
+        'portia.h',
+        'alli.j',
+        'carolyn.t',
+        'lisa.w',
+        'peg.t',
+        'julie.f'
     ]
 
     for (const name of users) {
-        const email = `${name.toLowerCase()}@example.com`
+        const email = `${name.toLowerCase()}@weaverstreetmarket.coop`
         await prisma.user.upsert({
             where: { email },
-            update: {},
+            update: {
+                avatar: null
+            },
             create: {
                 name,
-                email,
-                avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
+                username: name,
+                email
             }
         })
     }

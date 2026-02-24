@@ -1,6 +1,6 @@
 # Authentication Guide
 
-Promoty uses a secure session-based authentication system.
+Co+promote uses a secure session-based authentication system.
 
 ## Features
 - **Stateless Sessions**: JWT-based sessions stored in HTTP-only cookies

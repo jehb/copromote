@@ -7,15 +7,16 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Pencil, Trash2, X, Plus, GripVertical } from 'lucide-react'
-import { updateEmailItem, deleteEmailItem, addItemEvent, removeItemEvent } from '@/app/actions/email-item'
+import { updateEmailItem, deleteEmailItem, addItemEvent, removeItemEvent, updateItemAsset } from '@/app/actions/email-item'
 import { EventSelector } from './event-selector'
 import { Loader2 } from 'lucide-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import Link from 'next/link'
 import { ProductSelector } from './product-selector'
+import { PhotoSelector } from './photo-selector'
 import { Product } from '@/app/actions/external-db'
-import { addItemProduct, removeItemProduct } from '@/app/actions/email-item'
+import { addItemProduct, removeItemProduct, addItemPhoto, removeItemPhoto } from '@/app/actions/email-item'
 
 interface Event {
     id: string
@@ -30,16 +31,20 @@ interface EmailItem {
     order: number
     events: Event[]
     products: { id: string, upc: string }[]
+    photos?: { photoId: string }[]
+    savedAssetId: string | null
+    savedAsset: { id: string, name: string, previewImage: string | null } | null
 }
 
 interface EmailItemCardProps {
     item: EmailItem
     availableEvents: { id: string, title: string, startTime: Date }[]
     availableProducts: Product[]
+    availableAssets: { id: string, name: string, previewImage: string | null }[]
+    availablePhotos: { id: string, url: string, name: string }[]
     sortable?: boolean
 }
-
-export function EmailItemCard({ item, availableEvents, availableProducts, sortable }: EmailItemCardProps) {
+export function EmailItemCard({ item, availableEvents, availableProducts, availableAssets, availablePhotos, sortable }: EmailItemCardProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
@@ -127,6 +132,22 @@ export function EmailItemCard({ item, availableEvents, availableProducts, sortab
         }
     }
 
+    const handleAddPhoto = async (photoId: string) => {
+        try {
+            await addItemPhoto(item.id, photoId)
+        } catch (error) {
+            console.error('Failed to add photo:', error)
+        }
+    }
+
+    const handleRemovePhoto = async (photoId: string) => {
+        try {
+            await removeItemPhoto(item.id, photoId)
+        } catch (error) {
+            console.error('Failed to remove photo:', error)
+        }
+    }
+
     return (
         <div ref={setNodeRef} style={style}>
             <Card className="mb-4">
@@ -185,74 +206,155 @@ export function EmailItemCard({ item, availableEvents, availableProducts, sortab
                         <p className="text-sm text-gray-500 mb-4 whitespace-pre-wrap">{item.description}</p>
                     )}
 
-                    {(isEditing || item.events.length > 0) && (
-                        <div className="space-y-2 mb-4">
-                            <h4 className="text-sm font-semibold">Attached Events</h4>
-                            <div className="flex flex-wrap gap-2 mb-2">
-                                {item.events.map(event => (
-                                    <Badge key={event.id} variant="secondary" className="flex items-center gap-1">
-                                        <Link href={`/events/${event.id}`} className="hover:underline">
-                                            {event.title}
-                                        </Link>
-                                        {isEditing && (
-                                            <button
-                                                onClick={() => handleRemoveEvent(event.id)}
-                                                className="ml-1 hover:text-red-500"
-                                            >
-                                                <X className="h-3 w-3" />
-                                            </button>
-                                        )}
-                                    </Badge>
-                                ))}
-                                {item.events.length === 0 && isEditing && <span className="text-xs text-stone-500">No events attached</span>}
-                            </div>
-
-                            {isEditing && (
-                                <div className="w-[300px]">
-                                    <EventSelector
-                                        events={selectorEvents.filter(e => !item.events.find(ie => ie.id === e.id))}
-                                        onSelect={handleAddEvent}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {(isEditing || (item.products && item.products.length > 0)) && (
-                        <div className="space-y-2">
-                            <h4 className="text-sm font-semibold">Attached Products</h4>
-                            <div className="flex flex-wrap gap-2 mb-2">
-                                {item.products?.map(prod => {
-                                    const fullProduct = availableProducts.find(ap => ap.upc === prod.upc)
-                                    return (
-                                        <Badge key={prod.id} variant="outline" className="flex items-center gap-1 bg-blue-50/50">
-                                            <Link href={`/product/${prod.upc}`} className="hover:underline truncate max-w-[200px]" title={fullProduct?.name || prod.upc}>
-                                                {fullProduct ? `${fullProduct.brand} - ${fullProduct.name}` : prod.upc}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mt-4 pt-4 border-t border-gray-100">
+                        {(isEditing || item.events.length > 0) && (
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-semibold">Attached Events</h4>
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {item.events.map(event => (
+                                        <Badge key={event.id} variant="secondary" className="flex items-center gap-1">
+                                            <Link href={`/events/${event.id}`} className="hover:underline">
+                                                {event.title}
                                             </Link>
                                             {isEditing && (
                                                 <button
-                                                    onClick={() => handleRemoveProduct(prod.upc)}
+                                                    onClick={() => handleRemoveEvent(event.id)}
                                                     className="ml-1 hover:text-red-500"
                                                 >
                                                     <X className="h-3 w-3" />
                                                 </button>
                                             )}
                                         </Badge>
-                                    )
-                                })}
-                                {(!item.products || item.products.length === 0) && isEditing && <span className="text-xs text-stone-500">No products attached</span>}
-                            </div>
-
-                            {isEditing && (
-                                <div className="w-[300px]">
-                                    <ProductSelector
-                                        availableProducts={item.products?.map(p => availableProducts.find(ap => ap.upc === p.upc)).filter(Boolean) as Product[]}
-                                        onSelect={handleAddProduct}
-                                    />
+                                    ))}
+                                    {item.events.length === 0 && isEditing && <span className="text-xs text-stone-500">No events attached</span>}
                                 </div>
-                            )}
-                        </div>
-                    )}
+
+                                {isEditing && (
+                                    <div className="w-full">
+                                        <EventSelector
+                                            events={selectorEvents.filter(e => !item.events.find(ie => ie.id === e.id))}
+                                            onSelect={handleAddEvent}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {(isEditing || (item.products && item.products.length > 0)) && (
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-semibold">Attached Products</h4>
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {item.products?.map(prod => {
+                                        const fullProduct = availableProducts.find(ap => ap.upc === prod.upc)
+                                        return (
+                                            <Badge key={prod.id} variant="outline" className="flex items-center gap-1 bg-blue-50/50">
+                                                <Link href={`/product/${prod.upc}`} className="hover:underline truncate max-w-[200px]" title={fullProduct?.name || prod.upc}>
+                                                    {fullProduct ? `${fullProduct.brand} - ${fullProduct.name}` : prod.upc}
+                                                </Link>
+                                                {isEditing && (
+                                                    <button
+                                                        onClick={() => handleRemoveProduct(prod.upc)}
+                                                        className="ml-1 hover:text-red-500"
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                )}
+                                            </Badge>
+                                        )
+                                    })}
+                                    {(!item.products || item.products.length === 0) && isEditing && <span className="text-xs text-stone-500">No products attached</span>}
+                                </div>
+
+                                {isEditing && (
+                                    <div className="w-full">
+                                        <ProductSelector
+                                            availableProducts={item.products?.map(p => availableProducts.find(ap => ap.upc === p.upc)).filter(Boolean) as Product[]}
+                                            onSelect={handleAddProduct}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {(isEditing || (item.photos && item.photos.length > 0)) && (
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-semibold">Attached Gallery Photos</h4>
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {item.photos?.map(itemPhoto => {
+                                        const fullPhoto = availablePhotos.find(ap => ap.id === itemPhoto.photoId)
+                                        if (!fullPhoto) return null
+
+                                        return (
+                                            <Badge key={itemPhoto.photoId} variant="outline" className="flex items-center gap-1 bg-green-50/50 relative overflow-hidden h-10 pr-1 pl-1">
+                                                <div className="h-8 w-8 rounded-sm overflow-hidden shrink-0">
+                                                    <img src={fullPhoto.url} alt={fullPhoto.name || 'Photo'} className="w-full h-full object-cover" />
+                                                </div>
+                                                <span className="truncate max-w-[150px]" title={fullPhoto.name}>{fullPhoto.name}</span>
+                                                {isEditing && (
+                                                    <button
+                                                        onClick={() => handleRemovePhoto(fullPhoto.id)}
+                                                        className="ml-1 hover:text-red-500 bg-white/50 rounded-full p-0.5"
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                )}
+                                            </Badge>
+                                        )
+                                    })}
+                                    {(!item.photos || item.photos.length === 0) && isEditing && <span className="text-xs text-stone-500">No photos attached</span>}
+                                </div>
+
+                                {isEditing && (
+                                    <div className="w-full">
+                                        <PhotoSelector
+                                            availablePhotos={availablePhotos.filter(p => !item.photos?.find(ip => ip.photoId === p.id))}
+                                            onSelect={handleAddPhoto}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {(isEditing || item.savedAsset) && (
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-semibold">Attached Asset</h4>
+
+                                {!isEditing && item.savedAsset && (
+                                    <div className="flex items-center gap-3 p-3 border rounded-md max-w-sm bg-neutral-50/50">
+                                        {item.savedAsset.previewImage ? (
+                                            <img src={item.savedAsset.previewImage} alt={item.savedAsset.name} className="w-16 h-16 object-contain bg-white border rounded" />
+                                        ) : (
+                                            <div className="w-16 h-16 bg-white border rounded flex items-center justify-center text-xs text-neutral-400">No Preview</div>
+                                        )}
+                                        <span className="font-medium text-sm">{item.savedAsset.name}</span>
+                                    </div>
+                                )}
+
+                                {isEditing && (
+                                    <div className="w-full">
+                                        <select
+                                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                            value={item.savedAssetId || ""}
+                                            onChange={async (e) => {
+                                                const val = e.target.value;
+                                                try {
+                                                    await updateItemAsset(item.id, val ? val : null);
+                                                } catch (error) {
+                                                    console.error('Failed to attach asset:', error);
+                                                }
+                                            }}
+                                            disabled={loading}
+                                        >
+                                            <option value="">-- No Asset Attached --</option>
+                                            {availableAssets.map(asset => (
+                                                <option key={asset.id} value={asset.id}>{asset.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
         </div>

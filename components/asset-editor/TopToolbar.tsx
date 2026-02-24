@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditorElement } from './types';
-import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup, Crop, ArrowRightLeft } from 'lucide-react';
+import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup, Crop, ArrowRightLeft, WrapText } from 'lucide-react';
 
 interface TopToolbarProps {
     selectedElements: EditorElement[];
@@ -175,6 +175,11 @@ export default function TopToolbar({
                             title="Bullet List"
                             onClick={() => updateSelectedElement({ isList: !selectedElement.isList })}
                         ><span className="text-xs font-bold leading-none px-1">List</span></button>
+                        <button
+                            className={`p-1.5 rounded transition-colors border-l ml-1 ${selectedElement.wrap === 'word' ? 'bg-white shadow-sm text-blue-600' : 'hover:bg-white text-neutral-700'}`}
+                            title="Wrap Text"
+                            onClick={() => updateSelectedElement({ wrap: selectedElement.wrap === 'word' ? 'none' : 'word' })}
+                        ><WrapText size={14} /></button>
                     </div>
 
                     <div className="flex items-center gap-2 ml-4">

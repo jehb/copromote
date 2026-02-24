@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { search, SearchResults } from "@/app/actions/search"
 import { useDebounce } from "@/hooks/use-debounce"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import {
     CalendarIcon,
     FileIcon,
@@ -33,7 +34,7 @@ import {
     CommandShortcut,
 } from "@/components/ui/command"
 
-export function CommandMenu() {
+export function CommandMenu({ isCollapsed }: { isCollapsed?: boolean }) {
     const [open, setOpen] = React.useState(false)
     const [query, setQuery] = React.useState("")
     const [results, setResults] = React.useState<SearchResults | null>(null)
@@ -88,14 +89,20 @@ export function CommandMenu() {
         <>
             <Button
                 variant="secondary"
-                className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                className={cn(
+                    "justify-start gap-2 text-muted-foreground hover:text-foreground",
+                    isCollapsed ? "w-10 h-10 p-0 mx-auto justify-center" : "w-full"
+                )}
                 onClick={() => setOpen(true)}
+                title={isCollapsed ? "Search..." : undefined}
             >
-                <Search className="h-4 w-4" />
-                <span>Search...</span>
-                <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-                    <span className="text-xs">⌘</span>K
-                </kbd>
+                <Search className={cn("shrink-0", isCollapsed ? "h-6 w-6" : "h-4 w-4")} />
+                {!isCollapsed && <span>Search...</span>}
+                {!isCollapsed && (
+                    <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+                        <span className="text-xs">⌘</span>K
+                    </kbd>
+                )}
             </Button>
             <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
                 <CommandInput

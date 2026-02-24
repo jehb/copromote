@@ -1,6 +1,6 @@
-# Android Packaging Guide - Promoty PWA
+# Android Packaging Guide - Co+promote PWA
 
-This guide walks you through packaging Promoty as a native Android application using **Bubblewrap**, Google's official tool for creating Trusted Web Activities (TWAs).
+This guide walks you through packaging Co+promote as a native Android application using **Bubblewrap**, Google's official tool for creating Trusted Web Activities (TWAs).
 
 ---
 
@@ -31,15 +31,15 @@ bubblewrap --version
 Navigate to a directory where you want to create the Android project (NOT inside your Next.js project):
 
 ```bash
-mkdir promoty-android
-cd promoty-android
+mkdir copromote-android
+cd copromote-android
 bubblewrap init --manifest https://yourdomain.com/manifest.json
 ```
 
 **Interactive Prompts:**
 - **Host URL**: `https://yourdomain.com`
-- **App name**: `Promoty`
-- **Package name**: `com.promoty.app` (must match assetlinks.json)
+- **App name**: `Co+promote`
+- **Package name**: `com.copromote.app` (must match assetlinks.json)
 - **Icon URL**: `https://yourdomain.com/icons/icon-512x512.png`
 - **Maskable icon URL**: `https://yourdomain.com/icons/maskable-icon-512x512.png`
 - **Theme color**: `#2563eb`
@@ -62,7 +62,7 @@ This auto-generates a debug key.
 
 For **production** (Google Play Store):
 ```bash
-keytool -genkey -v -keystore promoty-release-key.keystore -alias promoty -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore copromote-release-key.keystore -alias copromote -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 **Important**: Store this keystore file securely! You'll need it for all future updates.
@@ -74,7 +74,7 @@ keytool -genkey -v -keystore promoty-release-key.keystore -alias promoty -keyalg
 Extract the SHA-256 fingerprint from your keystore:
 
 ```bash
-keytool -list -v -keystore promoty-release-key.keystore -alias promoty
+keytool -list -v -keystore copromote-release-key.keystore -alias copromote
 ```
 
 Look for the **SHA256** line, it will look like:
@@ -99,7 +99,7 @@ Update `/public/.well-known/assetlinks.json` with your SHA-256 fingerprint:
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.promoty.app",
+      "package_name": "com.copromote.app",
       "sha256_cert_fingerprints": [
         "146DE983C5730650D8EEB9952F34FC6416A08342E61DBEA88A0496B13FCF44E5"
       ]
@@ -156,7 +156,7 @@ Output: `app-release-unsigned.apk`
 
 ### Production Build (Signed)
 ```bash
-bubblewrap build --signingKeyPath ./promoty-release-key.keystore --signingKeyAlias promoty
+bubblewrap build --signingKeyPath ./copromote-release-key.keystore --signingKeyAlias copromote
 ```
 
 Output: `app-release-signed.apk`
@@ -224,7 +224,7 @@ When you make changes to your PWA:
    ```
 3. **Rebuild APK**:
    ```bash
-   bubblewrap build --signingKeyPath ./promoty-release-key.keystore --signingKeyAlias promoty
+   bubblewrap build --signingKeyPath ./copromote-release-key.keystore --signingKeyAlias copromote
    ```
 4. **Upload to Google Play Console** as an update
 

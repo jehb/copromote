@@ -32,7 +32,7 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
             <Card className="w-full max-w-md shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="text-2xl font-bold text-center text-slate-900">Sign in to Promoty</CardTitle>
+                    <CardTitle className="text-2xl font-bold text-center text-slate-900">Sign in to Co+promote</CardTitle>
                     <CardDescription className="text-center text-slate-500">
                         {isMagicLink ? 'We\'ll send a magic link to your email' : 'Enter your credentials to access your account'}
                     </CardDescription>
@@ -136,7 +136,7 @@ export default function LoginPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="justify-center border-t border-slate-100 py-4">
-                    <p className="text-xs text-slate-400">Promoty Secure Access</p>
+                    <p className="text-xs text-slate-400">Co+promote Secure Access</p>
                 </CardFooter>
             </Card>
         </div>

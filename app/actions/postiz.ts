@@ -65,7 +65,7 @@ export async function syncPostToPostiz(postParams: {
             return null
         }
 
-        // Map promoty platforms to Postiz integration provider types
+        // Map Co+promote platforms to Postiz integration provider types
         const typeMap: Record<string, string> = {
             'twitter': 'x',
             'linkedin': 'linkedin',

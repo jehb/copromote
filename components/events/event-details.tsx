@@ -54,6 +54,7 @@ export function EventDetails({
     const handleDelete = async () => {
         await deleteEvent(event.id)
         router.push('/events')
+        router.refresh()
     }
 
     if (isEditing) {

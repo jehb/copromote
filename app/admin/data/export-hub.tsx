@@ -64,7 +64,7 @@ export function ExportHub() {
             })
 
             const timestamp = new Date().toISOString().split('T')[0]
-            const filename = `promoty-data-export-${timestamp}.${format}`
+            const filename = `copromote-data-export-${timestamp}.${format}`
 
             let buffer: ArrayBuffer;
             let mimeType: string;

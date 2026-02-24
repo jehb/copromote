@@ -1,0 +1,2 @@
+jehb      591141  0.0  0.0 11630732 77760 pts/12 Sl+  19:01   0:00 node /home/jehb/projects/promoty/node_modules/.bin/next dev -p 3008
+jehb      681758  0.0  0.0 231272  2536 pts/0    S+   20:11   0:00 grep --color=auto next dev

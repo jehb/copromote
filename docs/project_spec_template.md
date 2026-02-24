@@ -1,7 +1,7 @@
 
 # Project Specification: [App Name]
 
-This document serves as a blueprint for building **[App Name]**, a self-management application based on the architecture of Promoty. Use this template to define the scope, features, and data model of your new project.
+This document serves as a blueprint for building **[App Name]**, a self-management application based on the architecture of Co+promote. Use this template to define the scope, features, and data model of your new project.
 
 ## 1. Project Overview
 **[App Name]** is a [Brief Description of App Type, e.g., Personal CRM, Habit Tracker, Learning Management System] designed to [Core Value Proposition]. It unifies [Key Feature 1], [Key Feature 2], and [Key Feature 3] into a single platform.

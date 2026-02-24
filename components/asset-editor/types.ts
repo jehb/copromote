@@ -22,6 +22,7 @@ export interface EditorElement {
     isList?: boolean;
     isCurved?: boolean;
     curveRadius?: number;
+    wrap?: 'none' | 'word' | 'char';
     // Image specific
     src?: string;
     cropX?: number;
@@ -47,4 +48,4 @@ export interface EditorElement {
     outerRadius?: number; // For rings
 }
 
-export type SidebarTab = 'templates' | 'text' | 'shapes' | 'uploads' | 'background' | 'layers' | 'resize' | 'icons';
+export type SidebarTab = 'templates' | 'saved-assets' | 'text' | 'shapes' | 'uploads' | 'background' | 'layers' | 'resize' | 'icons';

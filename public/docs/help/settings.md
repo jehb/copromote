@@ -1,7 +1,7 @@
 # Settings Help
 
 ## Overview
-Configure your Promoty application settings, including AI integration and offline sync preferences.
+Configure your Co+promote application settings, including AI integration and offline sync preferences.
 
 ## AI Configuration
 
@@ -11,7 +11,7 @@ Configure your Promoty application settings, including AI integration and offlin
 2. Enter your **Gemini API Key**
    - Get your key from [Google AI Studio](https://makersuite.google.com/app/apikey)
    - Click "Create API Key"
-   - Copy and paste into Promoty
+   - Copy and paste into Co+promote
 
 3. Click **Test Connection** to verify
 4. Adjust **Temperature** (creativity level):
@@ -42,7 +42,7 @@ Once configured, AI is available for:
 
 ### How It Works
 
-Promoty automatically syncs data when you're offline:
+Co+promote automatically syncs data when you're offline:
 1. Changes are saved locally in IndexedDB
 2. A queue tracks pending changes
 3. When online, changes sync automatically

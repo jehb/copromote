@@ -59,11 +59,17 @@ export function EventCard({ event, locations, users, contacts, organizations, ev
                             </span>
                         )}
                     </div>
-                    <form action={deleteEvent.bind(null, event.id)} onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50">
-                            <Trash2 className="h-3 w-3" />
-                        </Button>
-                    </form>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                        onClick={async (e) => {
+                            e.stopPropagation();
+                            await deleteEvent(event.id);
+                        }}
+                    >
+                        <Trash2 className="h-3 w-3" />
+                    </Button>
                 </div>
 
                 <div>

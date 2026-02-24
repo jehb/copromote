@@ -1,5 +1,6 @@
 import { getUsers, deleteUser } from '@/app/actions/admin-users'
 import { getContacts } from '@/app/actions/contacts'
+import { getRoles } from '@/app/actions/admin-roles'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { UserAvatar } from '@/components/ui/user-avatar'
@@ -15,6 +16,7 @@ export const dynamic = 'force-dynamic'
 export default async function UsersPage() {
     const users = await getUsers()
     const contacts = await getContacts()
+    const roles = await getRoles()
 
     return (
         <div className="p-8 space-y-8">
@@ -23,7 +25,7 @@ export default async function UsersPage() {
                     <h1 className="text-3xl font-bold">User Management</h1>
                     <p className="text-muted-foreground">Manage system access and user accounts.</p>
                 </div>
-                <NewUserDialog />
+                <NewUserDialog roles={roles} />
             </div>
 
             <Card>
@@ -81,7 +83,7 @@ export default async function UsersPage() {
                                     <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
-                                            <EditUserDialog user={user} contacts={contacts} />
+                                            <EditUserDialog user={user} contacts={contacts} roles={roles} />
                                             {user.username === 'admin' ? (
                                                 <Button
                                                     variant="ghost"

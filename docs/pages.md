@@ -1,6 +1,6 @@
 # Application Pages (Routing)
 
-Promoty is built using the Next.js App Router. This document outlines the primary page structures found in the `app/` directory.
+Co+promote is built using the Next.js App Router. This document outlines the primary page structures found in the `app/` directory.
 
 ## Authentication
 - **`/(auth)/login`**: User authentication entry point.
@@ -44,6 +44,7 @@ Promoty is built using the Next.js App Router. This document outlines the primar
 - **`/admin`**: Admin dashboard.
   - **`/admin/settings`**: System configurations (`.env` variables status for DB, APIs, AI).
   - **`/admin/users`**: User account management and role assignment.
+  - **`/admin/permissions`**: Dynamic role-based access control and system permissions dashboard.
   - **`/admin/activity` / `/admin/logs`**: Audit trails and security logs.
   - **`/admin/data`**: Administrative data hub for backups and bulk operations.
   - **`/admin/locations`**: Management of physical/virtual locations for events.

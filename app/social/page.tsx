@@ -3,6 +3,8 @@ import { getPromotions } from '@/app/actions/promotions'
 import { getEvents } from '@/app/actions/events'
 import { SocialClientPage } from '@/components/social/social-client-page'
 
+import { ProtectedRoute } from '@/components/layout/protected-route'
+
 export default async function SocialPage({
     searchParams
 }: {
@@ -41,18 +43,20 @@ export default async function SocialPage({
     ])
 
     return (
-        <SocialClientPage
-            initialData={{ posts, promotions, events }}
-            initialFilters={{
-                platform,
-                view: view as 'table' | 'grid',
-                status,
-                startDate,
-                endDate,
-                promotionPeriodId,
-                eventId
-            }}
-        />
+        <ProtectedRoute pageName="social">
+            <SocialClientPage
+                initialData={{ posts, promotions, events }}
+                initialFilters={{
+                    platform,
+                    view: view as 'table' | 'grid',
+                    status,
+                    startDate,
+                    endDate,
+                    promotionPeriodId,
+                    eventId
+                }}
+            />
+        </ProtectedRoute>
     )
 }
 

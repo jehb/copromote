@@ -34,6 +34,10 @@ export async function getEmailPlan(id: string) {
                     include: {
                         events: true,
                         products: true,
+                        photos: true,
+                        savedAsset: {
+                            select: { id: true, name: true, previewImage: true }
+                        }
                     },
                 },
             },

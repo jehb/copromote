@@ -12,9 +12,9 @@ describe('Sidebar Component', () => {
     it('should render navigation links', () => {
         render(<Sidebar />)
 
-        expect(screen.getByText('Social Media')).toBeInTheDocument()
+        expect(screen.getByText('Marketing')).toBeInTheDocument()
         expect(screen.getByText('Contacts')).toBeInTheDocument()
-        expect(screen.getByText('Events')).toBeInTheDocument()
+        expect(screen.getByText('Dashboard')).toBeInTheDocument()
         expect(screen.getByText('Projects')).toBeInTheDocument()
     })
 
@@ -45,6 +45,17 @@ describe('Sidebar Component', () => {
         expect(sidebar?.className).toContain('-translate-x-full')
     })
 
+    it('should open Marketing group when clicked', () => {
+        render(<Sidebar />)
+
+        const marketingGroup = screen.getByText('Marketing')
+        fireEvent.click(marketingGroup)
+
+        expect(screen.getByText('Social Media')).toBeInTheDocument()
+        expect(screen.getByText('Events')).toBeInTheDocument()
+        expect(screen.getByText('Gallery')).toBeInTheDocument()
+    })
+
     it('should close mobile menu when navigation link is clicked', () => {
         render(<Sidebar />)
 
@@ -52,6 +63,10 @@ describe('Sidebar Component', () => {
 
         // Open menu
         fireEvent.click(hamburgerButton)
+
+        // Open Marketing
+        const marketingGroup = screen.getByText('Marketing')
+        fireEvent.click(marketingGroup)
 
         // Click a navigation link
         const socialLink = screen.getByText('Social Media')
