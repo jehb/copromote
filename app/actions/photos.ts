@@ -27,6 +27,11 @@ export async function getPhotos(tagId?: string) {
     })
 }
 
+export async function getPhoto(id: string) {
+    const photos = await getPhotos()
+    return photos.find(p => p.id === id) || null
+}
+
 export async function getPhotoTags() {
     const tags = await getImmichTags()
     return tags.map(t => ({

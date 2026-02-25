@@ -8,10 +8,25 @@ import { Trash2, Tag as TagIcon, Search, Eye } from 'lucide-react'
 import { UploadModal } from './upload-modal'
 import { deletePhoto } from '@/app/actions/photos'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
+
+export interface PhotoTag {
+    id: string
+    name: string
+    color?: string
+}
+
+export interface PhotoAsset {
+    id: string
+    url: string
+    name: string
+    createdAt: string
+    tags: PhotoTag[]
+}
 
 interface GalleryClientProps {
-    initialPhotos: any[]
-    tags: any[]
+    initialPhotos: PhotoAsset[]
+    tags: PhotoTag[]
 }
 
 export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
@@ -19,9 +34,9 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
     const [searchQuery, setSearchQuery] = useState('')
 
     const filteredPhotos = initialPhotos.filter(photo => {
-        const matchesTag = selectedTag === 'all' || photo.tags.some((t: any) => t.id === selectedTag)
-        const matchesSearch = photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            photo.tags.some((t: any) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        const matchesTag = selectedTag === 'all' || photo.tags.some((t) => t.id === selectedTag)
+        const matchesSearch = !!photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            photo.tags.some((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
         return matchesTag && matchesSearch
     })
 
@@ -100,25 +115,30 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                         {filteredPhotos.map((photo) => (
                             <Card key={photo.id} className="group overflow-hidden border-0 shadow-sm ring-1 ring-slate-200 hover:ring-primary/50 transition-all">
                                 <CardContent className="p-0 relative aspect-square">
-                                    <img
-                                        src={photo.url}
-                                        alt={photo.name || 'Photo'}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <Button size="icon" variant="secondary" className="h-9 w-9 rounded-full" asChild>
-                                            <a href={photo.url} target="_blank" rel="noopener noreferrer">
-                                                <Eye className="h-4 w-4" />
-                                            </a>
-                                        </Button>
-                                        <Button
-                                            size="icon"
-                                            variant="destructive"
-                                            className="h-9 w-9 rounded-full bg-red-500 hover:bg-red-600"
-                                            onClick={() => handleDelete(photo.id)}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                    <Link href={`/gallery/${photo.id}`}>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={photo.url}
+                                            alt={photo.name || 'Photo'}
+                                            className="w-full h-full object-cover cursor-pointer"
+                                        />
+                                    </Link>
+                                    <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none">
+                                        <div className="pointer-events-auto flex gap-2">
+                                            <Button size="icon" variant="secondary" className="h-9 w-9 rounded-full" asChild>
+                                                <Link href={`/gallery/${photo.id}`}>
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                            <Button
+                                                size="icon"
+                                                variant="destructive"
+                                                className="h-9 w-9 rounded-full bg-red-500 hover:bg-red-600"
+                                                onClick={() => handleDelete(photo.id)}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
                                     </div>
                                     {photo.tags.length > 0 && (
                                         <Badge className="absolute top-2 left-2 bg-white/90 text-slate-900 hover:bg-white pointer-events-none border-0 shadow-sm flex gap-1 items-center">
@@ -133,7 +153,7 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                                         {photo.name || 'Untitled Photo'}
                                     </div>
                                     <div className="flex flex-wrap gap-1">
-                                        {photo.tags.map((tag: any) => (
+                                        {photo.tags.map((tag) => (
                                             <div key={tag.id} className="flex items-center gap-1.5 text-[10px] bg-slate-50 border px-2 py-0.5 rounded-full text-slate-600 font-medium">
                                                 <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: tag.color || '#cbd5e1' }} />
                                                 {tag.name}

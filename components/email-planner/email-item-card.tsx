@@ -286,10 +286,12 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
 
                                         return (
                                             <Badge key={itemPhoto.photoId} variant="outline" className="flex items-center gap-1 bg-green-50/50 relative overflow-hidden h-10 pr-1 pl-1">
-                                                <div className="h-8 w-8 rounded-sm overflow-hidden shrink-0">
-                                                    <img src={fullPhoto.url} alt={fullPhoto.name || 'Photo'} className="w-full h-full object-cover" />
-                                                </div>
-                                                <span className="truncate max-w-[150px]" title={fullPhoto.name}>{fullPhoto.name}</span>
+                                                <Link href={`/gallery/${fullPhoto.id}`} className="flex items-center gap-1 hover:underline">
+                                                    <div className="h-8 w-8 rounded-sm overflow-hidden shrink-0">
+                                                        <img src={fullPhoto.url} alt={fullPhoto.name || 'Photo'} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <span className="truncate max-w-[150px]" title={fullPhoto.name}>{fullPhoto.name}</span>
+                                                </Link>
                                                 {isEditing && (
                                                     <button
                                                         onClick={() => handleRemovePhoto(fullPhoto.id)}

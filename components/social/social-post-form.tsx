@@ -46,12 +46,10 @@ export function SocialPostForm({ post, promotions, users, events, availablePlatf
     const [error, setError] = useState<string | null>(null)
     const [selectedPhotos, setSelectedPhotos] = useState<any[]>(post?.assets || [])
 
-    const photoIds = selectedPhotos.map(p => p.id).join(',')
-
     return (
         <form action={action} className="space-y-6">
             {post?.id && <input type="hidden" name="id" value={post.id} />}
-            <input type="hidden" name="assetIds" value={photoIds} />
+            <input type="hidden" name="assetsData" value={JSON.stringify(selectedPhotos)} />
 
             <div className="space-y-2">
                 <div className="flex justify-between items-center">
@@ -160,7 +158,7 @@ export function SocialPostForm({ post, promotions, users, events, availablePlatf
                         <ImagesIcon className="h-4 w-4 text-slate-500" /> Attached Media
                     </Label>
                     <PhotoSelectionModal
-                        selectedPhotoIds={useMemo(() => selectedPhotos.map(p => p.id), [selectedPhotos])}
+                        selectedPhotoIds={useMemo(() => selectedPhotos.map(p => p.url?.split('/api/immich/asset/')[1] || p.id), [selectedPhotos])}
                         onSelect={async (ids) => {
                             // This depends on getPhotos but for simplicity we could refetch or trust the modal
                             // Since the modal already has the data, but we only return IDs

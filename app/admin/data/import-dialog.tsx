@@ -33,6 +33,7 @@ const ENTITIES = [
     { value: 'social-posts', label: 'Social Media Posts' },
     { value: 'hyperlinks', label: 'Hyperlinks' },
     { value: 'promotions', label: 'Promotions' },
+    { value: 'users', label: 'Users' },
 ]
 
 export function ImportDialog() {

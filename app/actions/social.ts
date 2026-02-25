@@ -124,17 +124,30 @@ async function syncReviewerTask(reviewerId: string | null) {
 }
 
 export async function createSocialPost(formData: FormData) {
+    const sanitizeId = (id: FormDataEntryValue | null) => {
+        if (!id || typeof id !== 'string') return null;
+        const cleanId = id.trim();
+        if (['none', 'unlinked', 'null', 'undefined', ''].includes(cleanId)) return null;
+        return cleanId;
+    };
+
     const content = formData.get('content') as string
     const platform = formData.get('platform') as string
     const status = formData.get('status') as string || 'draft'
     const scheduledDateStr = formData.get('scheduledDate') as string
-    const scheduledDate = scheduledDateStr ? new Date(scheduledDateStr) : null
-    const promotionPeriodId = formData.get('promotionPeriodId') as string
-    const reviewerId = formData.get('reviewerId') as string
-    const eventId = formData.get('eventId') as string
+    const scheduledDate = (scheduledDateStr && scheduledDateStr.trim() !== '' && scheduledDateStr !== 'null') ? new Date(scheduledDateStr) : null
 
-    const assetIdsStr = formData.get('assetIds') as string
-    const assetIds = assetIdsStr ? assetIdsStr.split(',').filter(Boolean) : []
+    const promotionPeriodId = sanitizeId(formData.get('promotionPeriodId'))
+    const reviewerId = sanitizeId(formData.get('reviewerId'))
+    const eventId = sanitizeId(formData.get('eventId'))
+
+    const assetsDataStr = formData.get('assetsData') as string
+    let assetsData: any[] = []
+    if (assetsDataStr) {
+        try {
+            assetsData = JSON.parse(assetsDataStr)
+        } catch (e) { }
+    }
 
     const post = await prisma.socialPost.create({
         data: {
@@ -142,10 +155,16 @@ export async function createSocialPost(formData: FormData) {
             platform,
             status,
             scheduledDate,
-            promotionPeriod: (promotionPeriodId && promotionPeriodId !== 'unlinked') ? { connect: { id: promotionPeriodId } } : undefined,
-            reviewer: (reviewerId && reviewerId !== 'none') ? { connect: { id: reviewerId } } : undefined,
-            event: (eventId && eventId !== 'none') ? { connect: { id: eventId } } : undefined,
-            assets: assetIds.length > 0 ? { connect: assetIds.map(id => ({ id })) } : undefined
+            promotionPeriod: promotionPeriodId ? { connect: { id: promotionPeriodId } } : undefined,
+            reviewer: reviewerId ? { connect: { id: reviewerId } } : undefined,
+            event: eventId ? { connect: { id: eventId } } : undefined,
+            assets: assetsData.length > 0 ? {
+                create: assetsData.map(photo => ({
+                    name: photo.name || 'Image',
+                    type: photo.type || 'image',
+                    url: photo.url
+                }))
+            } : undefined
         },
         include: {
             assets: true
@@ -188,56 +207,78 @@ export async function updateSocialPost(formData: FormData) {
         where: { id }
     })
 
+    const sanitizeId = (val: FormDataEntryValue | null) => {
+        if (!val || typeof val !== 'string') return null;
+        const cleanVal = val.trim();
+        if (['none', 'unlinked', 'null', 'undefined', ''].includes(cleanVal)) return null;
+        return cleanVal;
+    };
+
     const content = formData.get('content') as string
     const platform = formData.get('platform') as string
     const scheduledDateStr = formData.get('scheduledDate') as string
-    const scheduledDate = scheduledDateStr ? new Date(scheduledDateStr) : null
+    const scheduledDate = (scheduledDateStr && scheduledDateStr.trim() !== '' && scheduledDateStr !== 'null') ? new Date(scheduledDateStr) : null
     const status = formData.get('status') as string
-    const promotionPeriodId = formData.get('promotionPeriodId') as string
-    const reviewerIdInput = formData.get('reviewerId') as string
-    const reviewerId = (reviewerIdInput && reviewerIdInput !== 'none') ? reviewerIdInput : null
-    const eventIdInput = formData.get('eventId') as string
-    const eventId = (eventIdInput && eventIdInput !== 'none') ? eventIdInput : null
-    const assetIdsStr = formData.get('assetIds') as string
-    const assetIds = assetIdsStr ? assetIdsStr.split(',').filter(Boolean) : []
+    const promotionPeriodId = sanitizeId(formData.get('promotionPeriodId'))
+    const reviewerId = sanitizeId(formData.get('reviewerId'))
+    const eventId = sanitizeId(formData.get('eventId'))
+
+    const assetsDataStr = formData.get('assetsData') as string
+    let assetsData: any[] = []
+    if (assetsDataStr) {
+        try {
+            assetsData = JSON.parse(assetsDataStr)
+        } catch (e) { }
+    }
 
     // Delete old postiz post to re-create it (Postiz API does not easily support updating posts directly yet)
     if (oldPost?.postizId) {
         await deletePostFromPostiz(oldPost.postizId)
     }
 
-    let postizIdResult: string | null = null
-    if (status === 'scheduled' || status === 'published' || status === 'draft') {
-        const assetsForPostiz = assetIds.length > 0 ? await prisma.asset.findMany({ where: { id: { in: assetIds } } }) : []
-        postizIdResult = await syncPostToPostiz({
-            platforms: [platform],
-            content,
-            scheduledDate,
-            status,
-            assets: assetsForPostiz
-        })
-    }
+    await prisma.asset.deleteMany({ where: { socialPostId: id } })
 
-    await prisma.socialPost.update({
+    const updatedPost = await prisma.socialPost.update({
         where: { id },
         data: {
             content,
             platform,
             scheduledDate,
             status,
-            postizId: postizIdResult,
-            promotionPeriodId: (promotionPeriodId && promotionPeriodId !== 'unlinked') ? promotionPeriodId : null,
+            postizId: null, // temporarily null, logic updates it below
+            promotionPeriodId,
             reviewerId,
             eventId,
-            assets: {
-                set: [], // Clear existing
-                connect: assetIds.map(id => ({ id })) // Connect new
-            }
+            assets: assetsData.length > 0 ? {
+                create: assetsData.map(photo => ({
+                    name: photo.name || 'Image',
+                    type: photo.type || 'image',
+                    url: photo.url
+                }))
+            } : undefined
         },
         include: {
             assets: true
         }
     })
+
+    let postizIdResult: string | null = null
+    if (status === 'scheduled' || status === 'published' || status === 'draft') {
+        postizIdResult = await syncPostToPostiz({
+            platforms: [platform],
+            content,
+            scheduledDate,
+            status,
+            assets: updatedPost.assets
+        })
+    }
+
+    if (postizIdResult) {
+        await prisma.socialPost.update({
+            where: { id },
+            data: { postizId: postizIdResult }
+        })
+    }
 
     await logActivity('UPDATE', 'SocialPost', id, `Updated ${platform} post`)
 
