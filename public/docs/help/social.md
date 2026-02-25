@@ -10,9 +10,9 @@ Manage your social media content pipeline. Create, schedule, and publish posts a
    - **Content**: Your post text (required)
    - **Platform**: Instagram, Facebook, LinkedIn, or Twitter
    - **Scheduled Date**: When to publish (optional)
-   - **Status**: Draft, Ready for Review, Scheduled, or Published
-
-3. Click **Create** to save the post
+   - **Status**: Draft, Ready for Review, Scheduled, or Published. 
+3. **Assets & Syncing**: You can attach media assets to your posts directly from the gallery. Once your post is marked as "Ready for Review" or "Published", it is automatically synchronized with our external publishing service, Postiz, carrying over the content and associated media.
+4. Click **Create** to save the post
 
 ## AI Suggestions
 

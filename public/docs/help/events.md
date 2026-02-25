@@ -1,7 +1,7 @@
 # Events Help
 
 ## Overview
-Manage your promotional events, trade shows, conferences, and other important dates. Link events to contacts, organizations, and track logistics.
+Manage your promotional events, trade shows, conferences, and other important dates. Link events to contacts, organizations, and track logistics. You can also view external events, such as integrated market events from websites like Weaver Street Market, directly in your list.
 
 ## Creating an Event
 

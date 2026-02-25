@@ -26,6 +26,7 @@ Co+promote is your all-in-one promotional campaign management platform. Manage c
 - **Contacts**: Manage your professional network
 - **Events**: Track promotional events and logistics
 - **Social Media**: Plan and schedule content
+- **Email Planner**: Organize and schedule newsletter campaigns
 - **Projects**: Organize campaigns and tasks
 
 ## Getting Started
@@ -54,7 +55,8 @@ Co+promote is your all-in-one promotional campaign management platform. Manage c
 1. Start with **Contacts** - add your network
 2. Create **Events** for upcoming activities
 3. Plan **Social Media** content
-4. Organize **Projects** and campaigns
+4. Draft newsletters in the **Email Planner**
+5. Organize **Projects** and campaigns
 
 ## Offline Mode
 
@@ -88,6 +90,7 @@ Check the sidebar for connection status:
 ### Sidebar Menu
 
 - **Social Media**: Content calendar and posts
+- **Email Planner**: Newsletter drafting and scheduling
 - **Contacts**: Professional network
 - **Events**: Promotional events
 - **Projects**: Campaign management

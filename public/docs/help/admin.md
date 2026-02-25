@@ -4,7 +4,7 @@ Administrative controls and system settings.
 
 ## Sections
 - **Activity**: View system-wide activity logs.
-- **Data**: Manage data imports/exports and backups.
+- **Data**: Manage data imports/exports and backups, including User CSV import/export.
 - **Hyperlinks**: Configure global quick links and navigation shortcuts.
 - **Logs**: thorough error and access logs for troubleshooting.
 - **Settings**: General application settings like currency, timezone, and branding.
