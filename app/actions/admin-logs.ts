@@ -1,9 +1,12 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 export async function getSecurityLogs() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const logs = await prisma.securityLog.findMany({
             orderBy: { createdAt: 'desc' },
@@ -26,6 +29,8 @@ export async function logSecurityEvent(
     ipAddress?: string,
     userAgent?: string
 ) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const headerStore = await headers()
 

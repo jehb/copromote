@@ -1,12 +1,12 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { verifySession } from '@/lib/session'
+import { getSession } from '@/lib/session'
 import { revalidatePath } from 'next/cache'
 
 export async function getWordPressConfig() {
-    const session = await verifySession()
-    if (!session) throw new Error('Unauthorized')
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
 
     const url = process.env.WORDPRESS_URL
     const username = process.env.WORDPRESS_USERNAME
@@ -21,15 +21,15 @@ export async function getWordPressConfig() {
 }
 
 export async function saveWordPressConfig(data: { url: string, username: string, appPassword?: string }) {
-    const session = await verifySession()
-    if (!session) throw new Error('Unauthorized')
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
 
     throw new Error('WordPress configuration is now managed via environment variables')
 }
 
 export async function testWordPressConnection() {
-    const session = await verifySession()
-    if (!session) throw new Error('Unauthorized')
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
 
     const urlConfig = process.env.WORDPRESS_URL
     const usernameConfig = process.env.WORDPRESS_USERNAME
@@ -68,8 +68,8 @@ export async function testWordPressConnection() {
 }
 
 export async function searchWordPressPosts(query: string) {
-    const session = await verifySession()
-    if (!session) throw new Error('Unauthorized')
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
 
     const urlConfig = process.env.WORDPRESS_URL
     const usernameConfig = process.env.WORDPRESS_USERNAME
@@ -106,8 +106,8 @@ export async function searchWordPressPosts(query: string) {
 }
 
 export async function searchWordPressEvents(query: string) {
-    const session = await verifySession()
-    if (!session) throw new Error('Unauthorized')
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
 
     const urlConfig = process.env.WORDPRESS_URL
     const usernameConfig = process.env.WORDPRESS_USERNAME

@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { OpenAI } from 'openai'
@@ -10,6 +11,8 @@ import { OpenAI } from 'openai'
  * Fetches available models from a local LLM endpoint (OpenAI compatible).
  */
 export async function fetchLocalModels(baseUrl: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     console.log('Fetching local models from:', baseUrl);
     try {
         const url = await getFinalBaseUrl(baseUrl, 'openai')!;
@@ -37,6 +40,8 @@ export async function fetchLocalModels(baseUrl: string) {
  * Fetches available models from Google Gemini.
  */
 export async function fetchGeminiModels(apiKey: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     console.log('Fetching Gemini models...');
     try {
         // v1beta is often needed for the latest models, but v1 is more stable.
@@ -68,6 +73,8 @@ export async function fetchGeminiModels(apiKey: string) {
  * Gets the configured AI provider settings from the database.
  */
 export async function getAISettings() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const provider = process.env.AI_PROVIDER || 'gemini'
     const model = process.env.AI_MODEL
     const apiKey = process.env.AI_API_KEY
@@ -83,6 +90,8 @@ export async function getAISettings() {
  * Normalizes local URLs for Ollama/LMStudio compatibility.
  */
 export async function getFinalBaseUrl(baseUrl: string | null | undefined, provider: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     if (provider !== 'openai' && provider !== 'local') return undefined
 
     let url = baseUrl || (provider === 'local' ? 'http://127.0.0.1:1234' : 'https://api.openai.com/v1')
@@ -100,6 +109,8 @@ export async function getFinalBaseUrl(baseUrl: string | null | undefined, provid
  * Tests the AI connection by sending a simple prompt.
  */
 export async function testAIConnection() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const settings = await getAISettings()
 
     if (settings.provider !== 'local' && !settings.apiKey) {
@@ -156,6 +167,8 @@ export async function testAIConnection() {
  * Common interface for generating text alternatives across different providers.
  */
 export async function generateSocialPostAlternatives(content: string, platform: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const settings = await getAISettings()
 
     if (settings.provider !== 'local' && !settings.apiKey) {

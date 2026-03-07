@@ -1,4 +1,4 @@
-import { prisma } from '../lib/db'
+import { prisma } from '../../lib/db'
 
 // Manual diff logic simulation to verify functionality without pulling in Next.js internals
 async function verifyActivityLog() {

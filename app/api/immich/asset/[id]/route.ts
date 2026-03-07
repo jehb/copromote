@@ -1,11 +1,15 @@
 import { initImmich } from '@/app/actions/immich'
 import * as immich from '@immich/sdk'
+import { getSession } from '@/lib/session'
 
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const session = await getSession()
+        if (!session) return new Response('Unauthorized', { status: 401 })
+
         await initImmich()
         const resolvedParams = await params
         const blob = await immich.viewAsset({ id: resolvedParams.id })

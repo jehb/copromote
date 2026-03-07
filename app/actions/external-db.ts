@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import sql from 'mssql'
 
@@ -36,6 +37,8 @@ async function getDBConfig() {
 }
 
 export async function testExternalConnection() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const config = await getDBConfig()
     if (!config) return { success: false, message: 'Invalid MSSQL configuration.' }
 
@@ -55,6 +58,8 @@ export async function getExternalProducts(
     pageSize: number = 10,
     search: string = ''
 ): Promise<{ products: Product[], totalCount: number }> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const config = await getDBConfig()
     if (!config) return { products: [], totalCount: 0 }
 
@@ -126,6 +131,8 @@ export async function getExternalProducts(
 }
 
 export async function getExternalProductByUPC(upc: string): Promise<Record<string, any> | null> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const config = await getDBConfig()
     if (!config) return null
 
@@ -155,6 +162,8 @@ export async function getExternalProductByUPC(upc: string): Promise<Record<strin
 }
 
 export async function getExternalBrands(): Promise<string[]> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const config = await getDBConfig()
     if (!config) return []
 
@@ -177,6 +186,8 @@ export async function getExternalBrands(): Promise<string[]> {
 }
 
 export async function getExternalProductsByBrand(brand: string): Promise<Product[]> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const config = await getDBConfig()
     if (!config) return []
 
@@ -208,6 +219,8 @@ export async function getExternalProductsByBrand(brand: string): Promise<Product
 }
 
 export async function getExternalProductsByUPCs(upcs: string[]): Promise<Product[]> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     if (!upcs.length) return []
     const config = await getDBConfig()
     if (!config) return []

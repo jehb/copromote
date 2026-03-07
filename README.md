@@ -79,9 +79,9 @@ Refer to the included `docs/` folder for comprehensive structural documentation:
 
 ## Tech Stack
 
-- **Framework**: Next.js 14
+- **Framework**: Next.js 16
 - **Language**: TypeScript
 - **Database**: MariaDB/MySQL (via Prisma ORM)
-- **UI Components**: Shadcn UI (Radix Primitives + Tailwind CSS)
+- **UI Components**: Shadcn UI (React 19, Radix Primitives + Tailwind CSS)
 - **State Management**: React Query
 - **Testing**: Jest, React Testing Library

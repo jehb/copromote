@@ -7,6 +7,8 @@ import { getSession } from '@/lib/session'
 import { getCurrentUserId } from '@/lib/user-util'
 
 export async function getTasks() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.task.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
@@ -31,11 +33,12 @@ export async function getTasks() {
 }
 
 export async function createTask(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const title = formData.get('title') as string
     const description = formData.get('description') as string
     const status = formData.get('status') as string || 'todo'
     const dueDateStr = formData.get('dueDate') as string
-    const session = await getSession()
 
     // Verify user exists to prevent foreign key constraint errors
     let assigneeId = null
@@ -68,6 +71,8 @@ export async function createTask(formData: FormData) {
 }
 
 export async function updateTask(id: string, formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const title = formData.get('title') as string
     const description = formData.get('description') as string
     const status = formData.get('status') as string
@@ -93,6 +98,8 @@ export async function updateTask(id: string, formData: FormData) {
 }
 
 export async function updateTaskStatus(id: string, status: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.task.update({
         where: { id },
         data: { status }
@@ -102,6 +109,8 @@ export async function updateTaskStatus(id: string, status: string) {
 }
 
 export async function deleteTask(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.task.delete({
         where: { id }
     })

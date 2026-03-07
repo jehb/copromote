@@ -1,10 +1,13 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser } from '@/lib/user-util'
 
 export async function getRoles() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.role.findMany({
         orderBy: {
             createdAt: 'asc'
@@ -13,6 +16,8 @@ export async function getRoles() {
 }
 
 export async function createRole(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const user = await getCurrentUser()
     if (user?.role !== 'ADMIN') {
         return { success: false, message: 'Unauthorized' }
@@ -55,6 +60,8 @@ export async function createRole(formData: FormData) {
 }
 
 export async function deleteRole(name: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const user = await getCurrentUser()
     if (user?.role !== 'ADMIN') {
         return { success: false, message: 'Unauthorized' }

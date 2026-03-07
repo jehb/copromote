@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 
@@ -12,6 +13,8 @@ export type EventItem = {
 }
 
 export async function getCalendarEvents(): Promise<EventItem[]> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const projects = await prisma.project.findMany()
     const events = await prisma.calendarEvent.findMany()
     const promotions = await prisma.promotionPeriod.findMany()

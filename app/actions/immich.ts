@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import * as immich from '@immich/sdk'
 import { randomUUID } from 'crypto'
@@ -6,6 +7,8 @@ import { randomUUID } from 'crypto'
 let isInitialized = false
 
 export async function initImmich() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     if (isInitialized) return true
 
     let url = process.env.IMMICH_URL
@@ -32,6 +35,8 @@ export async function initImmich() {
 }
 
 export async function testImmichConnection() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         let url = process.env.IMMICH_URL
         const apiKey = process.env.IMMICH_API_KEY
@@ -56,6 +61,8 @@ export async function testImmichConnection() {
 }
 
 export async function getImmichTags() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const ready = await initImmich()
     if (!ready) return []
     try {
@@ -67,6 +74,8 @@ export async function getImmichTags() {
 }
 
 export async function getImmichAssets(tagId?: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const ready = await initImmich()
     if (!ready) return []
 
@@ -86,16 +95,22 @@ export async function getImmichAssets(tagId?: string) {
 }
 
 export async function deleteImmichAsset(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     return await immich.deleteAssets({ assetBulkDeleteDto: { ids: [id] } })
 }
 
 export async function createImmichTag(name: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     return await immich.createTag({ tagCreateDto: { name } })
 }
 
 export async function uploadImmichAsset(file: File, tagIds?: string[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
 
     const url = process.env.IMMICH_URL
@@ -142,6 +157,8 @@ export async function uploadImmichAsset(file: File, tagIds?: string[]) {
 }
 
 export async function addTagToImmichAsset(assetId: string, tagId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     try {
         await immich.bulkTagAssets({
@@ -154,6 +171,8 @@ export async function addTagToImmichAsset(assetId: string, tagId: string) {
 }
 
 export async function updateImmichAsset(id: string, description: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     try {
         await immich.updateAsset({
@@ -167,6 +186,8 @@ export async function updateImmichAsset(id: string, description: string) {
 }
 
 export async function removeTagFromImmichAsset(assetId: string, tagId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     try {
         await immich.untagAssets({
@@ -180,6 +201,8 @@ export async function removeTagFromImmichAsset(assetId: string, tagId: string) {
 }
 
 export async function getImmichAlbums() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const ready = await initImmich()
     if (!ready) return []
     try {
@@ -192,6 +215,8 @@ export async function getImmichAlbums() {
 }
 
 export async function createImmichAlbum(albumName: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     try {
         return await immich.createAlbum({ createAlbumDto: { albumName } })
@@ -202,6 +227,8 @@ export async function createImmichAlbum(albumName: string) {
 }
 
 export async function deleteImmichAlbum(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     try {
         return await immich.deleteAlbum({ id })
@@ -212,6 +239,8 @@ export async function deleteImmichAlbum(id: string) {
 }
 
 export async function addAssetToImmichAlbum(albumId: string, assetId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     try {
         return await immich.addAssetsToAlbum({
@@ -225,6 +254,8 @@ export async function addAssetToImmichAlbum(albumId: string, assetId: string) {
 }
 
 export async function removeAssetFromImmichAlbum(albumId: string, assetId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await initImmich()
     try {
         return await immich.removeAssetFromAlbum({

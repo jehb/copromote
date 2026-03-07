@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
@@ -7,6 +8,8 @@ import { logActivity } from '@/app/actions/activity-logs'
 import { getCurrentUserId } from '@/lib/user-util'
 
 export async function getOrganizations() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.organization.findMany({
         include: {
             primaryContact: true,
@@ -33,6 +36,8 @@ export async function getOrganizations() {
 }
 
 export async function getOrganization(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.organization.findUnique({
         where: { id },
         include: {
@@ -57,6 +62,8 @@ export async function getOrganization(id: string) {
 }
 
 export async function createOrganization(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const name = formData.get('name') as string
     const category = formData.get('category') as string
     const description = formData.get('description') as string
@@ -84,6 +91,8 @@ export async function createOrganization(formData: FormData) {
 }
 
 export async function updateOrganization(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const id = formData.get('id') as string
     const name = formData.get('name') as string
     const category = formData.get('category') as string
@@ -137,6 +146,8 @@ export async function updateOrganization(formData: FormData) {
 }
 
 export async function deleteOrganization(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.organization.delete({
         where: { id }
     })

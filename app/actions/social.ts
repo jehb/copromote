@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
@@ -14,6 +15,8 @@ export async function getSocialPosts(filters: {
     promotionPeriodId?: string,
     eventId?: string
 } = {}) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const { platform, status, startDate, endDate, promotionPeriodId, eventId } = filters
 
     const where: any = {}
@@ -124,6 +127,8 @@ async function syncReviewerTask(reviewerId: string | null) {
 }
 
 export async function createSocialPost(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const sanitizeId = (id: FormDataEntryValue | null) => {
         if (!id || typeof id !== 'string') return null;
         const cleanId = id.trim();
@@ -200,6 +205,8 @@ export async function createSocialPost(formData: FormData) {
 }
 
 export async function updateSocialPost(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const id = formData.get('id') as string
 
     // Get existing post to check for reviewer changes
@@ -300,6 +307,8 @@ export async function updateSocialPost(formData: FormData) {
 }
 
 export async function deleteSocialPost(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const post = await prisma.socialPost.findUnique({ where: { id } })
     if (post?.postizId) {
         await deletePostFromPostiz(post.postizId)
@@ -311,6 +320,8 @@ export async function deleteSocialPost(id: string) {
 }
 
 export async function getSocialPost(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.socialPost.findUnique({
         where: { id },
         include: {
@@ -323,6 +334,8 @@ export async function getSocialPost(id: string) {
 }
 
 export async function addAssetToSocialPost(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const name = formData.get('name') as string
     const type = formData.get('type') as string
     const url = formData.get('url') as string
@@ -341,6 +354,8 @@ export async function addAssetToSocialPost(formData: FormData) {
 }
 
 export async function deleteSocialPostAsset(id: string, socialPostId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.asset.delete({ where: { id } })
     revalidatePath(`/social/${socialPostId}`)
 }

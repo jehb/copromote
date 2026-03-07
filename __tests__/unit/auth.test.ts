@@ -1,9 +1,9 @@
 
 import { hashPassword, verifyPassword } from '@/lib/auth'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 
-// Mock bcryptjs
-jest.mock('bcryptjs', () => ({
+// Mock bcrypt
+jest.mock('bcrypt', () => ({
     hash: jest.fn().mockResolvedValue('hashed_password'),
     compare: jest.fn().mockResolvedValue(true),
 }))

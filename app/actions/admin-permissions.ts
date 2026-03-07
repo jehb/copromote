@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/user-util'
@@ -10,6 +11,8 @@ async function logSecurityEventFallback(action: string, details: string) {
 }
 
 export async function getRolePermissions() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const user = await getCurrentUser()
     if (!user || user.role !== 'ADMIN') {
         throw new Error('Unauthorized')
@@ -24,6 +27,8 @@ export async function getRolePermissions() {
 }
 
 export async function updateRolePermission(role: string, page: string, isEnabled: boolean) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const user = await getCurrentUser()
     if (!user || user.role !== 'ADMIN') {
         throw new Error('Unauthorized')
@@ -62,6 +67,8 @@ export async function updateRolePermission(role: string, page: string, isEnabled
 }
 
 export async function checkPageAccess(page: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const user = await getCurrentUser()
 
     // Admins always have access to everything
@@ -91,6 +98,7 @@ export async function checkPageAccess(page: string) {
 }
 
 export async function getDisabledPages(role: string): Promise<string[]> {
+
     if (!role || role === 'ADMIN') {
         return []
     }

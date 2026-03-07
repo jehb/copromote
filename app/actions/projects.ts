@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db' // Ensure you have this configured
 import { revalidatePath } from 'next/cache'
@@ -7,6 +8,8 @@ import { logActivity } from '@/app/actions/activity-logs'
 import { getCurrentUserId, getCurrentUser } from '@/lib/user-util'
 
 export async function getProjects() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.project.findMany({
         orderBy: { createdAt: 'desc' },
         include: {
@@ -40,6 +43,8 @@ export async function getProjects() {
 }
 
 export async function getProject(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.project.findUnique({
         where: { id },
         include: {
@@ -84,6 +89,8 @@ export async function getProject(id: string) {
 }
 
 export async function createProject(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const name = formData.get('name') as string
     const description = formData.get('description') as string
     const startDate = new Date(formData.get('startDate') as string)
@@ -125,6 +132,8 @@ export async function createProject(formData: FormData) {
 }
 
 export async function deleteProject(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const user = await getCurrentUser()
     if (user?.role !== 'ADMIN') {
         throw new Error('Only admins can delete projects')
@@ -137,6 +146,8 @@ export async function deleteProject(id: string) {
 }
 
 export async function updateProjectStatus(id: string, status: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.project.update({
         where: { id },
         data: { status }
@@ -146,6 +157,8 @@ export async function updateProjectStatus(id: string, status: string) {
 }
 
 export async function updateProject(id: string, formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const name = formData.get('name') as string
     const description = formData.get('description') as string
     const startDate = new Date(formData.get('startDate') as string)

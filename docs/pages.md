@@ -48,6 +48,7 @@ Co+promote is built using the Next.js App Router. This document outlines the pri
   - **`/admin/activity` / `/admin/logs`**: Audit trails and security logs.
   - **`/admin/data`**: Administrative data hub for backups and bulk operations.
   - **`/admin/locations`**: Management of physical/virtual locations for events.
+  - **`/admin/color-palettes`**: Management of custom branding color palettes.
   - **`/admin/hyperlinks`**: Management of global quick links.
 
 ## Assistance

@@ -14,8 +14,8 @@ This document outlines the core data structures used in Co+promote, defined via 
 - **Contact**: Individual people linked to Organizations or managed independently.
 
 ## Media & Social
-- **Asset**: Media files (images, videos, etc.) uploaded to the system, linked to Projects or Social Posts. Managed via Immich integration.
 - **AssetTemplate**: JSON-based canvas templates used in the internal Asset Editor.
+- **SavedAsset**: Reusable saved asset configurations for the internal Asset Editor.
 - **SocialPost**: Drafted or scheduled social media posts. Integrates with Postiz for publishing.
 - **PromotionPeriod**: Time-bound organizational periods tying together Assets and Social Posts for campaigns.
 
@@ -23,14 +23,18 @@ This document outlines the core data structures used in Co+promote, defined via 
 - **EmailPlan**: A scheduled newsletter or email campaign.
 - **EmailItem**: Specific content blocks within an Email Plan, which can be linked to Events and Products.
 - **EmailItemProduct**: A bridge table linking specific UPCs (products) to an Email Item.
+- **EmailItemPhoto**: A bridge linking specific cloud photos to an Email Item.
 
 ## External Data
 - **EventProduct**: A bridge linking external catalog products (via UPC) to Co+promote Events.
 
 ## System & Auth
-- **User**: System accounts with role-based access control (Admin, User).
+- **User**: System accounts.
+- **Role**: Custom user roles.
+- **RolePermission**: Granular page-level overrides and permissions for Roles.
 - **ActivityLog**: Detailed audit trail tracking user actions across entities.
 - **SecurityLog**: Audit trail for authentication and security-related events.
 - **Config**: Key-value configurations (Legacy: being migrated to environment variables).
 - **Hyperlink**: Global quick links for users.
 - **MagicLink**: Tokens used for passwordless login or account verification.
+- **ColorPalette**: Saved custom branding and color palettes.

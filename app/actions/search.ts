@@ -1,7 +1,7 @@
 'use server'
 
 import { prisma } from '@/lib/prisma'
-import { verifySession } from '@/lib/session'
+import { getSession } from '@/lib/session'
 
 export type SearchResult = {
     id: string
@@ -23,6 +23,8 @@ export type SearchResults = {
 }
 
 export async function search(query: string): Promise<SearchResults> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     if (!query || query.length < 2) {
         return {
             projects: [],
@@ -34,11 +36,6 @@ export async function search(query: string): Promise<SearchResults> {
             users: [],
             hyperlinks: []
         }
-    }
-
-    const session = await verifySession()
-    if (!session) {
-        throw new Error('Unauthorized')
     }
 
     try {

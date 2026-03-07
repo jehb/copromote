@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/prisma'
 import { formatInTimeZone } from 'date-fns-tz'
@@ -12,6 +13,8 @@ function formatDate(date: Date | null | undefined) {
 }
 
 export async function getExportData(entities: string[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const data: Record<string, any[]> = {}
 
     if (entities.includes('contacts')) {

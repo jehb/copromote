@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { getAISettings, getFinalBaseUrl } from './ai'
@@ -67,6 +68,8 @@ async function getChatContext(text: string) {
  * Sends a chat message to the configured AI provider.
  */
 export async function sendChatMessage(messages: ChatMessage[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const settings = await getAISettings()
     const globalInstructions = process.env.AI_CHAT_INSTRUCTIONS || 'You are a helpful assistant for the Co+promote workspace management system.'
 

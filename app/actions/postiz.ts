@@ -1,8 +1,11 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import Postiz from '@postiz/node'
 
 export async function getPostizClient() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const url = process.env.POSTIZ_URL
     const apiKey = process.env.POSTIZ_API_KEY
     if (!apiKey) return null
@@ -15,6 +18,8 @@ export async function getPostizClient() {
 }
 
 export async function fetchPostizIntegrations() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const client = await getPostizClient()
     if (!client) return []
     try {
@@ -27,6 +32,8 @@ export async function fetchPostizIntegrations() {
 }
 
 export async function getAvailablePlatforms(): Promise<{ value: string, label: string }[]> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const integrations = await fetchPostizIntegrations()
     if (!integrations || integrations.length === 0) {
         // Fallback or unconfigured
@@ -55,6 +62,8 @@ export async function syncPostToPostiz(postParams: {
     status: string,
     assets?: { url: string, type: string }[]
 }): Promise<string | null> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const client = await getPostizClient()
     if (!client) return null
 
@@ -163,6 +172,8 @@ export async function syncPostToPostiz(postParams: {
 }
 
 export async function deletePostFromPostiz(postId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const client = await getPostizClient()
     if (!client) return
     try {
@@ -173,6 +184,8 @@ export async function deletePostFromPostiz(postId: string) {
 }
 
 export async function testPostizConnection() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const url = process.env.POSTIZ_URL
         const apiKey = process.env.POSTIZ_API_KEY

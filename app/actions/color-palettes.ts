@@ -1,9 +1,12 @@
-'use server';
+'use server'
+import { getSession } from '@/lib/session';
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export async function getColorPalettes() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const palettes = await prisma.colorPalette.findMany({
             orderBy: { name: 'asc' }
@@ -16,6 +19,8 @@ export async function getColorPalettes() {
 }
 
 export async function createColorPalette(data: { name: string; colors: string[] }) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const existing = await prisma.colorPalette.findUnique({
             where: { name: data.name }
@@ -41,6 +46,8 @@ export async function createColorPalette(data: { name: string; colors: string[] 
 }
 
 export async function updateColorPalette(id: string, data: { name: string; colors: string[] }) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const existing = await prisma.colorPalette.findFirst({
             where: {
@@ -70,6 +77,8 @@ export async function updateColorPalette(id: string, data: { name: string; color
 }
 
 export async function deleteColorPalette(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         await prisma.colorPalette.delete({
             where: { id }

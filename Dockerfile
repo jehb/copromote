@@ -36,7 +36,7 @@ RUN adduser --system --uid 1001 --home /app nextjs
 
 # Install correct Prisma CLI version globally to avoid npx downloading latest incompatible version
 RUN npm install -g prisma@5.22.0 tsx
-RUN npm install bcryptjs
+RUN npm install bcrypt
 
 COPY --from=builder /app/public ./public
 
@@ -52,8 +52,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy prisma directory for migrations
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 # Copy entrypoint script
-COPY --from=builder --chown=nextjs:nodejs /app/scripts/docker-entrypoint.sh ./scripts/docker-entrypoint.sh
-RUN chmod +x ./scripts/docker-entrypoint.sh
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/utils/docker-entrypoint.sh ./scripts/utils/docker-entrypoint.sh
+RUN chmod +x ./scripts/utils/docker-entrypoint.sh
 
 # Ensure /app is owned by nextjs so it can write (e.g. .npm cache)
 # Install gosu for easy step-down from root
@@ -72,5 +72,5 @@ ENV HOSTNAME="0.0.0.0"
 # Set HOME to /app so npx/npm uses a writable directory for cache
 ENV HOME="/app"
 
-ENTRYPOINT ["./scripts/docker-entrypoint.sh"]
+ENTRYPOINT ["./scripts/utils/docker-entrypoint.sh"]
 CMD ["node", "server.js"]

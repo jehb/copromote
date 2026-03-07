@@ -32,6 +32,8 @@ export async function logActivity(
 }
 
 export async function getActivityLogs() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         return await prisma.activityLog.findMany({
             orderBy: { createdAt: 'desc' },

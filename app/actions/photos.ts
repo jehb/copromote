@@ -1,9 +1,12 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { revalidatePath } from 'next/cache'
 import { getImmichAssets, getImmichTags, uploadImmichAsset, deleteImmichAsset, createImmichTag, addTagToImmichAsset, updateImmichAsset, removeTagFromImmichAsset, getImmichAlbums, createImmichAlbum, deleteImmichAlbum, addAssetToImmichAlbum, removeAssetFromImmichAlbum } from './immich'
 
 export async function getPhotos(tagId?: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const assets = await getImmichAssets(tagId)
     const allTags = await getPhotoTags()
 
@@ -30,11 +33,15 @@ export async function getPhotos(tagId?: string) {
 }
 
 export async function getPhoto(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const photos = await getPhotos()
     return photos.find(p => p.id === id) || null
 }
 
 export async function getPhotoTags() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const tags = await getImmichTags()
     return tags.map(t => ({
         id: t.id,
@@ -44,6 +51,8 @@ export async function getPhotoTags() {
 }
 
 export async function uploadPhoto(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const file = formData.get('file') as File
     const tagIdsString = formData.get('tagIds') as string
     const tagIds = tagIdsString ? tagIdsString.split(',').filter(Boolean) : []
@@ -57,11 +66,15 @@ export async function uploadPhoto(formData: FormData) {
 }
 
 export async function deletePhoto(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await deleteImmichAsset(id)
     revalidatePath('/gallery')
 }
 
 export async function createPhotoTag(name: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const newTag = await createImmichTag(name)
     revalidatePath('/gallery')
     return {
@@ -72,6 +85,8 @@ export async function createPhotoTag(name: string) {
 }
 
 export async function assignProductTagToPhoto(photoId: string, upc: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const tagName = `upc/${upc}`
     const allTags = await getPhotoTags()
 
@@ -96,24 +111,32 @@ export async function assignProductTagToPhoto(photoId: string, upc: string) {
 }
 
 export async function updatePhotoDescription(id: string, description: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await updateImmichAsset(id, description)
     revalidatePath('/gallery')
     revalidatePath(`/gallery/${id}`)
 }
 
 export async function addPhotoTag(photoId: string, tagId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await addTagToImmichAsset(photoId, tagId)
     revalidatePath('/gallery')
     revalidatePath(`/gallery/${photoId}`)
 }
 
 export async function removePhotoTag(photoId: string, tagId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await removeTagFromImmichAsset(photoId, tagId)
     revalidatePath('/gallery')
     revalidatePath(`/gallery/${photoId}`)
 }
 
 export async function getAlbums() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const albums = await getImmichAlbums()
     return albums.map((a: any) => ({
         id: a.id,
@@ -123,6 +146,8 @@ export async function getAlbums() {
 }
 
 export async function createAlbum(name: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const newAlbum = await createImmichAlbum(name)
     revalidatePath('/gallery')
     return {
@@ -132,17 +157,23 @@ export async function createAlbum(name: string) {
 }
 
 export async function deleteAlbum(albumId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await deleteImmichAlbum(albumId)
     revalidatePath('/gallery')
 }
 
 export async function addPhotoToAlbum(photoId: string, albumId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await addAssetToImmichAlbum(albumId, photoId)
     revalidatePath('/gallery')
     revalidatePath(`/gallery/${photoId}`)
 }
 
 export async function removePhotoFromAlbum(photoId: string, albumId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await removeAssetFromImmichAlbum(albumId, photoId)
     revalidatePath('/gallery')
     revalidatePath(`/gallery/${photoId}`)

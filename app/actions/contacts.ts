@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
@@ -7,6 +8,8 @@ import { logActivity } from '@/app/actions/activity-logs'
 import { getCurrentUserId, getCurrentUser } from '@/lib/user-util'
 
 export async function getContacts() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.contact.findMany({
         include: {
             organization: true,
@@ -30,6 +33,8 @@ export async function getContacts() {
 }
 
 export async function getContact(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.contact.findUnique({
         where: { id },
         include: {
@@ -54,6 +59,8 @@ export async function getContact(id: string) {
 }
 
 export async function createContact(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const firstName = formData.get('firstName') as string
     const lastName = formData.get('lastName') as string
     const email = formData.get('email') as string
@@ -90,6 +97,8 @@ export async function createContact(formData: FormData) {
 }
 
 export async function updateContact(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const id = formData.get('id') as string
     const firstName = formData.get('firstName') as string
     const lastName = formData.get('lastName') as string
@@ -154,6 +163,8 @@ export async function updateContact(formData: FormData) {
 }
 
 export async function deleteContact(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.contact.delete({
         where: { id }
     })
@@ -163,6 +174,8 @@ export async function deleteContact(id: string) {
 }
 
 export async function linkContactToOrganization(contactId: string, organizationId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.contact.update({
         where: { id: contactId },
         data: { organizationId }

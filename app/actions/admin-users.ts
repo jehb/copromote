@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
@@ -39,6 +40,8 @@ export type UserWithContact = {
 }
 
 export async function getUsers(): Promise<UserWithContact[]> {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const users = await prisma.user.findMany({
             orderBy: { createdAt: 'desc' },
@@ -76,6 +79,8 @@ export async function getUsers(): Promise<UserWithContact[]> {
 
 
 export async function createUser(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const rawData = Object.fromEntries(formData.entries())
     const result = CreateUserSchema.safeParse(rawData)
 
@@ -137,6 +142,8 @@ const UpdateUserSchema = z.object({
 })
 
 export async function updateUser(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const rawData = Object.fromEntries(formData.entries())
     // Handle "none" or empty string for contactId
     if (rawData.contactId === 'none' || rawData.contactId === '') {
@@ -205,6 +212,8 @@ export async function updateUser(formData: FormData) {
 
 // Export delete user action
 export async function deleteUser(userId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const user = await prisma.user.findUnique({
             where: { id: userId }

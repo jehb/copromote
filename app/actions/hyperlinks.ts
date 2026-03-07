@@ -6,6 +6,8 @@ import { revalidatePath } from 'next/cache'
 import { logActivity } from './activity-logs'
 
 export async function getHyperlinks() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     // Optional: Add strict auth check if needed, depending on middleware
     return await prisma.hyperlink.findMany({
         orderBy: { createdAt: 'desc' }
@@ -43,6 +45,8 @@ export async function createHyperlink(formData: FormData) {
 }
 
 export async function deleteHyperlink(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     // We need to fetch the hyperlink before deleting to log its title
     const hyperlink = await prisma.hyperlink.findUnique({ where: { id } })
 

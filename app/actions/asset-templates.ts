@@ -1,10 +1,13 @@
-'use server';
+'use server'
+import { getSession } from '@/lib/session';
 
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 export async function getAssetTemplates() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const templates = await prisma.assetTemplate.findMany({
             orderBy: {
@@ -25,6 +28,8 @@ export async function createAssetTemplate(data: {
     canvasBg: string;
     previewImage?: string;
 }) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const template = await prisma.assetTemplate.create({
             data: {
@@ -50,6 +55,8 @@ export async function updateAssetTemplate(id: string, data: {
     canvasBg?: string;
     previewImage?: string;
 }) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const template = await prisma.assetTemplate.update({
             where: { id },
@@ -68,6 +75,8 @@ export async function updateAssetTemplate(id: string, data: {
 }
 
 export async function deleteAssetTemplate(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         await prisma.assetTemplate.delete({
             where: { id },

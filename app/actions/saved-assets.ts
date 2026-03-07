@@ -1,10 +1,13 @@
-'use server';
+'use server'
+import { getSession } from '@/lib/session';
 
 import { revalidatePath } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 
 export async function getSavedAssets() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const assets = await prisma.savedAsset.findMany({
             orderBy: [
@@ -27,6 +30,8 @@ export async function createSavedAsset(data: {
     canvasBg: string;
     previewImage?: string;
 }) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const asset = await prisma.savedAsset.create({
             data: {
@@ -54,6 +59,8 @@ export async function updateSavedAsset(id: string, data: {
     canvasBg?: string;
     previewImage?: string;
 }) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const asset = await prisma.savedAsset.update({
             where: { id },
@@ -72,6 +79,8 @@ export async function updateSavedAsset(id: string, data: {
 }
 
 export async function deleteSavedAsset(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         await prisma.savedAsset.delete({
             where: { id },

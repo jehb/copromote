@@ -1,10 +1,13 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { logActivity } from '@/app/actions/activity-logs'
 
 export async function getLocations() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.location.findMany({
         orderBy: { name: 'asc' },
         include: {
@@ -16,6 +19,8 @@ export async function getLocations() {
 }
 
 export async function createLocation(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const name = formData.get('name') as string
 
     if (!name) {
@@ -42,6 +47,8 @@ export async function createLocation(formData: FormData) {
 }
 
 export async function updateLocation(id: string, formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const name = formData.get('name') as string
 
     if (!name) {
@@ -69,6 +76,8 @@ export async function updateLocation(id: string, formData: FormData) {
 }
 
 export async function deleteLocation(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         // Check if location is in use
         const location = await prisma.location.findUnique({

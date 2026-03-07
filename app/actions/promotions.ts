@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
@@ -25,6 +26,8 @@ const PromotionSchema = z.object({
 })
 
 export async function getPromotions() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.promotionPeriod.findMany({
         orderBy: { startDate: 'desc' },
         include: {
@@ -39,6 +42,8 @@ export async function getPromotions() {
 }
 
 export async function getPromotion(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.promotionPeriod.findUnique({
         where: { id },
         include: {
@@ -49,6 +54,8 @@ export async function getPromotion(id: string) {
 }
 
 export async function createPromotion(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const rawData = {
         name: formData.get('name') as string,
         startDate: formData.get('startDate') as string,
@@ -76,6 +83,8 @@ export async function createPromotion(formData: FormData) {
 }
 
 export async function updatePromotion(id: string, formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const rawData = {
         name: formData.get('name') as string,
         startDate: formData.get('startDate') as string,
@@ -105,6 +114,8 @@ export async function updatePromotion(id: string, formData: FormData) {
 }
 
 export async function deletePromotion(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.promotionPeriod.delete({
         where: { id },
     })
@@ -117,6 +128,8 @@ export async function deletePromotion(id: string) {
 
 // Asset Management
 export async function addAssetToPromotion(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const promotionPeriodId = formData.get('promotionPeriodId') as string
     const name = formData.get('name') as string
     const type = formData.get('type') as string
@@ -137,6 +150,8 @@ export async function addAssetToPromotion(formData: FormData) {
 }
 
 export async function deletePromotionAsset(assetId: string, promotionPeriodId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.asset.delete({
         where: { id: assetId }
     })

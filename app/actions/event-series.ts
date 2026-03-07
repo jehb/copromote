@@ -1,10 +1,13 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
 import { logActivity } from '@/app/actions/activity-logs'
 
 export async function getEventSeries() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.eventSeries.findMany({
         orderBy: { title: 'asc' },
         include: {
@@ -21,6 +24,8 @@ export async function getEventSeries() {
 }
 
 export async function createEventSeries(title: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     if (!title || title.trim() === '') {
         return { success: false, message: 'Title is required' }
     }

@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
@@ -11,6 +12,8 @@ import { EventStatus } from '@prisma/client'
 const TIMEZONE = 'America/New_York'
 
 export async function getEvents() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.event.findMany({
         orderBy: { startTime: 'asc' },
         include: {
@@ -28,6 +31,8 @@ export async function getEvents() {
 }
 
 export async function getEvent(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.event.findUnique({
         where: { id },
         include: {
@@ -45,6 +50,8 @@ export async function getEvent(id: string) {
 }
 
 export async function createEvent(formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const title = formData.get('title') as string
     const description = formData.get('description') as string
     const startTimeStr = formData.get('startTime') as string
@@ -96,6 +103,8 @@ export async function createEvent(formData: FormData) {
 }
 
 export async function updateEvent(id: string, formData: FormData) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const title = formData.get('title') as string
     const description = formData.get('description') as string
     const startTimeStr = formData.get('startTime') as string
@@ -147,6 +156,8 @@ export async function updateEvent(id: string, formData: FormData) {
 }
 
 export async function deleteEvent(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     await prisma.event.delete({
         where: { id }
     })
@@ -156,17 +167,23 @@ export async function deleteEvent(id: string) {
 }
 
 export async function getLocations() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.location.findMany({
         orderBy: { name: 'asc' }
     })
 }
 
 export async function getUsers() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     return await prisma.user.findMany({
         orderBy: { name: 'asc' }
     })
 }
 export async function searchEventsForAutocomplete(query: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     const now = new Date()
 
     // Fetch events matching query or just latest if query is empty

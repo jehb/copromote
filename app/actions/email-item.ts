@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
@@ -11,6 +12,8 @@ export async function createEmailItem(
         order?: number
     }
 ) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const item = await prisma.emailItem.create({
             data: {
@@ -37,6 +40,8 @@ export async function updateEmailItem(
         order?: number
     }
 ) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         // Find the planId first to revalidate
         const currentItem = await prisma.emailItem.findUnique({
@@ -64,6 +69,8 @@ export async function updateEmailItem(
 }
 
 export async function deleteEmailItem(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const currentItem = await prisma.emailItem.findUnique({
             where: { id },
@@ -85,6 +92,8 @@ export async function deleteEmailItem(id: string) {
 }
 
 export async function addItemEvent(itemId: string, eventId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const item = await prisma.emailItem.update({
             where: { id: itemId },
@@ -105,6 +114,8 @@ export async function addItemEvent(itemId: string, eventId: string) {
 }
 
 export async function removeItemEvent(itemId: string, eventId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const item = await prisma.emailItem.update({
             where: { id: itemId },
@@ -125,6 +136,8 @@ export async function removeItemEvent(itemId: string, eventId: string) {
 }
 
 export async function reorderEmailItems(items: { id: string; order: number }[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         // We need to know the planId to revalidate. 
         // Optimization: fetch it from the first item if list is not empty.
@@ -159,6 +172,8 @@ export async function reorderEmailItems(items: { id: string; order: number }[]) 
 }
 
 export async function addItemProduct(itemId: string, upc: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const item = await prisma.emailItemProduct.create({
             data: {
@@ -179,6 +194,8 @@ export async function addItemProduct(itemId: string, upc: string) {
 }
 
 export async function removeItemProduct(itemId: string, upc: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const product = await prisma.emailItemProduct.findUnique({
             where: {
@@ -212,6 +229,8 @@ export async function removeItemProduct(itemId: string, upc: string) {
 }
 
 export async function updateItemAsset(itemId: string, assetId: string | null) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const item = await prisma.emailItem.update({
             where: { id: itemId },
@@ -230,6 +249,8 @@ export async function updateItemAsset(itemId: string, assetId: string | null) {
 }
 
 export async function addItemPhoto(itemId: string, photoId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const item = await prisma.emailItemPhoto.create({
             data: {
@@ -250,6 +271,8 @@ export async function addItemPhoto(itemId: string, photoId: string) {
 }
 
 export async function removeItemPhoto(itemId: string, photoId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const photo = await prisma.emailItemPhoto.findUnique({
             where: {

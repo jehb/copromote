@@ -1,9 +1,12 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 export async function getEmailPlans() {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const plans = await prisma.emailPlan.findMany({
             orderBy: {
@@ -23,6 +26,8 @@ export async function getEmailPlans() {
 }
 
 export async function getEmailPlan(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const plan = await prisma.emailPlan.findUnique({
             where: { id },
@@ -59,6 +64,8 @@ export async function createEmailPlan(data: {
     sendDate: Date
     notes?: string
 }) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const plan = await prisma.emailPlan.create({
             data: {
@@ -84,6 +91,8 @@ export async function updateEmailPlan(
         notes?: string
     }
 ) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         const plan = await prisma.emailPlan.update({
             where: { id },
@@ -102,6 +111,8 @@ export async function updateEmailPlan(
 }
 
 export async function deleteEmailPlan(id: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         await prisma.emailPlan.delete({
             where: { id },

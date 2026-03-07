@@ -1,4 +1,5 @@
 'use server'
+import { getSession } from '@/lib/session'
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
@@ -13,6 +14,8 @@ function parseDate(value: any) {
 }
 
 export async function importData(entity: string, data: any[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
     try {
         let count = 0
 

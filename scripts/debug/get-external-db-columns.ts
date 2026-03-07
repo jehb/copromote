@@ -1,5 +1,5 @@
 import sql from 'mssql';
-import { prisma } from '../lib/db';
+import { prisma } from '../../lib/db';
 
 async function getConfig(key: string) {
     const config = await prisma.config.findUnique({
