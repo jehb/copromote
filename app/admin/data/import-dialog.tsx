@@ -34,6 +34,7 @@ const ENTITIES = [
     { value: 'hyperlinks', label: 'Hyperlinks' },
     { value: 'promotions', label: 'Promotions' },
     { value: 'users', label: 'Users' },
+    { value: 'color-palettes', label: 'Color Palettes' },
 ]
 
 export function ImportDialog() {

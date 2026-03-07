@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Settings, Users, Shield, Database, Activity, Link2, MapPin } from 'lucide-react'
+import { Settings, Users, Shield, Database, Activity, Link2, MapPin, Palette } from 'lucide-react'
 import { PageHeader } from '@/components/ui/page-header'
 import Link from 'next/link'
 import { ProtectedRoute } from '@/components/layout/protected-route'
@@ -125,6 +125,20 @@ export default function AdminPage() {
                                 </CardTitle>
                                 <CardDescription>
                                     Manage venues and event locations.
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+
+                    <Link href="/admin/color-palettes">
+                        <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Palette className="h-5 w-5 text-pink-500" />
+                                    Color Palettes
+                                </CardTitle>
+                                <CardDescription>
+                                    Manage predefined color palettes used in the Asset Editor.
                                 </CardDescription>
                             </CardHeader>
                         </Card>

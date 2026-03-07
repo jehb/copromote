@@ -26,6 +26,8 @@ const ENTITIES = [
     { id: 'promotions', label: 'Promotions', description: 'Marketing campaigns timelines' },
     { id: 'email-plans', label: 'Email Plans', description: 'Newsletter subjects and schedule' },
     { id: 'email-items', label: 'Email Items', description: 'Newsletter content items' },
+    { id: 'users', label: 'Users', description: 'System users and roles' },
+    { id: 'color-palettes', label: 'Color Palettes', description: 'Brand color definitions' },
 ]
 
 export function ExportHub() {
@@ -37,6 +39,14 @@ export function ExportHub() {
         setSelectedEntities(prev =>
             prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
         )
+    }
+
+    const toggleSelectAll = () => {
+        if (selectedEntities.length === ENTITIES.length) {
+            setSelectedEntities([])
+        } else {
+            setSelectedEntities(ENTITIES.map(e => e.id))
+        }
     }
 
     const handleExport = async () => {
@@ -103,6 +113,19 @@ export function ExportHub() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+                <div
+                    className="flex items-center space-x-2 cursor-pointer w-fit hover:opacity-80 transition-opacity"
+                    onClick={toggleSelectAll}
+                >
+                    {selectedEntities.length === ENTITIES.length
+                        ? <CheckSquare className="h-4 w-4 text-indigo-600" />
+                        : <Square className="h-4 w-4 text-slate-400" />
+                    }
+                    <Label className="font-semibold text-slate-700 cursor-pointer select-none">
+                        Select All
+                    </Label>
+                </div>
+
                 <div className="grid gap-4 sm:grid-cols-2">
                     {ENTITIES.map((entity) => (
                         <div

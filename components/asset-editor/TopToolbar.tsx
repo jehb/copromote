@@ -1,6 +1,7 @@
 import React from 'react';
 import { EditorElement } from './types';
 import { Trash2, Copy, BringToFront, SendToBack, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Group, Ungroup, Crop, ArrowRightLeft, WrapText } from 'lucide-react';
+import { ColorPickerPopover } from './ColorPickerPopover';
 
 interface TopToolbarProps {
     selectedElements: EditorElement[];
@@ -12,6 +13,7 @@ interface TopToolbarProps {
     groupSelected: () => void;
     ungroupSelected: () => void;
     onCrop?: (id: string) => void;
+    palettes?: any[];
 }
 
 export default function TopToolbar({
@@ -23,7 +25,8 @@ export default function TopToolbar({
     sendBackward,
     groupSelected,
     ungroupSelected,
-    onCrop
+    onCrop,
+    palettes = []
 }: TopToolbarProps) {
     if (selectedElements.length === 0) {
         return (
@@ -48,24 +51,32 @@ export default function TopToolbar({
             {isNativeShape && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Fill:</span>
-                    <input
-                        type="color"
-                        value={selectedElement.fill || '#000000'}
-                        onChange={(e) => updateSelectedElement({ fill: e.target.value })}
-                        className="w-6 h-6 rounded cursor-pointer border-0 p-0"
-                    />
+                    <ColorPickerPopover
+                        color={selectedElement.fill as string || '#000000'}
+                        onChange={(color) => updateSelectedElement({ fill: color })}
+                        palettes={palettes}
+                    >
+                        <button
+                            className="w-6 h-6 rounded border border-black/10 shadow-sm overflow-hidden"
+                            style={{ backgroundColor: selectedElement.fill as string || '#000000' }}
+                        />
+                    </ColorPickerPopover>
                 </div>
             )}
 
             {isNativeShape && type !== 'text' && (
                 <div className="flex items-center gap-2 border-r pr-4 border-neutral-200">
                     <span className="text-xs text-neutral-500 font-medium">Border:</span>
-                    <input
-                        type="color"
-                        value={selectedElement.stroke || '#000000'}
-                        onChange={(e) => updateSelectedElement({ stroke: e.target.value })}
-                        className="w-6 h-6 rounded cursor-pointer border-0 p-0"
-                    />
+                    <ColorPickerPopover
+                        color={selectedElement.stroke as string || '#000000'}
+                        onChange={(color) => updateSelectedElement({ stroke: color })}
+                        palettes={palettes}
+                    >
+                        <button
+                            className="w-6 h-6 rounded border border-black/10 shadow-sm overflow-hidden"
+                            style={{ backgroundColor: selectedElement.stroke as string || '#000000' }}
+                        />
+                    </ColorPickerPopover>
                     <input
                         type="number"
                         value={selectedElement.strokeWidth || 0}
@@ -210,19 +221,27 @@ export default function TopToolbar({
                 <div className="flex flex-col gap-1 border-r pr-4 border-neutral-200 py-1">
                     <div className="flex items-center gap-2">
                         <span className="text-[10px] text-neutral-500 font-medium">Shadow:</span>
-                        <input
-                            type="color"
-                            value={selectedElement.shadowColor || '#000000'}
-                            onChange={(e) => updateSelectedElement({ shadowColor: e.target.value, shadowOpacity: selectedElement.shadowOpacity || 0.5 })}
-                            className="w-4 h-4 rounded cursor-pointer border-0 p-0"
-                        />
+                        <ColorPickerPopover
+                            color={selectedElement.shadowColor as string || '#000000'}
+                            onChange={(color) => updateSelectedElement({ shadowColor: color, shadowOpacity: selectedElement.shadowOpacity || 0.5 })}
+                            palettes={palettes}
+                        >
+                            <button
+                                className="w-4 h-4 rounded border border-black/10 overflow-hidden"
+                                style={{ backgroundColor: selectedElement.shadowColor === 'transparent' ? '#000000' : (selectedElement.shadowColor as string || '#000000') }}
+                            />
+                        </ColorPickerPopover>
                         <span className="text-[10px] text-neutral-500 font-medium ml-1">Blur</span>
                         <input
                             type="number"
                             min="0"
                             max="50"
                             value={selectedElement.shadowBlur || 0}
-                            onChange={(e) => updateSelectedElement({ shadowBlur: Number(e.target.value) })}
+                            onChange={(e) => updateSelectedElement({
+                                shadowBlur: Number(e.target.value),
+                                ...((!selectedElement.shadowOpacity || selectedElement.shadowOpacity === 0) ? { shadowOpacity: 0.5 } : {}),
+                                ...((!selectedElement.shadowColor || selectedElement.shadowColor === 'transparent') ? { shadowColor: '#000000' } : {})
+                            })}
                             className="w-10 h-5 text-[10px] p-0.5 border rounded-md bg-neutral-50"
                         />
                     </div>
@@ -231,14 +250,22 @@ export default function TopToolbar({
                         <input
                             type="number"
                             value={selectedElement.shadowOffsetX || 0}
-                            onChange={(e) => updateSelectedElement({ shadowOffsetX: Number(e.target.value) })}
+                            onChange={(e) => updateSelectedElement({
+                                shadowOffsetX: Number(e.target.value),
+                                ...((!selectedElement.shadowOpacity || selectedElement.shadowOpacity === 0) ? { shadowOpacity: 0.5 } : {}),
+                                ...((!selectedElement.shadowColor || selectedElement.shadowColor === 'transparent') ? { shadowColor: '#000000' } : {})
+                            })}
                             className="w-10 h-5 text-[10px] p-0.5 border rounded-md bg-neutral-50"
                         />
                         <span className="text-[10px] text-neutral-500 font-medium">Y</span>
                         <input
                             type="number"
                             value={selectedElement.shadowOffsetY || 0}
-                            onChange={(e) => updateSelectedElement({ shadowOffsetY: Number(e.target.value) })}
+                            onChange={(e) => updateSelectedElement({
+                                shadowOffsetY: Number(e.target.value),
+                                ...((!selectedElement.shadowOpacity || selectedElement.shadowOpacity === 0) ? { shadowOpacity: 0.5 } : {}),
+                                ...((!selectedElement.shadowColor || selectedElement.shadowColor === 'transparent') ? { shadowColor: '#000000' } : {})
+                            })}
                             className="w-10 h-5 text-[10px] p-0.5 border rounded-md bg-neutral-50"
                         />
                     </div>

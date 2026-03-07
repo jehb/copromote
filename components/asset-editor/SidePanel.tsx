@@ -25,6 +25,7 @@ interface SidePanelProps {
     selectedIds: string[];
     setSelectedIds: (ids: string[] | ((prev: string[]) => string[])) => void;
     photos?: any[];
+    palettes?: any[];
 }
 
 export default function SidePanel({
@@ -48,7 +49,8 @@ export default function SidePanel({
     setElements,
     selectedIds,
     setSelectedIds,
-    photos = []
+    photos = [],
+    palettes = []
 }: SidePanelProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -182,26 +184,36 @@ export default function SidePanel({
                                     <button
                                         key={photo.id}
                                         onClick={() => {
-                                            // Simulate a file upload event by fetching the blob from the proxy URL
-                                            // OR we can just add a Konva Image element directly skipping FileReader
+                                            const img = new Image();
+                                            const fullResUrl = `/api/immich/asset/${photo.id}/download?inline=true`;
+                                            img.src = fullResUrl;
 
-                                            // Since we already have a direct URL, it's cleaner to inject the element directly
-                                            // But for MVP, let's keep it consistent with the existing `onImageUpload` signature 
-                                            // by fetching and generating a Blob if possible, OR we refactor slightly.
+                                            img.onload = () => {
+                                                const originalWidth = img.naturalWidth;
+                                                const originalHeight = img.naturalHeight;
 
-                                            // Actually, `src` can just be the URL natively in use-image. Let's just create an element.
-                                            const newElement = {
-                                                id: `image-${Date.now()}-${photo.id}`,
-                                                type: 'image' as const,
-                                                x: 50,
-                                                y: 50,
-                                                width: 200,
-                                                height: 200,
-                                                src: photo.url, // "/api/immich/asset/[id]"
+                                                // Calculate scaled dimensions, capping at 400px
+                                                let targetWidth = originalWidth;
+                                                let targetHeight = originalHeight;
+                                                const maxDim = 400;
+
+                                                if (originalWidth > maxDim || originalHeight > maxDim) {
+                                                    const ratio = Math.min(maxDim / originalWidth, maxDim / originalHeight);
+                                                    targetWidth = originalWidth * ratio;
+                                                    targetHeight = originalHeight * ratio;
+                                                }
+
+                                                const newElement = {
+                                                    id: `image-${Date.now()}-${photo.id}`,
+                                                    type: 'image' as const,
+                                                    x: 50,
+                                                    y: 50,
+                                                    width: targetWidth,
+                                                    height: targetHeight,
+                                                    src: fullResUrl,
+                                                };
+                                                setElements([...elements, newElement]);
                                             };
-                                            // Quick hack: we don't have direct access to append in SidePanel without bypassing `onImageUpload`. 
-                                            // We do have `elements` and `setElements`. Just append it.
-                                            setElements([...elements, newElement]);
                                         }}
                                         className="relative aspect-square rounded overflow-hidden group border border-neutral-200 hover:border-blue-500 transition-colors bg-neutral-100"
                                     >
@@ -219,20 +231,45 @@ export default function SidePanel({
                 )}
 
                 {activeTab === 'background' && (
-                    <div className="flex flex-col gap-2">
-                        <label className="text-sm text-neutral-600 font-medium mb-2">Solid Color</label>
-                        <div className="flex gap-2 flex-wrap">
-                            {['#ffffff', '#000000', '#f87171', '#fb923c', '#fbbf24', '#a3e635', '#4ade80', '#34d399', '#2dd4bf', '#38bdf8', '#60a5fa', '#818cf8', '#a78bfa', '#e879f9', '#f472b6'].map(color => (
-                                <button
-                                    key={color}
-                                    onClick={() => setCanvasBg(color)}
-                                    className="w-8 h-8 rounded-full border border-neutral-200 hover:scale-110 transition-transform shadow-sm"
-                                    style={{ backgroundColor: color }}
-                                    title={color}
-                                />
-                            ))}
-                        </div>
-                        <div className="mt-4 flex flex-col gap-2">
+                    <div className="flex flex-col gap-4">
+                        {palettes.length > 0 && palettes.map(palette => {
+                            const colors = typeof palette.colors === 'string' ? JSON.parse(palette.colors) : palette.colors;
+                            return (
+                                <div key={palette.id} className="flex flex-col gap-2">
+                                    <label className="text-sm text-neutral-600 font-medium">{palette.name}</label>
+                                    <div className="flex gap-2 flex-wrap">
+                                        {colors.map((color: string, i: number) => (
+                                            <button
+                                                key={`${palette.id}-${i}`}
+                                                onClick={() => setCanvasBg(color)}
+                                                className={`w-8 h-8 rounded-full border hover:scale-110 transition-transform shadow-sm ${canvasBg === color ? 'ring-2 ring-blue-500 ring-offset-1 border-transparent' : 'border-neutral-200'}`}
+                                                style={{ backgroundColor: color }}
+                                                title={color}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {palettes.length === 0 && (
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm text-neutral-600 font-medium whitespace-nowrap">Default Colors</label>
+                                <div className="flex gap-2 flex-wrap">
+                                    {['#ffffff', '#000000', '#f87171', '#fb923c', '#fbbf24', '#a3e635', '#4ade80', '#34d399', '#2dd4bf', '#38bdf8', '#60a5fa', '#818cf8', '#a78bfa', '#e879f9', '#f472b6'].map(color => (
+                                        <button
+                                            key={color}
+                                            onClick={() => setCanvasBg(color)}
+                                            className={`w-8 h-8 rounded-full border hover:scale-110 transition-transform shadow-sm ${canvasBg === color ? 'ring-2 ring-blue-500 ring-offset-1 border-transparent' : 'border-neutral-200'}`}
+                                            style={{ backgroundColor: color }}
+                                            title={color}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mt-2 flex flex-col gap-2">
                             <label className="text-sm text-neutral-600 font-medium">Custom Color</label>
                             <div className="flex items-center gap-3">
                                 <input

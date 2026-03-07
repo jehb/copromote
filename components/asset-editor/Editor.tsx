@@ -10,6 +10,7 @@ import Header from './Header';
 import { createAssetTemplate } from '@/app/actions/asset-templates';
 import { createSavedAsset } from '@/app/actions/saved-assets';
 import { uploadPhoto } from '@/app/actions/photos';
+import { getColorPalettes } from '@/app/actions/color-palettes';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 
 export default function Editor({ photos = [] }: { photos?: any[] }) {
@@ -19,6 +20,15 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
     const [croppingId, setCroppingId] = useState<string | null>(null);
     const [canvasBg, setCanvasBg] = useState<string>('#ffffff');
     const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+    const [palettes, setPalettes] = useState<any[]>([]);
+
+    React.useEffect(() => {
+        getColorPalettes().then((res) => {
+            if (res.success && res.data) {
+                setPalettes(res.data);
+            }
+        }).catch(console.error);
+    }, []);
 
     // History & Elements Data Structure (Undo/Redo implementation)
     const [history, setHistory] = useState<EditorElement[][]>([[]]);
@@ -641,6 +651,7 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
                     selectedIds={selectedIds}
                     setSelectedIds={setSelectedIds}
                     photos={photos}
+                    palettes={palettes}
                 />
 
                 <div className="flex-1 flex flex-col h-full bg-neutral-200">
@@ -654,6 +665,7 @@ export default function Editor({ photos = [] }: { photos?: any[] }) {
                         groupSelected={groupSelected}
                         ungroupSelected={ungroupSelected}
                         onCrop={setCroppingId}
+                        palettes={palettes}
                     />
 
                     <Workspace

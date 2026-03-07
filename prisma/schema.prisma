@@ -59,7 +59,7 @@ model AssetTemplate {
 }
 
 model SavedAsset {
-  id           String   @id @default(uuid())
+  id           String      @id @default(uuid())
   name         String
   category     String
   elements     Json
@@ -120,15 +120,14 @@ model SocialPost {
   @@index([reviewerId], map: "SocialPost_reviewerId_fkey")
 }
 
-
 model Role {
-  id          String           @id @default(uuid())
-  name        String           @unique
-  description String?          @db.Text
-  isSystem    Boolean          @default(false)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?  @db.Text
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   users       User[]
   permissions RolePermission[]
 }
@@ -365,20 +364,20 @@ model EmailPlan {
 }
 
 model EmailItem {
-  id          String    @id @default(uuid())
-  title       String
-  description String?   @db.Text
-  planId      String
-  order       Int       @default(0)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  plan        EmailPlan          @relation(fields: [planId], references: [id], onDelete: Cascade)
-  events      Event[]            @relation("EmailItemEvents")
-  products    EmailItemProduct[]
+  id           String             @id @default(uuid())
+  title        String
+  description  String?            @db.Text
+  planId       String
+  order        Int                @default(0)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  plan         EmailPlan          @relation(fields: [planId], references: [id], onDelete: Cascade)
+  events       Event[]            @relation("EmailItemEvents")
+  products     EmailItemProduct[]
   savedAssetId String?
-  savedAsset  SavedAsset? @relation(fields: [savedAssetId], references: [id], onDelete: SetNull)
-  photos      EmailItemPhoto[]
-  
+  savedAsset   SavedAsset?        @relation(fields: [savedAssetId], references: [id], onDelete: SetNull)
+  photos       EmailItemPhoto[]
+
   @@index([planId], map: "EmailItem_planId_fkey")
   @@index([savedAssetId], map: "EmailItem_savedAssetId_fkey")
 }
@@ -425,4 +424,12 @@ enum EventStatus {
   SCHEDULED
   PAST
   CANCELED
+}
+
+model ColorPalette {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  colors    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

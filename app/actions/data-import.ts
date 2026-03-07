@@ -229,6 +229,38 @@ export async function importData(entity: string, data: any[]) {
                 }
                 break
 
+            case 'color-palettes':
+                for (const row of data) {
+                    let colorsArray: string[] = []
+                    const colorsInput = row.Colors
+
+                    if (colorsInput) {
+                        try {
+                            if (colorsInput.startsWith('[')) {
+                                colorsArray = JSON.parse(colorsInput)
+                            } else {
+                                colorsArray = colorsInput.split(',').map((c: string) => c.trim()).filter(Boolean)
+                            }
+                        } catch (e) {
+                            console.error('Failed to parse colors for palette:', row.Name)
+                            colorsArray = []
+                        }
+                    }
+
+                    await prisma.colorPalette.upsert({
+                        where: { id: row.ID || '' },
+                        update: {
+                            name: row.Name,
+                            colors: JSON.stringify(colorsArray) // Store as a serialized JSON string in Prisma Json field as designed
+                        },
+                        create: {
+                            name: row.Name,
+                            colors: JSON.stringify(colorsArray)
+                        }
+                    })
+                    count++
+                }
+                break
         }
 
         revalidatePath('/admin/data')

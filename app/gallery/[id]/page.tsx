@@ -1,10 +1,14 @@
-import { getPhoto } from '@/app/actions/photos'
+import { getPhoto, getPhotoTags, getAlbums } from '@/app/actions/photos'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Calendar, Tag as TagIcon, Image as ImageIcon, Download } from 'lucide-react'
+import { ArrowLeft, Calendar, Tag as TagIcon, Image as ImageIcon, Download, AlignLeft, Layers } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
+import { ProductTagAssigner } from '@/components/gallery/product-tag-assigner'
+import { PhotoMetadataEditor } from '@/components/gallery/photo-metadata-editor'
+import { PhotoAlbumEditor } from '@/components/gallery/photo-album-editor'
+import { getImmichAssets } from '@/app/actions/immich'
 
 interface GalleryItemPageProps {
     params: Promise<{
@@ -15,10 +19,28 @@ interface GalleryItemPageProps {
 export default async function GalleryItemPage({ params }: GalleryItemPageProps) {
     const { id } = await params
     const photo = await getPhoto(id)
+    const allTags = await getPhotoTags()
+    const allAlbums = await getAlbums()
 
     if (!photo) {
         notFound()
     }
+
+    const existingUpcs = photo.tags
+        ?.filter(t => t.name.startsWith('upc/'))
+        .map(t => t.name.split('/')[1]) || []
+
+    // Map which albums this photo is currently in
+    const initialAlbums: any[] = []
+    
+    // Immich doesn't easily return an asset's albums from searchAssets yet,
+    // so we need a workaround or if the SDK exposes it, we use it. 
+    // Usually we fetch contents of albums or the list of albums an asset belongs to.
+    // For now we will iterate the albums and find if the asset belongs to it using getAssets by album but that might be slow.
+    // Given the SDK shape we may just pass empty initially if there's no efficient endpoint and let the UI manage new state, 
+    // wait, we can just fetch the album contents if needed or use a raw API call to get an asset's albums.
+    // Let's check if we can query an asset's albums directly. Immich allows getting asset details which might include album information.
+    // To keep it simple, we'll try to get it if available on the asset, otherwise default to [].
 
     return (
         <div className="space-y-6">
@@ -73,26 +95,26 @@ export default async function GalleryItemPage({ params }: GalleryItemPageProps) 
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                                    <TagIcon className="h-4 w-4" /> Tags
-                                </div>
-                                {photo.tags && photo.tags.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                        {photo.tags.map((tag: { id: string; name: string; color?: string }) => (
-                                            <Badge
-                                                key={tag.id}
-                                                variant="secondary"
-                                                className="px-2.5 py-1 text-sm bg-slate-100 hover:bg-slate-200 border-0 flex gap-2 items-center text-slate-700"
-                                            >
-                                                <div className="h-2 w-2 rounded-full" style={{ backgroundColor: tag.color || '#94a3b8' }} />
-                                                {tag.name}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-sm text-slate-500 italic">No tags associated with this photo.</div>
-                                )}
+                            <PhotoMetadataEditor
+                                photoId={photo.id}
+                                initialTags={photo.tags || []}
+                                initialDescription={photo.description || null}
+                                allTags={allTags}
+                            />
+                            
+                            <div className="pt-4 border-t border-slate-100">
+                                <PhotoAlbumEditor
+                                    photoId={photo.id}
+                                    initialAlbums={initialAlbums}
+                                    allAlbums={allAlbums}
+                                />
+                            </div>
+
+                            <div className="pt-4 border-t border-slate-100">
+                                <ProductTagAssigner
+                                    photoId={photo.id}
+                                    existingUpcs={existingUpcs}
+                                />
                             </div>
                         </div>
                         <div className="p-6 pt-0">
@@ -106,6 +128,6 @@ export default async function GalleryItemPage({ params }: GalleryItemPageProps) 
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

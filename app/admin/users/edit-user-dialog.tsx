@@ -56,6 +56,12 @@ export function EditUserDialog({ user, contacts, roles }: EditUserDialogProps) {
         // Add ID to form data since it's not an input
         formData.append('id', user.id)
 
+        // The role select is disabled for the primary admin, so it won't be in the formData.
+        // We ensure it is added here so the server action validation (z.string()) succeeds.
+        if (!formData.has('role')) {
+            formData.append('role', user.role)
+        }
+
         const res = await updateUser(formData)
 
         if (res.success) {

@@ -539,32 +539,35 @@ const UrlImage = (props: any) => {
             onDragEnd={shapeProps.onDragEnd}
             onTransformEnd={shapeProps.onTransformEnd}
             name={shapeProps.name}
-            clipX={cropX}
-            clipY={cropY}
-            clipWidth={cropWidth}
-            clipHeight={cropHeight}
             onDblClick={shapeProps.onDblClick}
+            shadowColor={shapeProps.shadowColor}
+            shadowBlur={shapeProps.shadowBlur}
+            shadowOffsetX={shapeProps.shadowOffsetX}
+            shadowOffsetY={shapeProps.shadowOffsetY}
+            shadowOpacity={shapeProps.shadowOpacity}
         >
-            <KonvaImage
-                x={0}
-                y={0}
-                image={image}
-                ref={imageRef}
-                width={shapeProps.width}
-                height={shapeProps.height}
-                filters={[Konva.Filters.Blur, Konva.Filters.Brighten]}
-                blurRadius={shapeProps.blurRadius || 0}
-                brightness={shapeProps.brightness || 0}
-                opacity={shapeProps.opacity}
-                shadowColor={shapeProps.shadowColor}
-                shadowBlur={shapeProps.shadowBlur}
-                shadowOffsetX={shapeProps.shadowOffsetX}
-                shadowOffsetY={shapeProps.shadowOffsetY}
-                shadowOpacity={shapeProps.shadowOpacity}
-                stroke={shapeProps.stroke}
-                strokeWidth={shapeProps.strokeWidth}
-                {...rest}
-            />
+            <KonvaGroup
+                clipX={cropX}
+                clipY={cropY}
+                clipWidth={cropWidth}
+                clipHeight={cropHeight}
+            >
+                <KonvaImage
+                    x={0}
+                    y={0}
+                    image={image}
+                    ref={imageRef}
+                    width={shapeProps.width}
+                    height={shapeProps.height}
+                    filters={[Konva.Filters.Blur, Konva.Filters.Brighten]}
+                    blurRadius={shapeProps.blurRadius || 0}
+                    brightness={shapeProps.brightness || 0}
+                    opacity={shapeProps.opacity}
+                    stroke={shapeProps.stroke}
+                    strokeWidth={shapeProps.strokeWidth}
+                    {...rest}
+                />
+            </KonvaGroup>
         </KonvaGroup>
     );
 };

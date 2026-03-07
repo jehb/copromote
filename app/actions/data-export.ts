@@ -156,5 +156,40 @@ export async function getExportData(entities: string[]) {
         }))
     }
 
+    if (entities.includes('users')) {
+        const users = await prisma.user.findMany()
+        data.users = users.map(u => ({
+            ID: u.id,
+            Name: u.name,
+            Email: u.email,
+            Username: u.username,
+            Role: u.role,
+            'Must Change Password': u.mustChangePassword ? 'Yes' : 'No',
+            'Created At': formatDate(u.createdAt)
+        }))
+    }
+
+    if (entities.includes('color-palettes')) {
+        const palettes = await prisma.colorPalette.findMany()
+        data['color-palettes'] = palettes.map(p => {
+            let parsedColors = p.colors;
+            if (typeof p.colors === 'string') {
+                try {
+                    parsedColors = JSON.parse(p.colors)
+                } catch (e) {
+                    // Fallback if parsing fails
+                }
+            }
+            const colorsString = Array.isArray(parsedColors) ? parsedColors.join(', ') : String(parsedColors);
+
+            return {
+                ID: p.id,
+                Name: p.name,
+                Colors: colorsString,
+                'Created At': formatDate(p.createdAt)
+            }
+        })
+    }
+
     return data
 }

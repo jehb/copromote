@@ -74,7 +74,8 @@ export async function getImmichAssets(tagId?: string) {
         const res = await immich.searchAssets({
             metadataSearchDto: {
                 createdBefore: new Date().toISOString(),
-                tagIds: tagId && tagId !== 'all' ? [tagId] : undefined
+                tagIds: tagId && tagId !== 'all' ? [tagId] : undefined,
+                withExif: true
             }
         })
         return res?.assets?.items ?? []
@@ -138,6 +139,100 @@ export async function uploadImmichAsset(file: File, tagIds?: string[]) {
     }
 
     return res
+}
 
-    return res
+export async function addTagToImmichAsset(assetId: string, tagId: string) {
+    await initImmich()
+    try {
+        await immich.bulkTagAssets({
+            tagBulkAssetsDto: { tagIds: [tagId], assetIds: [assetId] }
+        })
+    } catch (e: any) {
+        console.error('Failed to add tag to Immich asset:', e?.response?.data || e.message)
+        throw new Error('Failed to tag photo.')
+    }
+}
+
+export async function updateImmichAsset(id: string, description: string) {
+    await initImmich()
+    try {
+        await immich.updateAsset({
+            id,
+            updateAssetDto: { description }
+        })
+    } catch (e: any) {
+        console.error('Failed to update Immich asset:', e?.response?.data || e.message)
+        throw new Error('Failed to update photo description.')
+    }
+}
+
+export async function removeTagFromImmichAsset(assetId: string, tagId: string) {
+    await initImmich()
+    try {
+        await immich.untagAssets({
+            id: tagId,
+            bulkIdsDto: { ids: [assetId] }
+        })
+    } catch (e: any) {
+        console.error('Failed to remove tag from Immich asset:', e?.response?.data || e.message)
+        throw new Error('Failed to remove tag from photo.')
+    }
+}
+
+export async function getImmichAlbums() {
+    const ready = await initImmich()
+    if (!ready) return []
+    try {
+        const response = await immich.getAllAlbums({})
+        return Array.isArray(response) ? response : []
+    } catch (e) {
+        console.error('Failed to get Immich albums:', e)
+        return []
+    }
+}
+
+export async function createImmichAlbum(albumName: string) {
+    await initImmich()
+    try {
+        return await immich.createAlbum({ createAlbumDto: { albumName } })
+    } catch (e) {
+        console.error('Failed to create Immich album:', e)
+        throw new Error('Failed to create album.')
+    }
+}
+
+export async function deleteImmichAlbum(id: string) {
+    await initImmich()
+    try {
+        return await immich.deleteAlbum({ id })
+    } catch (e) {
+        console.error('Failed to delete Immich album:', e)
+        throw new Error('Failed to delete album.')
+    }
+}
+
+export async function addAssetToImmichAlbum(albumId: string, assetId: string) {
+    await initImmich()
+    try {
+        return await immich.addAssetsToAlbum({
+            id: albumId,
+            bulkIdsDto: { ids: [assetId] }
+        })
+    } catch (e) {
+        console.error('Failed to add asset to Immich album:', e)
+        throw new Error('Failed to add photo to album.')
+    }
+}
+
+export async function removeAssetFromImmichAlbum(albumId: string, assetId: string) {
+    await initImmich()
+    try {
+        return await immich.removeAssetFromAlbum({
+            id: albumId,
+            bulkIdsDto: { ids: [assetId] }
+        })
+    } catch (e) {
+        console.error('Failed to remove asset from Immich album:', e)
+        throw new Error('Failed to remove photo from album.')
+    }
 }

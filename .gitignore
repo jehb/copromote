@@ -45,4 +45,4 @@ next-env.d.ts
 # temporary logs and outputs
 *.log
 *_output.txt
-
+temp_*.txt
