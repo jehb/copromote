@@ -54,8 +54,7 @@ describe('DashboardPage', () => {
         // We might need more specific query if '1' appears elsewhere.
         // It's in a card content.
 
-        // Total Assets (5 + 10 = 15)
-        expect(screen.getByText('15')).toBeInTheDocument()
+
 
         // Recent Projects list
         expect(screen.getByText('Project Alpha')).toBeInTheDocument()

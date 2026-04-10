@@ -97,7 +97,7 @@ describe('Projects Actions', () => {
                     description: 'A test project',
                     startDate: new Date('2025-01-01'),
                     endDate: new Date('2025-12-31'),
-                    status: 'active',
+                    status: 'Active',
                     createdById: 'user-1',
                     updatedById: 'user-1'
                 })
@@ -197,7 +197,7 @@ describe('Projects Actions', () => {
             formData.append('name', 'P3')
             formData.append('description', 'D3')
             formData.append('startDate', '2025-01-01')
-            formData.append('status', 'active')
+            formData.append('status', 'Active')
 
                 ; (prisma.project.update as jest.Mock).mockResolvedValue({ id: 'proj-1' })
 

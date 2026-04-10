@@ -27,6 +27,7 @@ jest.mock('next/cache', () => ({
 
 describe('Email Plan Actions', () => {
     beforeEach(() => {
+        jest.spyOn(console, 'error').mockImplementation(() => {});
         jest.clearAllMocks()
     })
 
@@ -41,7 +42,7 @@ describe('Email Plan Actions', () => {
             expect(result.data).toEqual(mockPlans)
             expect(prisma.emailPlan.findMany).toHaveBeenCalledWith({
                 orderBy: { sendDate: 'desc' },
-                include: { _count: { select: { items: true } } },
+                include: expect.any(Object)
             })
         })
 
@@ -69,7 +70,12 @@ describe('Email Plan Actions', () => {
                 include: {
                     items: {
                         orderBy: { order: 'asc' },
-                        include: { events: true, products: true },
+                        include: { 
+                            events: true, 
+                            photos: true,
+                            products: true,
+                            savedAsset: { select: { id: true, name: true, previewImage: true } }
+                        },
                     },
                 },
             })

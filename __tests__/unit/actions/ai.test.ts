@@ -51,10 +51,17 @@ jest.mock('openai', () => {
 global.fetch = jest.fn()
 
 describe('AI Actions', () => {
+    const originalEnv = process.env;
+
     beforeEach(() => {
         jest.clearAllMocks()
         jest.spyOn(console, 'log').mockImplementation(() => { })
         jest.spyOn(console, 'error').mockImplementation(() => { })
+        process.env = { ...originalEnv };
+    })
+
+    afterEach(() => {
+        process.env = originalEnv;
     })
 
     describe('fetchLocalModels', () => {
@@ -130,26 +137,26 @@ describe('AI Actions', () => {
 
     describe('getAISettings', () => {
         it('should return default provider if no config', async () => {
-            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            delete process.env.AI_PROVIDER;
+            delete process.env.AI_MODEL;
+            delete process.env.AI_API_KEY;
+            delete process.env.AI_BASE_URL;
             const settings = await getAISettings()
             expect(settings.provider).toBe('gemini')
-            expect(settings.model).toBeNull()
+            expect(settings.model).toBeUndefined()
         })
 
         it('should return configured settings', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_MODEL') return 'gpt-4'
-                if (key === 'AI_API_KEY') return 'sk-test'
-                if (key === 'AI_BASE_URL') return 'test-url'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_MODEL = 'gpt-4';
+            process.env.AI_API_KEY = 'test-key';
+            process.env.AI_BASE_URL = 'test-url';
 
             const settings = await getAISettings()
             expect(settings).toEqual({
                 provider: 'openai',
                 model: 'gpt-4',
-                apiKey: 'sk-test',
+                apiKey: 'test-key',
                 baseUrl: 'test-url',
             })
         })
@@ -180,20 +187,14 @@ describe('AI Actions', () => {
 
     describe('testAIConnection', () => {
         it('should throw error if API key missing (non-local)', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
 
             await expect(testAIConnection()).rejects.toThrow('API Key is missing')
         })
 
         it('should test gemini connection successfully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'gemini'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'gemini';
+            process.env.AI_API_KEY = 'test-key';
 
             const result = await testAIConnection()
             expect(result.success).toBe(true)
@@ -201,11 +202,8 @@ describe('AI Actions', () => {
         })
 
         it('should test openai connection successfully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
 
             const result = await testAIConnection()
             expect(result.success).toBe(true)
@@ -213,10 +211,7 @@ describe('AI Actions', () => {
         })
 
         it('should test local connection successfully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'local'
-                return null
-            })
+            process.env.AI_PROVIDER = 'local';
 
             const result = await testAIConnection()
             expect(result.success).toBe(true)
@@ -224,11 +219,8 @@ describe('AI Actions', () => {
         })
 
         it('should handle API errors gracefully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
 
                 ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
                     chat: {
@@ -244,11 +236,8 @@ describe('AI Actions', () => {
         })
 
         it('should handle empty choices gracefully in OpenAI', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
 
                 ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
                     chat: {
@@ -264,11 +253,8 @@ describe('AI Actions', () => {
         })
 
         it('should handle API_KEY_INVALID specially', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
                 ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
                     chat: { completions: { create: jest.fn().mockRejectedValue(new Error('API_KEY_INVALID')) } },
                 }))
@@ -278,11 +264,8 @@ describe('AI Actions', () => {
         })
 
         it('should handle 404 error specially', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
             const error404 = new Error('Not Found') as any
             error404.status = 404
                 ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
@@ -298,16 +281,16 @@ describe('AI Actions', () => {
         const promptParams = ['Some content', 'Twitter'] as const
 
         it('should throw error if API key missing', async () => {
-            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            delete process.env.AI_PROVIDER;
+            delete process.env.AI_MODEL;
+            delete process.env.AI_API_KEY;
+            delete process.env.AI_BASE_URL;
             await expect(generateSocialPostAlternatives(...promptParams)).rejects.toThrow('AI API Key not found')
         })
 
         it('should generate alternatives via Gemini', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'gemini'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'gemini';
+            process.env.AI_API_KEY = 'test-key';
 
                 ; (GoogleGenerativeAI as jest.Mock).mockImplementationOnce(() => ({
                     getGenerativeModel: jest.fn().mockReturnValue({
@@ -325,11 +308,8 @@ describe('AI Actions', () => {
         })
 
         it('should handle Gemini generation errors', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'gemini'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'gemini';
+            process.env.AI_API_KEY = 'test-key';
 
                 ; (GoogleGenerativeAI as jest.Mock).mockImplementationOnce(() => ({
                     getGenerativeModel: jest.fn().mockReturnValue({
@@ -341,11 +321,8 @@ describe('AI Actions', () => {
         })
 
         it('should generate alternatives via OpenAI', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
 
                 ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
                     chat: {
@@ -362,11 +339,8 @@ describe('AI Actions', () => {
         })
 
         it('should handle OpenAI generation errors', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
 
                 ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
                     chat: {
@@ -380,11 +354,8 @@ describe('AI Actions', () => {
         })
 
         it('should handle empty choices from OpenAI', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'openai'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_PROVIDER = 'openai';
+            process.env.AI_API_KEY = 'test-key';
                 ; (OpenAI as unknown as jest.Mock).mockImplementationOnce(() => ({
                     chat: { completions: { create: jest.fn().mockResolvedValue({ choices: [] }) } },
                 }))
@@ -392,11 +363,8 @@ describe('AI Actions', () => {
         })
 
         it('should throw unsupported provider error', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'AI_PROVIDER') return 'unsupported'
-                if (key === 'AI_API_KEY') return 'test-key'
-                return null
-            })
+            process.env.AI_API_KEY = 'test-key';
+            process.env.AI_PROVIDER = 'unsupported';
 
             await expect(generateSocialPostAlternatives(...promptParams)).rejects.toThrow('Unsupported AI provider: unsupported')
         })

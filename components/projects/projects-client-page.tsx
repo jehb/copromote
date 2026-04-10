@@ -50,7 +50,7 @@ export function ProjectsClientPage({ initialProjects, userRole }: ProjectsClient
                     <Card key={project.id} className="hover:shadow-xl transition-all border-slate-200 shadow-sm overflow-hidden group">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 bg-slate-50/50 border-b">
                             <CardTitle className="text-lg font-bold text-slate-900 line-clamp-1">{project.name}</CardTitle>
-                            <Badge className="font-bold text-[10px] uppercase tracking-wider" variant={project.status === 'active' ? 'default' : 'secondary'}>
+                            <Badge className="font-bold text-[10px] uppercase tracking-wider" variant={project.status?.toLowerCase() === 'active' ? 'default' : 'secondary'}>
                                 {project.status}
                             </Badge>
                         </CardHeader>

@@ -9,6 +9,7 @@ import { Check, Sparkles, Globe, Key, Cpu, Loader2, MessageSquare } from 'lucide
 import { getConfig, updateConfig } from '@/app/actions/settings'
 import { testAIConnection, fetchLocalModels, fetchGeminiModels } from '@/app/actions/ai'
 import { Link2 } from 'lucide-react'
+import Link from 'next/link'
 import {
     Select,
     SelectContent,
@@ -168,6 +169,23 @@ export default function SettingsPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-sm text-muted-foreground">User profile management is coming soon.</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>API Key Management</CardTitle>
+                        <CardDescription>
+                            Generate and manage programmatic access keys for integrations.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex items-center gap-4">
+                        <Button asChild>
+                            <Link href="/admin/settings/api-keys">
+                                <Key className="mr-2 h-4 w-4" />
+                                Manage API Keys
+                            </Link>
+                        </Button>
                     </CardContent>
                 </Card>
             </div>

@@ -105,7 +105,7 @@ export async function createProject(formData: FormData) {
             description,
             startDate,
             endDate,
-            status: 'active',
+            status: 'Active',
             createdById: userId,
             updatedById: userId
         }

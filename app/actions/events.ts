@@ -54,6 +54,7 @@ export async function createEvent(formData: FormData) {
     if (!session) throw new Error("Unauthorized");
     const title = formData.get('title') as string
     const description = formData.get('description') as string
+    const internalNotes = formData.get('internalNotes') as string
     const startTimeStr = formData.get('startTime') as string
     const endTimeStr = formData.get('endTime') as string
     const locationId = formData.get('locationId') as string
@@ -73,6 +74,7 @@ export async function createEvent(formData: FormData) {
         data: {
             title,
             description,
+            internalNotes,
             startTime: fromZonedTime(startTimeStr, TIMEZONE),
             endTime: fromZonedTime(endTimeStr, TIMEZONE),
             status,
@@ -107,6 +109,7 @@ export async function updateEvent(id: string, formData: FormData) {
     if (!session) throw new Error("Unauthorized");
     const title = formData.get('title') as string
     const description = formData.get('description') as string
+    const internalNotes = formData.get('internalNotes') as string
     const startTimeStr = formData.get('startTime') as string
     const endTimeStr = formData.get('endTime') as string
     const locationId = formData.get('locationId') as string
@@ -126,6 +129,7 @@ export async function updateEvent(id: string, formData: FormData) {
         data: {
             title,
             description,
+            internalNotes,
             startTime: fromZonedTime(startTimeStr, TIMEZONE),
             endTime: fromZonedTime(endTimeStr, TIMEZONE),
             status,

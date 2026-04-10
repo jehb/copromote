@@ -23,6 +23,7 @@ jest.mock('next/cache', () => ({
 describe('Task Actions', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        ;(getSession as jest.Mock).mockResolvedValue({ id: 'user-1' })
     })
 
     describe('getTasks', () => {
@@ -34,7 +35,6 @@ describe('Task Actions', () => {
 
             expect(tasks).toEqual(mockTasks)
             expect(prisma.task.findMany).toHaveBeenCalledWith({
-                orderBy: { createdAt: 'desc' },
                 orderBy: { createdAt: 'desc' },
                 include: expect.objectContaining({ assignee: true, project: true }),
             })
@@ -48,7 +48,6 @@ describe('Task Actions', () => {
             formData.append('dueDate', '2024-01-01')
             formData.append('projectId', 'proj-1')
 
-                ; (getSession as jest.Mock).mockResolvedValue({ id: 'user-1' })
                 ; (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'user-1' })
 
             await createTask(formData)
@@ -66,23 +65,14 @@ describe('Task Actions', () => {
             expect(revalidatePath).toHaveBeenCalledWith('/tasks')
         })
 
-        it('should create task without assignee if no session', async () => {
+        it('should throw Unauthorized if no session', async () => {
             const formData = new FormData()
             formData.append('title', 'New Task')
             formData.append('projectId', 'none')
 
                 ; (getSession as jest.Mock).mockResolvedValue(null)
 
-            await createTask(formData)
-
-            expect(prisma.task.create).toHaveBeenCalledWith({
-                data: expect.objectContaining({
-                    title: 'New Task',
-                    assigneeId: null,
-                    dueDate: null,
-                    projectId: null
-                }),
-            })
+            await expect(createTask(formData)).rejects.toThrow('Unauthorized')
         })
     })
 

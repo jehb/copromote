@@ -8,6 +8,10 @@ jest.mock('@/app/actions/contacts', () => ({
     getContacts: jest.fn(),
 }))
 
+jest.mock('@/components/layout/protected-route', () => ({
+    ProtectedRoute: ({ children }: any) => <>{children}</>
+}))
+
 // Mock Client Component
 jest.mock('@/components/contacts/contacts-client-page', () => ({
     ContactsClientPage: (props: any) => (

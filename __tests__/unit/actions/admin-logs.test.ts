@@ -14,6 +14,11 @@ jest.mock('@/lib/prisma', () => ({
 
 jest.mock('next/headers', () => ({
     headers: jest.fn(),
+    cookies: jest.fn().mockResolvedValue({
+        get: jest.fn().mockReturnValue({ value: 'mock_session_token' }),
+        set: jest.fn(),
+        delete: jest.fn(),
+    }),
 }))
 
 jest.mock('next/cache', () => ({

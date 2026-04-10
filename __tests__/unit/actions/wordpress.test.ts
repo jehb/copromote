@@ -1,6 +1,6 @@
 import { getWordPressConfig, saveWordPressConfig, testWordPressConnection, searchWordPressPosts, searchWordPressEvents } from '@/app/actions/wordpress'
 import { prisma } from '@/lib/prisma'
-import { verifySession } from '@/lib/session'
+import { getSession } from '@/lib/session'
 import { revalidatePath } from 'next/cache'
 
 jest.mock('@/lib/prisma', () => ({
@@ -13,7 +13,7 @@ jest.mock('@/lib/prisma', () => ({
 }))
 
 jest.mock('@/lib/session', () => ({
-    verifySession: jest.fn(),
+    getSession: jest.fn(),
 }))
 
 jest.mock('next/cache', () => ({
@@ -29,22 +29,19 @@ describe('WordPress Actions', () => {
         jest.spyOn(console, 'log').mockImplementation(() => { })
         jest.spyOn(console, 'warn').mockImplementation(() => { })
             // Default authenticated session
-            ; (verifySession as jest.Mock).mockResolvedValue({ id: '1' })
+            ; (getSession as jest.Mock).mockResolvedValue({ id: '1' })
     })
 
     describe('getWordPressConfig', () => {
         it('should throw Unauthorized if no session', async () => {
-            ; (verifySession as jest.Mock).mockResolvedValue(null)
+            ; (getSession as jest.Mock).mockResolvedValue(null)
             await expect(getWordPressConfig()).rejects.toThrow('Unauthorized')
         })
 
         it('should fetch and format config', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockImplementation(async ({ where }) => {
-                if (where.key === 'WORDPRESS_URL') return { value: 'http://wp.com' }
-                if (where.key === 'WORDPRESS_USERNAME') return { value: 'admin' }
-                if (where.key === 'WORDPRESS_APP_PASSWORD') return { value: 'secret' }
-                return null
-            })
+            process.env.WORDPRESS_URL = 'http://wp.com'
+            process.env.WORDPRESS_USERNAME = 'admin'
+            process.env.WORDPRESS_APP_PASSWORD = 'secret'
 
             const config = await getWordPressConfig()
             expect(config).toEqual({
@@ -55,7 +52,9 @@ describe('WordPress Actions', () => {
         })
 
         it('should handle missing configs', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue(null)
+            delete process.env.WORDPRESS_URL;
+            delete process.env.WORDPRESS_USERNAME;
+            delete process.env.WORDPRESS_APP_PASSWORD;
 
             const config = await getWordPressConfig()
             expect(config).toEqual({
@@ -68,43 +67,36 @@ describe('WordPress Actions', () => {
 
     describe('saveWordPressConfig', () => {
         it('should throw Unauthorized if no session', async () => {
-            ; (verifySession as jest.Mock).mockResolvedValue(null)
+            ; (getSession as jest.Mock).mockResolvedValue(null)
             await expect(saveWordPressConfig({ url: '', username: '' })).rejects.toThrow('Unauthorized')
         })
 
         it('should save config without password', async () => {
-            const result = await saveWordPressConfig({ url: 'http://wp.com', username: 'admin' })
-            expect(result.success).toBe(true)
-            expect(prisma.config.upsert).toHaveBeenCalledTimes(2) // url, username
-            expect(revalidatePath).toHaveBeenCalledWith('/admin/settings')
+            await expect(saveWordPressConfig({ url: 'http://wp.com', username: 'admin' })).rejects.toThrow('WordPress configuration is now managed via environment variables')
         })
 
         it('should save config with password', async () => {
-            await saveWordPressConfig({ url: 'http://wp.com', username: 'admin', appPassword: 'new-password' })
-            expect(prisma.config.upsert).toHaveBeenCalledTimes(3)
+            await expect(saveWordPressConfig({ url: 'http://wp.com', username: 'admin', appPassword: 'new-password' })).rejects.toThrow('WordPress configuration is now managed via environment variables')
         })
     })
 
     describe('testWordPressConnection', () => {
         it('should throw Unauthorized if no session', async () => {
-            ; (verifySession as jest.Mock).mockResolvedValue(null)
+            ; (getSession as jest.Mock).mockResolvedValue(null)
             await expect(testWordPressConnection()).rejects.toThrow('Unauthorized')
         })
 
         it('should return error if missing configuration', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue(null)
+            delete process.env.WORDPRESS_URL;
             const result = await testWordPressConnection()
             expect(result.success).toBe(false)
             expect(result.message).toContain('Missing configuration')
         })
 
         it('should test connection successfully', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockImplementation(async ({ where }) => {
-                if (where.key === 'WORDPRESS_URL') return { value: 'http://wp.com/' } // Testing trailing slash removal
-                if (where.key === 'WORDPRESS_USERNAME') return { value: 'admin' }
-                if (where.key === 'WORDPRESS_APP_PASSWORD') return { value: 'secret' }
-                return null
-            })
+            process.env.WORDPRESS_URL = 'http://wp.com/' // Testing trailing slash removal
+            process.env.WORDPRESS_USERNAME = 'admin'
+            process.env.WORDPRESS_APP_PASSWORD = 'secret'
 
                 ; (global.fetch as jest.Mock).mockResolvedValueOnce({
                     ok: true,
@@ -121,9 +113,9 @@ describe('WordPress Actions', () => {
         })
 
         it('should handle unauthorized or failed fetch', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockImplementation(async ({ where }) => {
-                return { value: 'exists' }
-            })
+            process.env.WORDPRESS_URL = 'http://wp.com/'
+            process.env.WORDPRESS_USERNAME = 'admin'
+            process.env.WORDPRESS_APP_PASSWORD = 'secret'
 
                 ; (global.fetch as jest.Mock).mockResolvedValueOnce({
                     ok: false,
@@ -137,9 +129,9 @@ describe('WordPress Actions', () => {
         })
 
         it('should handle generic fetch errors', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockImplementation(async ({ where }) => {
-                return { value: 'exists' }
-            })
+            process.env.WORDPRESS_URL = 'http://wp.com/'
+            process.env.WORDPRESS_USERNAME = 'admin'
+            process.env.WORDPRESS_APP_PASSWORD = 'secret'
 
                 ; (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
@@ -151,15 +143,15 @@ describe('WordPress Actions', () => {
 
     describe('searchWordPressPosts', () => {
         it('should return empty if missing url or query', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue(null)
+            delete process.env.WORDPRESS_URL;
             expect(await searchWordPressPosts('test')).toEqual([])
 
-                ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
             expect(await searchWordPressPosts('')).toEqual([])
         })
 
         it('should fetch and map posts', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
 
                 ; (global.fetch as jest.Mock).mockResolvedValueOnce({
                     ok: true,
@@ -175,14 +167,14 @@ describe('WordPress Actions', () => {
         })
 
         it('should handle fetch failure', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
                 ; (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false })
 
             expect(await searchWordPressPosts('test')).toEqual([])
         })
 
         it('should handle generic error', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
                 ; (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('fail'))
 
             expect(await searchWordPressPosts('test')).toEqual([])
@@ -191,12 +183,12 @@ describe('WordPress Actions', () => {
 
     describe('searchWordPressEvents', () => {
         it('should return empty if missing url or query', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue(null)
+            delete process.env.WORDPRESS_URL;
             expect(await searchWordPressEvents('test')).toEqual([])
         })
 
         it('should fetch and map events', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
 
                 ; (global.fetch as jest.Mock).mockResolvedValueOnce({
                     ok: true,
@@ -215,7 +207,7 @@ describe('WordPress Actions', () => {
         })
 
         it('should handle validation issues in response structure', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
 
                 ; (global.fetch as jest.Mock).mockResolvedValueOnce({
                     ok: true,
@@ -230,7 +222,7 @@ describe('WordPress Actions', () => {
         })
 
         it('should handle fetch failure printing text response', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
                 ; (global.fetch as jest.Mock).mockResolvedValueOnce({
                     ok: false,
                     status: 500,
@@ -242,7 +234,7 @@ describe('WordPress Actions', () => {
         })
 
         it('should handle generic error', async () => {
-            ; (prisma.config.findUnique as jest.Mock).mockResolvedValue({ value: 'http://wp.com' })
+            process.env.WORDPRESS_URL = 'http://wp.com'
                 ; (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('fail'))
 
             expect(await searchWordPressEvents('test')).toEqual([])

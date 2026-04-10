@@ -5,7 +5,7 @@ import { formatInTimeZone } from 'date-fns-tz'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -62,6 +62,8 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
     const [selectedProducts, setSelectedProducts] = useState<string[]>(
         event?.products?.map((p: any) => p.upc) || []
     )
+    const [description, setDescription] = useState(event?.description || '')
+    const [internalNotes, setInternalNotes] = useState(event?.internalNotes || '')
 
     // Series state
     const [localEventSeries, setLocalEventSeries] = useState(eventSeries)
@@ -339,14 +341,22 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                             <Calendar className="h-4 w-4 text-primary" /> Logistics & Notes
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="description">Event Description & Internal Notes</Label>
-                            <Textarea
-                                id="description"
-                                name="description"
-                                defaultValue={event?.description}
-                                placeholder="Add agenda items, loading details, or general notes..."
-                                className="min-h-[150px] bg-slate-50/50 border-slate-200 resize-none focus:ring-primary/20"
+                            <Label htmlFor="description">Public-facing Description</Label>
+                            <RichTextEditor
+                                value={description}
+                                onChange={setDescription}
+                                placeholder="Public description of the event..."
                             />
+                            <input type="hidden" name="description" value={description} />
+                        </div>
+                        <div className="space-y-2 pt-4">
+                            <Label htmlFor="internalNotes">Internal Notes</Label>
+                            <RichTextEditor
+                                value={internalNotes}
+                                onChange={setInternalNotes}
+                                placeholder="Add agenda items, loading details, or general notes..."
+                            />
+                            <input type="hidden" name="internalNotes" value={internalNotes} />
                         </div>
                     </section>
                 </div>

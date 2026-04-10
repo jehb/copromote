@@ -27,6 +27,7 @@ jest.mock('@/lib/db', () => ({
         asset: {
             create: jest.fn(),
             delete: jest.fn(),
+            deleteMany: jest.fn(),
         },
         config: {
             findUnique: jest.fn()
@@ -109,6 +110,7 @@ describe('Social Actions', () => {
                 ; (prisma.socialPost.findMany as jest.Mock).mockResolvedValue([]) // No more posts in review
                 ; (prisma.task.findFirst as jest.Mock).mockResolvedValue({ id: 'task-1' })
 
+            ; (prisma.socialPost.update as jest.Mock).mockResolvedValue({ id: 'post-1', assets: [] });
             await updateSocialPost(formData)
 
             expect(prisma.socialPost.update).toHaveBeenCalled()

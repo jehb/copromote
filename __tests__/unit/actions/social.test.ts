@@ -29,6 +29,7 @@ jest.mock('@/lib/db', () => ({
         asset: {
             create: jest.fn(),
             delete: jest.fn(),
+            deleteMany: jest.fn(),
         }
     },
 }))
@@ -268,7 +269,7 @@ describe('Social Actions', () => {
                     platform: 'twitter',
                     status: 'draft',
                     reviewerId: 'reviewer-2',
-                    assets: { set: [], connect: [] }
+                    assets: undefined
                 }),
                 include: { assets: true }
             })

@@ -38,6 +38,7 @@
   ],
   "exclude": [
     "node_modules",
+    "mcp",
     "jest.setup.ts",
     "**/*.test.ts",
     "**/*.test.tsx",

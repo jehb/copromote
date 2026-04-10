@@ -52,7 +52,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                     <div className="flex items-center gap-3">
                         <h1 className="text-4xl font-bold tracking-tight">{project.name}</h1>
                         <div className="flex items-center gap-2">
-                            <Badge className="uppercase tracking-wider" variant={project.status === 'active' ? 'default' : 'secondary'}>
+                            <Badge className="uppercase tracking-wider" variant={project.status?.toLowerCase() === 'active' ? 'default' : 'secondary'}>
                                 {project.status}
                             </Badge>
                             <Dialog>
@@ -92,9 +92,11 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="active">Active</SelectItem>
-                                                    <SelectItem value="completed">Completed</SelectItem>
-                                                    <SelectItem value="archived">Archived</SelectItem>
+                                                    <SelectItem value="Active">Active</SelectItem>
+                                                    <SelectItem value="In Progress">In Progress</SelectItem>
+                                                    <SelectItem value="Done">Done</SelectItem>
+                                                    <SelectItem value="Pending">Pending</SelectItem>
+                                                    <SelectItem value="Canceled">Canceled</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>

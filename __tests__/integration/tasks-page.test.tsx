@@ -16,6 +16,10 @@ jest.mock('@/app/actions/projects', () => ({
     getProjects: jest.fn(),
 }))
 
+jest.mock('@/components/layout/protected-route', () => ({
+    ProtectedRoute: ({ children }: any) => <>{children}</>
+}))
+
 // Mock Subcomponents
 jest.mock('@/components/tasks/task-board', () => ({
     TaskBoard: (props: any) => (

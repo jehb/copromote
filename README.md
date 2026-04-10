@@ -12,6 +12,7 @@ Co+promote is a comprehensive promotion management system designed to streamline
 - **Media Assets**: Native Immich integration for cloud-based photo organization and tagging.
 - **Activity Logging**: Comprehensive audit trail for all system actions.
 - **User Management**: Dynamic custom roles with granular permission control and secure authentication.
+- **REST API & Developer Tools**: Fully documented API with a standard I/O MCP (Model Context Protocol) server for deep AI integration.
 
 ## Getting Started
 
@@ -76,6 +77,28 @@ npm run test -- dashboard
 Refer to the included `docs/` folder for comprehensive structural documentation:
 - [Application Pages](docs/pages.md): Documentation on routing and interfaces.
 - [Database Models](docs/models.md): Documentation on Prisma models and schema relationships.
+
+### API Documentation
+
+The REST API is fully documented using Swagger OpenAPI 3.0. You can view, test, and interact with the live endpoints by navigating to **[`/docs/api`](http://localhost:3000/docs/api)** in your browser while the server is running.
+
+## MCP Server (AI Integration)
+
+Co+promote includes a standard I/O MCP (Model Context Protocol) server out of the box. This enables LLMs (like Claude Desktop or custom agents) to securely query tasks, events, CRM data, and social posts natively.
+
+**To run the MCP Server:**
+1. Generate an API Key from the Admin Settings Dashboard (`/admin/settings/api-keys`).
+2. Add the key and local API URL to your `.env` file (or export it):
+   ```env
+   PROMOTY_API_KEY="promoty_..."
+   PROMOTY_API_URL="http://localhost:3000/api/v1"
+   ```
+3. Navigate to the MCP folder and start the server:
+   ```bash
+   cd mcp
+   npm run build
+   npm run start
+   ```
 
 ## Tech Stack
 

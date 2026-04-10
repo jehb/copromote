@@ -8,8 +8,16 @@ import { getEventSeries } from '@/app/actions/event-series'
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/events/event-card'
 import Link from 'next/link'
-import { Plus, MapPin, Loader2, Calendar, LayoutGrid, List, Calendar as CalendarIcon } from 'lucide-react'
+import { Plus, MapPin, Loader2, Calendar, LayoutGrid, List, Calendar as CalendarIcon, Filter } from 'lucide-react'
 import { PageHeader } from '@/components/ui/page-header'
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { EventListView } from '@/components/events/event-list-view'
 import { EventCalendarView } from '@/components/events/event-calendar-view'
 import { useState } from 'react'
@@ -65,8 +73,14 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
     })
 
     const [view, setView] = useState<'list' | 'calendar' | 'cards'>('list')
+    const [statusFilter, setStatusFilter] = useState<string[]>([])
 
     const isLoadingAny = isLoadingEvents
+
+    const filteredEvents = events.filter((event: any) => {
+        if (statusFilter.length === 0) return true
+        return statusFilter.includes(event.status)
+    })
 
     const viewSwitcher = (
         <div className="flex items-center bg-slate-100 p-1 rounded-lg border shadow-sm">
@@ -127,9 +141,45 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
                 <div className="flex items-center gap-4">
                     <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Display View</h3>
                     {viewSwitcher}
+                    <div className="h-6 w-px bg-slate-200 hidden md:block" />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 border-dashed">
+                                <Filter className="h-3.5 w-3.5 mr-2" />
+                                Status
+                                {statusFilter.length > 0 && (
+                                    <>
+                                        <div className="mx-2 h-4 w-px bg-slate-200" />
+                                        <span className="rounded-sm bg-slate-100 px-1 font-normal text-slate-500 text-xs">
+                                            {statusFilter.length}
+                                        </span>
+                                    </>
+                                )}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[200px]">
+                            <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {['TENTATIVE', 'SCHEDULED', 'PAST', 'CANCELED'].map((status) => (
+                                <DropdownMenuCheckboxItem
+                                    key={status}
+                                    checked={statusFilter.includes(status)}
+                                    onCheckedChange={(checked) => {
+                                        setStatusFilter((prev) =>
+                                            checked
+                                                ? [...prev, status]
+                                                : prev.filter((s) => s !== status)
+                                        )
+                                    }}
+                                >
+                                    {status.charAt(0) + status.slice(1).toLowerCase()}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
                 <div className="text-sm text-slate-500 font-medium">
-                    Showing {events.length} event{events.length !== 1 ? 's' : ''}
+                    Showing {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
                 </div>
             </div>
 
@@ -153,11 +203,26 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
                             </Button>
                         </div>
                     </div>
+                ) : filteredEvents.length === 0 ? (
+                    <div className="text-center py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="p-4 bg-white rounded-full shadow-sm border border-slate-100">
+                                <Filter className="h-8 w-8 text-slate-300" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900">No events found</h3>
+                                <p className="text-slate-500">Try adjusting your filters.</p>
+                            </div>
+                            <Button variant="outline" className="mt-2 border-slate-200" onClick={() => setStatusFilter([])}>
+                                Clear Filters
+                            </Button>
+                        </div>
+                    </div>
                 ) : (
                     <>
                         {view === 'cards' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {events.map((event: any) => (
+                                {filteredEvents.map((event: any) => (
                                     <EventCard
                                         key={event.id}
                                         event={event}
@@ -171,9 +236,9 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
                             </div>
                         )}
 
-                        {view === 'list' && <EventListView events={events} />}
+                        {view === 'list' && <EventListView events={filteredEvents} />}
 
-                        {view === 'calendar' && <EventCalendarView events={events} />}
+                        {view === 'calendar' && <EventCalendarView events={filteredEvents} />}
                     </>
                 )}
             </div>

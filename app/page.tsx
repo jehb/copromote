@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic"
 import { getProjects } from '@/app/actions/projects'
 import { getHyperlinks } from '@/app/actions/hyperlinks'
+import { getEvents } from '@/app/actions/events'
 import { QuickLinks } from '@/components/dashboard/quick-links'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,7 +12,9 @@ import { PageHeader } from '@/components/ui/page-header'
 export default async function DashboardPage() {
   const projects = await getProjects()
   const hyperlinks = await getHyperlinks()
-  const activeProjects = projects.filter(p => p.status === 'active')
+  const events = await getEvents()
+  const activeProjects = projects.filter(p => ['active', 'in progress'].includes(p.status.toLowerCase()))
+  const upcomingEvents = events.filter(e => e.status === 'SCHEDULED')
 
   return (
     <div className="p-8 space-y-8">
@@ -27,7 +30,7 @@ export default async function DashboardPage() {
       <QuickLinks hyperlinks={hyperlinks} />
 
       {/* Stats Overview */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
@@ -35,19 +38,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeProjects.length}</div>
-            <p className="text-xs text-muted-foreground">current active campaigns</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {projects.reduce((acc, p) => acc + p._count.assets, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">across all projects</p>
+            <p className="text-xs text-muted-foreground">current active or in-progress</p>
           </CardContent>
         </Card>
         <Card>
@@ -56,8 +47,8 @@ export default async function DashboardPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">scheduled this month</p>
+            <div className="text-2xl font-bold">{upcomingEvents.length}</div>
+            <p className="text-xs text-muted-foreground">events scheduled</p>
           </CardContent>
         </Card>
       </div>

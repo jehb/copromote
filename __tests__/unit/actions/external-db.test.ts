@@ -32,7 +32,8 @@ describe('External DB Actions', () => {
 
     describe('testExternalConnection', () => {
         it('should return error if config is invalid', async () => {
-            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            delete process.env.EXTERNAL_DB_URL;
+            delete process.env.EXTERNAL_DB_TYPE;
 
             const result = await testExternalConnection()
             expect(result.success).toBe(false)
@@ -40,11 +41,8 @@ describe('External DB Actions', () => {
         })
 
         it('should test connection successfully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = { query: jest.fn().mockResolvedValue({}) }
             const mockPool = {
@@ -60,11 +58,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle jdbc style url for server extraction', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'jdbc:sqlserver://my-server.com:1433'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'jdbc:sqlserver://my-server.com:1433'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
             const mockRequest = { query: jest.fn().mockResolvedValue({}) }
             const mockPool = { request: jest.fn().mockReturnValue(mockRequest), close: jest.fn() }
                 ; (sql.connect as jest.Mock).mockResolvedValueOnce(mockPool)
@@ -77,11 +72,11 @@ describe('External DB Actions', () => {
         })
 
         it('should handle missing user, password, and database config defaults', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return null
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
+            delete process.env.EXTERNAL_DB_USER;
+            delete process.env.EXTERNAL_DB_PASSWORD;
+            delete process.env.EXTERNAL_DB_NAME;
 
             const mockRequest = { query: jest.fn().mockResolvedValue({}) }
             const mockPool = {
@@ -100,11 +95,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle connection errors explicitly', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
                 ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Connection timeout'))
 
@@ -116,7 +108,8 @@ describe('External DB Actions', () => {
 
     describe('getExternalProducts', () => {
         it('should return empty array if config is invalid', async () => {
-            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            delete process.env.EXTERNAL_DB_URL;
+            delete process.env.EXTERNAL_DB_TYPE;
 
             const result = await getExternalProducts()
             expect(result.products).toEqual([])
@@ -124,11 +117,8 @@ describe('External DB Actions', () => {
         })
 
         it('should fetch external products with pagination', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
@@ -161,11 +151,8 @@ describe('External DB Actions', () => {
         })
 
         it('should apply search filter and pass it to count query', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
@@ -187,11 +174,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle undefined fields gracefully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
@@ -224,11 +208,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle fetch errors gracefully and return mock error product', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
                 ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
@@ -243,18 +224,16 @@ describe('External DB Actions', () => {
 
     describe('getExternalProductByUPC', () => {
         it('should return null if config is invalid', async () => {
-            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            delete process.env.EXTERNAL_DB_URL;
+            delete process.env.EXTERNAL_DB_TYPE;
 
             const result = await getExternalProductByUPC('12345')
             expect(result).toBeNull()
         })
 
         it('should fetch single external product by UPC', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
@@ -278,11 +257,8 @@ describe('External DB Actions', () => {
         })
 
         it('should return null if no product found', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = {
                 input: jest.fn().mockReturnThis(),
@@ -304,11 +280,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle fetch errors gracefully and return null', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
                 ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
@@ -321,17 +294,15 @@ describe('External DB Actions', () => {
 
     describe('getExternalBrands', () => {
         it('should return empty array if config is invalid', async () => {
-            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            delete process.env.EXTERNAL_DB_URL;
+            delete process.env.EXTERNAL_DB_TYPE;
             const result = await getExternalBrands()
             expect(result).toEqual([])
         })
 
         it('should fetch external brands', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = { query: jest.fn() }
             const mockPool = {
@@ -349,11 +320,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle fetch errors gracefully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
                 ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
             const result = await getExternalBrands()
@@ -363,17 +331,15 @@ describe('External DB Actions', () => {
 
     describe('getExternalProductsByBrand', () => {
         it('should return empty array if config is invalid', async () => {
-            ; (getConfig as jest.Mock).mockResolvedValue(null)
+            delete process.env.EXTERNAL_DB_URL;
+            delete process.env.EXTERNAL_DB_TYPE;
             const result = await getExternalProductsByBrand('Brand A')
             expect(result).toEqual([])
         })
 
         it('should fetch external products by brand', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = { input: jest.fn().mockReturnThis(), query: jest.fn() }
             const mockPool = {
@@ -392,11 +358,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle undefined fields gracefully in brand products', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             const mockRequest = { input: jest.fn().mockReturnThis(), query: jest.fn() }
             const mockPool = {
@@ -415,11 +378,8 @@ describe('External DB Actions', () => {
         })
 
         it('should handle fetch errors gracefully', async () => {
-            ; (getConfig as jest.Mock).mockImplementation((key) => {
-                if (key === 'EXTERNAL_DB_URL') return 'test-server'
-                if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-                return 'test-val'
-            })
+            process.env.EXTERNAL_DB_URL = 'test-server'
+            process.env.EXTERNAL_DB_TYPE = 'mssql'
                 ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
             const result = await getExternalProductsByBrand('Brand A')
@@ -430,7 +390,8 @@ describe('External DB Actions', () => {
 
 describe('getExternalProductsByUPCs', () => {
     it('should return empty array if config is invalid', async () => {
-        ; (getConfig as jest.Mock).mockResolvedValue(null)
+        delete process.env.EXTERNAL_DB_URL;
+        delete process.env.EXTERNAL_DB_TYPE;
 
         const result = await getExternalProductsByUPCs(['123', '456'])
         expect(result).toEqual([])
@@ -447,11 +408,8 @@ describe('getExternalProductsByUPCs', () => {
     })
 
     it('should fetch multiple external products by UPCs', async () => {
-        ; (getConfig as jest.Mock).mockImplementation((key) => {
-            if (key === 'EXTERNAL_DB_URL') return 'test-server'
-            if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-            return 'test-val'
-        })
+        process.env.EXTERNAL_DB_URL = 'test-server'
+        process.env.EXTERNAL_DB_TYPE = 'mssql'
 
         const mockRequest = {
             input: jest.fn().mockReturnThis(),
@@ -481,11 +439,8 @@ describe('getExternalProductsByUPCs', () => {
     })
 
     it('should handle undefined fields gracefully in UPC products', async () => {
-        ; (getConfig as jest.Mock).mockImplementation((key) => {
-            if (key === 'EXTERNAL_DB_URL') return 'test-server'
-            if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-            return 'test-val'
-        })
+        process.env.EXTERNAL_DB_URL = 'test-server'
+        process.env.EXTERNAL_DB_TYPE = 'mssql'
 
         const mockRequest = {
             input: jest.fn().mockReturnThis(),
@@ -508,11 +463,8 @@ describe('getExternalProductsByUPCs', () => {
     })
 
     it('should handle fetch errors gracefully and return empty array', async () => {
-        ; (getConfig as jest.Mock).mockImplementation((key) => {
-            if (key === 'EXTERNAL_DB_URL') return 'test-server'
-            if (key === 'EXTERNAL_DB_TYPE') return 'mssql'
-            return 'test-val'
-        })
+        process.env.EXTERNAL_DB_URL = 'test-server'
+        process.env.EXTERNAL_DB_TYPE = 'mssql'
 
             ; (sql.connect as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 

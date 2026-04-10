@@ -75,7 +75,7 @@ export function EventCard({ event, locations, users, contacts, organizations, ev
                 <div>
                     <h3 className="font-semibold text-lg">{event.title}</h3>
                     {event.description && (
-                        <p className="text-sm text-slate-500 line-clamp-2 mt-1">{event.description}</p>
+                        <p className="text-sm text-slate-500 line-clamp-2 mt-1">{event.description.replace(/<[^>]*>?/gm, '')}</p>
                     )}
                 </div>
 

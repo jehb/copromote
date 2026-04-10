@@ -1,6 +1,6 @@
 import { search } from '@/app/actions/search'
 import { prisma } from '@/lib/prisma'
-import { verifySession } from '@/lib/session'
+import { getSession } from '@/lib/session'
 
 jest.mock('@/lib/prisma', () => ({
     prisma: {
@@ -16,7 +16,7 @@ jest.mock('@/lib/prisma', () => ({
 }))
 
 jest.mock('@/lib/session', () => ({
-    verifySession: jest.fn(),
+    getSession: jest.fn(),
 }))
 
 describe('Search Actions', () => {
@@ -24,7 +24,7 @@ describe('Search Actions', () => {
         jest.clearAllMocks()
         jest.spyOn(console, 'error').mockImplementation(() => { })
             // Default authenticated session
-            ; (verifySession as jest.Mock).mockResolvedValue({ id: '1' })
+            ; (getSession as jest.Mock).mockResolvedValue({ id: '1' })
     })
 
     describe('search', () => {
@@ -42,7 +42,7 @@ describe('Search Actions', () => {
         })
 
         it('should throw Unauthorized if no session', async () => {
-            ; (verifySession as jest.Mock).mockResolvedValue(null)
+            ; (getSession as jest.Mock).mockResolvedValue(null)
             await expect(search('test')).rejects.toThrow('Unauthorized')
         })
 

@@ -148,8 +148,22 @@ export function EventDetails({
                         </CardHeader>
                         <CardContent className="space-y-6">
                             {event.description && (
-                                <div className="prose prose-sm max-w-none text-slate-600">
-                                    <p className="whitespace-pre-wrap">{event.description}</p>
+                                <div className="space-y-2 overflow-hidden">
+                                    <div className="text-xs font-bold uppercase text-slate-400">Public-facing Description</div>
+                                    <div 
+                                        className="prose prose-sm max-w-none text-slate-600 break-words [&_p]:whitespace-break-spaces [&_*]:break-words" 
+                                        dangerouslySetInnerHTML={{ __html: event.description }} 
+                                    />
+                                </div>
+                            )}
+                            
+                            {event.internalNotes && (
+                                <div className="space-y-2 pt-4 border-t overflow-hidden">
+                                    <div className="text-xs font-bold uppercase text-slate-400">Internal Notes</div>
+                                    <div 
+                                        className="prose prose-sm max-w-none text-slate-600 bg-yellow-50 p-4 rounded-md border border-yellow-200 break-words [&_p]:whitespace-break-spaces [&_*]:break-words" 
+                                        dangerouslySetInnerHTML={{ __html: event.internalNotes }} 
+                                    />
                                 </div>
                             )}
 

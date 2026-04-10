@@ -21,6 +21,7 @@ jest.mock('next/cache', () => ({
 describe('Saved Assets Actions', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(console, 'error').mockImplementation(() => {});
     });
 
     describe('getSavedAssets', () => {
@@ -69,7 +70,7 @@ describe('Saved Assets Actions', () => {
 
             const result = await createSavedAsset(mockData);
 
-            expect(result).toEqual({ success: false, error: 'Failed to create saved asset' });
+            expect(result).toEqual({ success: false, error: 'Failed to create saved asset: Error: DB Error' });
         });
     });
 

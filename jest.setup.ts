@@ -84,6 +84,12 @@ jest.mock('next/headers', () => ({
     headers: jest.fn().mockReturnValue(new Map()),
 }))
 
+// Mock bcrypt to avoid native module missing error in tests
+jest.mock('bcrypt', () => ({
+    compare: jest.fn().mockResolvedValue(true),
+    hash: jest.fn().mockResolvedValue('hashed_password')
+}))
+
 // Mock next/server
 jest.mock('next/server', () => {
     // We need to return a module object with named exports
