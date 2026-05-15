@@ -41,7 +41,8 @@ export function CalendarView({
         promotions: true,
         social: true,
         projects: true,
-        events: true
+        events: true,
+        themes: true
     })
 
     const filteredEvents = initialEvents.filter(event => {
@@ -49,6 +50,7 @@ export function CalendarView({
         if (event.type === 'social_post' && !filters.social) return false
         if ((event.type.startsWith('project_') || event.type === 'event') && !filters.projects) return false
         if (event.type === 'logistics_event' && !filters.events) return false
+        if (event.type === 'theme' && !filters.themes) return false
         return true
     })
 
@@ -99,6 +101,16 @@ export function CalendarView({
                             />
                             <Label htmlFor="events" className="cursor-pointer">Events</Label>
                         </div>
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="themes"
+                                checked={filters.themes}
+                                onChange={(e) => setFilters(prev => ({ ...prev, themes: e.target.checked }))}
+                                className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                            />
+                            <Label htmlFor="themes" className="cursor-pointer">Themes</Label>
+                        </div>
                     </div>
                 </div>
 
@@ -118,6 +130,10 @@ export function CalendarView({
                     <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full bg-orange-100 border border-orange-500"></div>
                         <span>Event</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-teal-100 border border-teal-500"></div>
+                        <span>Theme</span>
                     </div>
                 </div>
             </div>
@@ -179,6 +195,9 @@ export function CalendarView({
                                         } else if (event.type === 'logistics_event') {
                                             href = `/events/${event.id}`
                                             badgeClass = 'border-orange-500 text-orange-700 bg-orange-50'
+                                        } else if (event.type === 'theme') {
+                                            href = `/themes`
+                                            badgeClass = 'border-teal-500 text-teal-800 bg-teal-100 font-medium'
                                         } else {
                                             badgeClass = 'border-blue-500 text-blue-700 bg-blue-50'
                                         }

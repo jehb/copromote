@@ -44,7 +44,7 @@ const MentionInput = forwardRef<MentionInputHandle, MentionInputProps>(({
             const selection = window.getSelection()
             if (!selection?.rangeCount) return
 
-            let range = selection.getRangeAt(0)
+            const range = selection.getRangeAt(0)
 
             // If the range is not in our editor, try to restore focus/selection if we have a saved range
             // (Ignoring saved range for now as it's more complex, but focusing on the current node)

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X, Megaphone, Shield, Package, Bot, Mail, Palette, TrendingUp, ChevronDown, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, FolderKanban, Calendar, MessageSquare, Calendar as CalendarIcon, CheckSquare, Images, Users, Building2, Menu, X, Megaphone, Shield, Package, Bot, Mail, Palette, TrendingUp, ChevronDown, ChevronRight, Tags } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import React, { useState } from 'react'
@@ -22,6 +22,7 @@ const navigation: NavItem[] = [
     { name: 'Products', href: '/products', icon: Package },
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
     { name: 'Calendar', href: '/calendar', icon: Calendar },
+    { name: 'Themes', href: '/themes', icon: Tags },
     { name: 'Promotions', href: '/promotions', icon: Megaphone },
     {
         name: 'Marketing',

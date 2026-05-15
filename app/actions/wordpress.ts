@@ -79,7 +79,7 @@ export async function searchWordPressPosts(query: string) {
 
     try {
         const baseUrl = urlConfig.replace(/\/$/, '')
-        let headers: HeadersInit = {}
+        const headers: HeadersInit = {}
 
         if (usernameConfig && passwordConfig) {
             const auth = Buffer.from(`${usernameConfig}:${passwordConfig}`).toString('base64')
@@ -117,7 +117,7 @@ export async function searchWordPressEvents(query: string) {
 
     try {
         const baseUrl = urlConfig.replace(/\/$/, '')
-        let headers: HeadersInit = {}
+        const headers: HeadersInit = {}
 
         if (usernameConfig && passwordConfig) {
             const auth = Buffer.from(`${usernameConfig}:${passwordConfig}`).toString('base64')

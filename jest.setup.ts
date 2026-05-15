@@ -250,6 +250,9 @@ const mockPrisma = {
         findUnique: jest.fn().mockResolvedValue({ id: 'mock_tag_id' }),
         create: jest.fn().mockResolvedValue({ id: 'mock_tag_id' }),
     },
+    theme: {
+        findMany: jest.fn().mockResolvedValue([]),
+    },
     config: {
         findUnique: jest.fn().mockResolvedValue({ key: 'mock_key', value: 'mock_value' }),
         upsert: jest.fn().mockResolvedValue({ key: 'mock_key', value: 'mock_value' }),

@@ -449,3 +449,19 @@ model ApiKey {
 
   @@index([userId], map: "ApiKey_userId_fkey")
 }
+
+model Theme {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime
+  isRecurring Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  parentId    String?
+  parent      Theme?   @relation("ThemeToTheme", fields: [parentId], references: [id])
+  children    Theme[]  @relation("ThemeToTheme")
+
+  @@index([parentId], map: "Theme_parentId_fkey")
+}
