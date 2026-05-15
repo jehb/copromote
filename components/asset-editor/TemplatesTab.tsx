@@ -68,6 +68,7 @@ export default function TemplatesTab({ setElements, setCanvasBg, setCanvasSize }
                         <button
                             onClick={() => handleLoadTemplate(template)}
                             className="w-full aspect-video bg-neutral-100 rounded-lg border hover:border-blue-500 overflow-hidden relative transition-colors flex items-center justify-center p-2"
+                            aria-label={`Load template ${template.name}`}
                         >
                             {template.previewImage ? (
                                 <img
@@ -87,6 +88,7 @@ export default function TemplatesTab({ setElements, setCanvasBg, setCanvasSize }
                                 onClick={(e) => handleDelete(e, template.id)}
                                 className="p-1 text-neutral-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
                                 title="Delete Template"
+                                aria-label={`Delete template ${template.name}`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M3 6h18" />
@@ -113,6 +115,7 @@ export default function TemplatesTab({ setElements, setCanvasBg, setCanvasSize }
                             ]);
                         }}
                         className="w-full aspect-video bg-neutral-100 rounded-lg border hover:border-blue-500 overflow-hidden relative group transition-colors"
+                        aria-label="Load default template: Hello World"
                     >
                         <div className="absolute inset-0 flex items-center justify-center p-4">
                             <span className="text-2xl font-bold text-neutral-800">Hello World</span>
@@ -129,6 +132,7 @@ export default function TemplatesTab({ setElements, setCanvasBg, setCanvasSize }
                             ]);
                         }}
                         className="w-full aspect-video bg-blue-500 rounded-lg border hover:border-blue-700 overflow-hidden relative group transition-colors"
+                        aria-label="Load default template: Modern Design"
                     >
                         <div className="absolute inset-0 flex items-center justify-center">
                             <span className="text-xl font-serif text-white">Modern Design</span>
