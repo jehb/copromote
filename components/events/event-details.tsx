@@ -11,6 +11,7 @@ import { Pencil, Calendar, MapPin, User, ArrowLeft, MessageSquare, Building2, Us
 import { updateEvent, deleteEvent } from '@/app/actions/events'
 import { EventForm } from './event-form'
 import { Product } from '@/app/actions/external-db'
+import DOMPurify from 'isomorphic-dompurify'
 
 const TIMEZONE = 'America/New_York'
 import { AuditInfo } from '@/components/common/audit-info'
@@ -152,7 +153,7 @@ export function EventDetails({
                                     <div className="text-xs font-bold uppercase text-slate-400">Public-facing Description</div>
                                     <div 
                                         className="prose prose-sm max-w-none text-slate-600 break-words [&_p]:whitespace-break-spaces [&_*]:break-words" 
-                                        dangerouslySetInnerHTML={{ __html: event.description }} 
+                                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description) }}
                                     />
                                 </div>
                             )}
@@ -162,7 +163,7 @@ export function EventDetails({
                                     <div className="text-xs font-bold uppercase text-slate-400">Internal Notes</div>
                                     <div 
                                         className="prose prose-sm max-w-none text-slate-600 bg-yellow-50 p-4 rounded-md border border-yellow-200 break-words [&_p]:whitespace-break-spaces [&_*]:break-words" 
-                                        dangerouslySetInnerHTML={{ __html: event.internalNotes }} 
+                                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.internalNotes) }}
                                     />
                                 </div>
                             )}
