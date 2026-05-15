@@ -62,6 +62,7 @@ export function EventCard({ event, locations, users, contacts, organizations, ev
                     <Button
                         variant="ghost"
                         size="icon"
+                        aria-label="Delete Event"
                         className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50"
                         onClick={async (e) => {
                             e.stopPropagation();
