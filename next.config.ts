@@ -7,7 +7,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
-  // Forced reload for Prisma
+  // Forced reload for Prisma schema update
   /* config options here */
   reactCompiler: true,
   output: "standalone",

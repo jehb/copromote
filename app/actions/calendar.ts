@@ -7,7 +7,7 @@ export type EventItem = {
     id: string
     title: string
     date: Date
-    type: 'project_start' | 'project_end' | 'event' | 'promotion_start' | 'promotion_end' | 'social_post' | 'logistics_event' | 'promotion_ad_live' | 'promotion_image_deadline' | 'promotion_publishing_deadline'
+    type: 'project_start' | 'project_end' | 'event' | 'promotion_start' | 'promotion_end' | 'social_post' | 'logistics_event' | 'promotion_ad_live' | 'promotion_image_deadline' | 'promotion_publishing_deadline' | 'theme'
     description?: string
     projectId?: string
 }
@@ -18,7 +18,7 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
     const projects = await prisma.project.findMany()
     const events = await prisma.calendarEvent.findMany()
     const promotions = await prisma.promotionPeriod.findMany()
-
+    const themes = await prisma.theme.findMany()
     const items: EventItem[] = []
 
     projects.forEach((p: any) => {
@@ -127,6 +127,40 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
                 projectId: p.id // using id for linking
             })
         }
+    })
+
+    themes.forEach((t: any) => {
+        let start = new Date(t.startDate)
+        let end = new Date(t.endDate)
+        
+        const years = t.isRecurring ? [-1, 0, 1, 2] : [0]
+        
+        years.forEach(offset => {
+            const currentYear = new Date().getFullYear() + offset
+            const origYear = start.getFullYear()
+            
+            const projectedStart = new Date(start)
+            projectedStart.setFullYear(currentYear)
+            
+            const projectedEnd = new Date(end)
+            projectedEnd.setFullYear(currentYear)
+
+            let currentDate = new Date(projectedStart)
+            // Limit to avoid infinite loops if dates are bad
+            let safeCounter = 0
+            while (currentDate <= projectedEnd && safeCounter < 366) {
+                items.push({
+                    id: t.id + '_' + currentYear + '_' + currentDate.toISOString(),
+                    title: t.name,
+                    date: new Date(currentDate),
+                    type: 'theme',
+                    description: t.description || undefined,
+                    projectId: t.id
+                })
+                currentDate.setDate(currentDate.getDate() + 1)
+                safeCounter++
+            }
+        })
     })
 
     return items
