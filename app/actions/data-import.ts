@@ -21,97 +21,89 @@ export async function importData(entity: string, data: any[]) {
 
         switch (entity) {
             case 'contacts':
-                for (const row of data) {
-                    await prisma.contact.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            firstName: row['First Name'],
-                            lastName: row['Last Name'],
-                            email: row.Email,
-                            phone: row.Phone,
-                            company: row.Company,
-                            jobTitle: row['Job Title'],
-                            type: row.Type || 'Contact',
-                            notes: row.Notes
-                        },
-                        create: {
-                            firstName: row['First Name'],
-                            lastName: row['Last Name'],
-                            email: row.Email,
-                            phone: row.Phone,
-                            company: row.Company,
-                            jobTitle: row['Job Title'],
-                            type: row.Type || 'Contact',
-                            notes: row.Notes
-                        }
-                    })
-                    count++
-                }
+                await Promise.all(data.map(row => prisma.contact.upsert({
+                    where: { id: row.ID || '' },
+                    update: {
+                        firstName: row['First Name'],
+                        lastName: row['Last Name'],
+                        email: row.Email,
+                        phone: row.Phone,
+                        company: row.Company,
+                        jobTitle: row['Job Title'],
+                        type: row.Type || 'Contact',
+                        notes: row.Notes
+                    },
+                    create: {
+                        firstName: row['First Name'],
+                        lastName: row['Last Name'],
+                        email: row.Email,
+                        phone: row.Phone,
+                        company: row.Company,
+                        jobTitle: row['Job Title'],
+                        type: row.Type || 'Contact',
+                        notes: row.Notes
+                    }
+                })))
+                count += data.length
                 break
 
             case 'organizations':
-                for (const row of data) {
-                    await prisma.organization.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            name: row.Name,
-                            category: row.Category || 'Organization',
-                            description: row.Description,
-                            website: row.Website
-                        },
-                        create: {
-                            name: row.Name,
-                            category: row.Category || 'Organization',
-                            description: row.Description,
-                            website: row.Website
-                        }
-                    })
-                    count++
-                }
+                await Promise.all(data.map(row => prisma.organization.upsert({
+                    where: { id: row.ID || '' },
+                    update: {
+                        name: row.Name,
+                        category: row.Category || 'Organization',
+                        description: row.Description,
+                        website: row.Website
+                    },
+                    create: {
+                        name: row.Name,
+                        category: row.Category || 'Organization',
+                        description: row.Description,
+                        website: row.Website
+                    }
+                })))
+                count += data.length
                 break
 
             case 'projects':
-                for (const row of data) {
-                    await prisma.project.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            name: row.Name,
-                            description: row.Description,
-                            status: row.Status || 'active',
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate)
-                        },
-                        create: {
-                            name: row.Name,
-                            description: row.Description,
-                            status: row.Status || 'active',
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate)
-                        }
-                    })
-                    count++
-                }
+                await Promise.all(data.map(row => prisma.project.upsert({
+                    where: { id: row.ID || '' },
+                    update: {
+                        name: row.Name,
+                        description: row.Description,
+                        status: row.Status || 'active',
+                        startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                        endDate: parseDate(row['End Date'] || row.EndDate)
+                    },
+                    create: {
+                        name: row.Name,
+                        description: row.Description,
+                        status: row.Status || 'active',
+                        startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                        endDate: parseDate(row['End Date'] || row.EndDate)
+                    }
+                })))
+                count += data.length
                 break
 
             case 'tasks':
-                for (const row of data) {
-                    await prisma.task.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            title: row.Title,
-                            description: row.Description,
-                            status: row.Status || 'todo',
-                            dueDate: parseDate(row['Due Date'])
-                        },
-                        create: {
-                            title: row.Title,
-                            description: row.Description,
-                            status: row.Status || 'todo',
-                            dueDate: parseDate(row['Due Date'])
-                        }
-                    })
-                    count++
-                }
+                await Promise.all(data.map(row => prisma.task.upsert({
+                    where: { id: row.ID || '' },
+                    update: {
+                        title: row.Title,
+                        description: row.Description,
+                        status: row.Status || 'todo',
+                        dueDate: parseDate(row['Due Date'])
+                    },
+                    create: {
+                        title: row.Title,
+                        description: row.Description,
+                        status: row.Status || 'todo',
+                        dueDate: parseDate(row['Due Date'])
+                    }
+                })))
+                count += data.length
                 break
 
             case 'events':
@@ -165,75 +157,69 @@ export async function importData(entity: string, data: any[]) {
                 break
 
             case 'social-posts':
-                for (const row of data) {
-                    await prisma.socialPost.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            content: row.Content,
-                            platform: row.Platform || 'Twitter',
-                            scheduledDate: parseDate(row['Scheduled Date']),
-                            status: row.Status || 'draft'
-                        },
-                        create: {
-                            content: row.Content,
-                            platform: row.Platform || 'Twitter',
-                            scheduledDate: parseDate(row['Scheduled Date']),
-                            status: row.Status || 'draft'
-                        }
-                    })
-                    count++
-                }
+                await Promise.all(data.map(row => prisma.socialPost.upsert({
+                    where: { id: row.ID || '' },
+                    update: {
+                        content: row.Content,
+                        platform: row.Platform || 'Twitter',
+                        scheduledDate: parseDate(row['Scheduled Date']),
+                        status: row.Status || 'draft'
+                    },
+                    create: {
+                        content: row.Content,
+                        platform: row.Platform || 'Twitter',
+                        scheduledDate: parseDate(row['Scheduled Date']),
+                        status: row.Status || 'draft'
+                    }
+                })))
+                count += data.length
                 break
 
             case 'hyperlinks':
-                for (const row of data) {
-                    await prisma.hyperlink.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            title: row.Title,
-                            url: row.URL || row.Url,
-                            description: row.Description,
-                            icon: row.Icon
-                        },
-                        create: {
-                            title: row.Title,
-                            url: row.URL || row.Url,
-                            description: row.Description,
-                            icon: row.Icon
-                        }
-                    })
-                    count++
-                }
+                await Promise.all(data.map(row => prisma.hyperlink.upsert({
+                    where: { id: row.ID || '' },
+                    update: {
+                        title: row.Title,
+                        url: row.URL || row.Url,
+                        description: row.Description,
+                        icon: row.Icon
+                    },
+                    create: {
+                        title: row.Title,
+                        url: row.URL || row.Url,
+                        description: row.Description,
+                        icon: row.Icon
+                    }
+                })))
+                count += data.length
                 break
 
 
             case 'promotions':
-                for (const row of data) {
-                    await prisma.promotionPeriod.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            name: row.Name,
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate) || new Date(),
-                            adLiveDate: parseDate(row['Ad Live Date']),
-                            adImageDeadline: parseDate(row['Ad Image Deadline']),
-                            adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
-                        },
-                        create: {
-                            name: row.Name,
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate) || new Date(Date.now() + 86400000 * 7), // Default 1 week
-                            adLiveDate: parseDate(row['Ad Live Date']),
-                            adImageDeadline: parseDate(row['Ad Image Deadline']),
-                            adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
-                        }
-                    })
-                    count++
-                }
+                await Promise.all(data.map(row => prisma.promotionPeriod.upsert({
+                    where: { id: row.ID || '' },
+                    update: {
+                        name: row.Name,
+                        startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                        endDate: parseDate(row['End Date'] || row.EndDate) || new Date(),
+                        adLiveDate: parseDate(row['Ad Live Date']),
+                        adImageDeadline: parseDate(row['Ad Image Deadline']),
+                        adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
+                    },
+                    create: {
+                        name: row.Name,
+                        startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                        endDate: parseDate(row['End Date'] || row.EndDate) || new Date(Date.now() + 86400000 * 7), // Default 1 week
+                        adLiveDate: parseDate(row['Ad Live Date']),
+                        adImageDeadline: parseDate(row['Ad Image Deadline']),
+                        adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
+                    }
+                })))
+                count += data.length
                 break
 
             case 'color-palettes':
-                for (const row of data) {
+                await Promise.all(data.map(row => {
                     let colorsArray: string[] = []
                     const colorsInput = row.Colors
 
@@ -250,7 +236,7 @@ export async function importData(entity: string, data: any[]) {
                         }
                     }
 
-                    await prisma.colorPalette.upsert({
+                    return prisma.colorPalette.upsert({
                         where: { id: row.ID || '' },
                         update: {
                             name: row.Name,
@@ -261,8 +247,8 @@ export async function importData(entity: string, data: any[]) {
                             colors: JSON.stringify(colorsArray)
                         }
                     })
-                    count++
-                }
+                }))
+                count += data.length
                 break
         }
 
