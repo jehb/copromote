@@ -46,19 +46,23 @@ export function PhotoMetadataEditor({
                 const initialTagIds = new Set((initialTags || []).map(t => t.id))
                 const currentTagIds = new Set(tags.map(t => t.id))
 
+                const tagPromises = []
+
                 // Tags to remove
                 for (const initTag of initialTags || []) {
                     if (!currentTagIds.has(initTag.id)) {
-                        await removePhotoTag(photoId, initTag.id)
+                        tagPromises.push(removePhotoTag(photoId, initTag.id))
                     }
                 }
 
                 // Tags to add
                 for (const currTag of tags) {
                     if (!initialTagIds.has(currTag.id)) {
-                        await addPhotoTag(photoId, currTag.id)
+                        tagPromises.push(addPhotoTag(photoId, currTag.id))
                     }
                 }
+
+                await Promise.all(tagPromises)
 
                 setIsEditing(false)
             } catch (error) {
