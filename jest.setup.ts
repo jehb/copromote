@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom'
 
+// Set environment variables for tests
+process.env.JWT_SECRET_KEY = 'test-secret-key-for-jest'
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
     useRouter() {
