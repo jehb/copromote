@@ -93,7 +93,7 @@ describe('TaskBoard', () => {
 
         // Needed to open dropdown to see delete
         // Finding dropdown trigger for Task 1
-        const triggers = screen.getAllByRole('button', { name: '' }) // Icon button usually has no text if not accessible named
+        const triggers = screen.getAllByRole('button', { name: 'Task options' })
         // The code uses MoreHorizontal in Button.
         // Actually, let's use a more specific selector if possible or just try to find the trigger.
         // But for "Quick Status Moves", we don't need dropdown. 
