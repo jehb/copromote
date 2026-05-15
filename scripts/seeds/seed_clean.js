@@ -31,12 +31,10 @@ async function main() {
 
     console.log('Seeding new promotion periods...')
 
-    for (const period of periods) {
-        const created = await prisma.promotionPeriod.create({
-            data: period,
-        })
-        console.log(`Created period: ${created.name} (${created.startDate.toISOString()} - ${created.endDate.toISOString()})`)
-    }
+    const { count: createdCount } = await prisma.promotionPeriod.createMany({
+        data: periods,
+    })
+    console.log(`Successfully created ${createdCount} promotion periods.`)
 
     const count = await prisma.promotionPeriod.count()
     console.log(`Total Promotion Periods: ${count}`)
