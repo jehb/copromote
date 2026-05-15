@@ -60,7 +60,7 @@ async function main() {
         }
     ]
 
-    for (const event of events) {
+    await Promise.all(events.map(async (event) => {
         // Use a simple check to avoid duplicates if re-running
         const existing = await prisma.event.findFirst({
             where: {
@@ -75,7 +75,7 @@ async function main() {
         } else {
             console.log(`Skipped existing event: ${event.title}`)
         }
-    }
+    }))
 
     console.log('Events seeded successfully.')
 }

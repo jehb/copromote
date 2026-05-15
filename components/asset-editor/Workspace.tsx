@@ -427,8 +427,6 @@ export default function Workspace({
                     const absolutePos = textNode ? textNode.getAbsolutePosition() : { x: 0, y: 0 };
 
                     // The stage container itself might be scaled by CSS (the container's inline style)
-                    // We need to account for zooming and CSS scaling.
-                    // const viewportScale = Math.min((containerSize.width * 0.8) / canvasSize.width, (containerSize.height * 0.8) / canvasSize.height);
 
                     const computedWidth = textNode ? Math.max(textNode.width(), el.wrap === 'word' ? 0 : (textNode.getTextWidth?.() || 0)) * textNode.scaleX() * scale : (el.width || 200);
                     const computedHeight = textNode ? Math.max(textNode.height(), el.wrap === 'word' ? 0 : (textNode.getTextHeight?.() || 0)) * textNode.scaleY() * scale : (el.height || 50);
