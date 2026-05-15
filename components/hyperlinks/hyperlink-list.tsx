@@ -10,8 +10,7 @@ import { HyperlinkForm } from '@/components/hyperlinks/hyperlink-form'
 
 // Helper to dynamically render icon
 const DynamicIcon = ({ name, className }: { name: string; className?: string }) => {
-    // @ts-ignore
-    const IconComponent = Icons[name]
+    const IconComponent = Icons[name as keyof typeof Icons] as React.ElementType
     if (!IconComponent) return <ExternalLink className={className} />
     return <IconComponent className={className} />
 }
