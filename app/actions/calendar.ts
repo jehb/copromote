@@ -15,10 +15,24 @@ export type EventItem = {
 export async function getCalendarEvents(): Promise<EventItem[]> {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    const projects = await prisma.project.findMany()
-    const events = await prisma.calendarEvent.findMany()
-    const promotions = await prisma.promotionPeriod.findMany()
-    const themes = await prisma.theme.findMany()
+
+    // Bolt: Parallelize independent DB queries to eliminate N+1 latency blocking on calendar dashboard load
+    const [
+        projects,
+        events,
+        promotions,
+        themes,
+        logisticsEvents,
+        socialPosts
+    ] = await Promise.all([
+        prisma.project.findMany(),
+        prisma.calendarEvent.findMany(),
+        prisma.promotionPeriod.findMany(),
+        prisma.theme.findMany(),
+        prisma.event.findMany({ include: { location: true } }),
+        prisma.socialPost.findMany({ where: { scheduledDate: { not: null } } })
+    ])
+
     const items: EventItem[] = []
 
     projects.forEach((p: any) => {
@@ -87,10 +101,6 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
         }
     })
 
-    const logisticsEvents = await prisma.event.findMany({
-        include: { location: true }
-    })
-
     events.forEach((e: any) => {
         items.push({
             id: e.id,
@@ -111,12 +121,6 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
         })
     })
 
-    const socialPosts = await prisma.socialPost.findMany({
-        where: {
-            scheduledDate: { not: null }
-        }
-    })
-
     socialPosts.forEach((p: any) => {
         if (p.scheduledDate) {
             items.push({
@@ -130,8 +134,8 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
     })
 
     themes.forEach((t: any) => {
-        let start = new Date(t.startDate)
-        let end = new Date(t.endDate)
+        const start = new Date(t.startDate)
+        const end = new Date(t.endDate)
         
         const years = t.isRecurring ? [-1, 0, 1, 2] : [0]
         
@@ -145,7 +149,7 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
             const projectedEnd = new Date(end)
             projectedEnd.setFullYear(currentYear)
 
-            let currentDate = new Date(projectedStart)
+            const currentDate = new Date(projectedStart)
             // Limit to avoid infinite loops if dates are bad
             let safeCounter = 0
             while (currentDate <= projectedEnd && safeCounter < 366) {
