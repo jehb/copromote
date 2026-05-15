@@ -3,9 +3,10 @@
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
+import { randomBytes } from "crypto";
 
 function generateKey() {
-  return "promoty_" + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  return "promoty_" + randomBytes(32).toString("hex");
 }
 
 export async function createApiKey(name: string) {
