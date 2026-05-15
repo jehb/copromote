@@ -87,6 +87,7 @@ describe('Miscellaneous Actions', () => {
                 // Mock other findMany to return empty array to avoid undefined errors if any
                 ; (prisma.project.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.promotionPeriod.findMany as jest.Mock).mockResolvedValue([])
+                ; (prisma.theme.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.event.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.socialPost.findMany as jest.Mock).mockResolvedValue([])
 

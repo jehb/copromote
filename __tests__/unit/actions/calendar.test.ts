@@ -6,6 +6,7 @@ jest.mock('@/lib/db', () => ({
         project: { findMany: jest.fn() },
         calendarEvent: { findMany: jest.fn() },
         promotionPeriod: { findMany: jest.fn() },
+        theme: { findMany: jest.fn() },
         event: { findMany: jest.fn() },
         socialPost: { findMany: jest.fn() },
     },
@@ -72,6 +73,7 @@ describe('Calendar Actions', () => {
                 ; (prisma.project.findMany as jest.Mock).mockResolvedValue(mockProjects)
                 ; (prisma.calendarEvent.findMany as jest.Mock).mockResolvedValue(mockCalendarEvents)
                 ; (prisma.promotionPeriod.findMany as jest.Mock).mockResolvedValue(mockPromotions)
+            ; (prisma.theme.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.event.findMany as jest.Mock).mockResolvedValue(mockLogisticsEvents)
                 ; (prisma.socialPost.findMany as jest.Mock).mockResolvedValue(mockSocialPosts)
 
@@ -124,6 +126,7 @@ describe('Calendar Actions', () => {
             ; (prisma.project.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.calendarEvent.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.promotionPeriod.findMany as jest.Mock).mockResolvedValue([])
+            ; (prisma.theme.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.event.findMany as jest.Mock).mockResolvedValue([])
                 ; (prisma.socialPost.findMany as jest.Mock).mockResolvedValue([])
 
