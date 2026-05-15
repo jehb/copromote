@@ -1,3 +1,7 @@
 ## 2024-05-15 - Added ARIA labels to Asset Editor template and saved asset load and delete buttons
 **Learning:** Found an accessibility issue pattern where visual previews were acting as buttons but lacked aria labels for screen readers. Deleting items also lacked aria labels, relying only on title.
 **Action:** Always ensure any icon-only button or purely visual button (such as a preview image acting as a load button) explicitly has an `aria-label` providing full context (e.g. `aria-label="Load template ${template.name}"`).
+
+## 2024-05-16 - Added ARIA label to Event Card delete button
+**Learning:** The project heavily uses `Button size="icon"` from Shadcn UI containing only lucide-react icons, particularly for common actions like delete or edit. These are invisible to screen readers without explicit `aria-label` attributes.
+**Action:** When adding or modifying any icon-only buttons (especially common actions like delete or edit), ensure they have an explicit and descriptive `aria-label` attribute (e.g., `aria-label="Delete Event"`).
