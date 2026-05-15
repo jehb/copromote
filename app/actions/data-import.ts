@@ -165,7 +165,7 @@ export async function importData(entity: string, data: any[]) {
                 break
 
             case 'social-posts':
-                for (const row of data) {
+                await Promise.all(data.map(async (row) => {
                     await prisma.socialPost.upsert({
                         where: { id: row.ID || '' },
                         update: {
@@ -181,8 +181,8 @@ export async function importData(entity: string, data: any[]) {
                             status: row.Status || 'draft'
                         }
                     })
-                    count++
-                }
+                }))
+                count += data.length
                 break
 
             case 'hyperlinks':

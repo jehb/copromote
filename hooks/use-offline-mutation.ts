@@ -59,6 +59,9 @@ export function useOfflineMutation(mutationFn: (variables: any) => Promise<any>,
         },
         onSuccess: (data) => {
             // Notification of offline queueing vs online success
+            if (data?.offline) {
+                console.log(`[OfflineSync] Queued ${options.actionName}`)
+            }
             if (!data?.offline && options.onSuccess) {
                 options.onSuccess(data)
             }
