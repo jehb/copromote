@@ -102,7 +102,8 @@ export async function syncPostToPostiz(postParams: {
         // Upload assets if any exist
         const postizMedia: any[] = []
         if (postParams.assets && postParams.assets.length > 0) {
-            for (const asset of postParams.assets) {
+            // Process uploads concurrently for better performance
+            const uploadPromises = postParams.assets.map(async (asset) => {
                 try {
                     // Extract extension from URL, defaulting to jpg/mp4 based on type if missing
                     let ext = asset.url.split('.').pop()?.split(/[?#]/)[0] || ''
@@ -120,15 +121,24 @@ export async function syncPostToPostiz(postParams: {
                     const uploadedMedia: any = await client.upload(buffer, ext)
                     console.log('Postiz Upload Media Result:', uploadedMedia)
 
-                    if (uploadedMedia && (uploadedMedia.id || uploadedMedia.path)) {
-                        postizMedia.push(uploadedMedia)
-                    } else if (Array.isArray(uploadedMedia)) {
-                        postizMedia.push(...uploadedMedia)
-                    } else if (typeof uploadedMedia === 'string') {
-                        postizMedia.push({ id: uploadedMedia })
-                    }
+                    return uploadedMedia
                 } catch (err: any) {
                     console.error('Failed to upload asset to Postiz:', asset.url, err?.message || err)
+                    return null
+                }
+            })
+
+            const uploadedResults = await Promise.all(uploadPromises)
+
+            for (const uploadedMedia of uploadedResults) {
+                if (!uploadedMedia) continue
+
+                if (uploadedMedia && (uploadedMedia.id || uploadedMedia.path)) {
+                    postizMedia.push(uploadedMedia)
+                } else if (Array.isArray(uploadedMedia)) {
+                    postizMedia.push(...uploadedMedia)
+                } else if (typeof uploadedMedia === 'string') {
+                    postizMedia.push({ id: uploadedMedia })
                 }
             }
         }

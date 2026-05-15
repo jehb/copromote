@@ -182,8 +182,7 @@ describe('useOfflineMutation', () => {
         // Verify custom onSuccess not called for offline queueing
         expect(onSuccess).not.toHaveBeenCalled()
 
-        // Verify log was called
-        expect(console.log).toHaveBeenCalledWith(expect.stringContaining('[OfflineSync] Queued testAction'))
+        // The console log check is removed here because the log was removed from the hook implementation.
 
         // Verify invalidate queries was NOT called
         expect(invalidateQueriesSpy).not.toHaveBeenCalled()
