@@ -11,14 +11,16 @@ async function main() {
         { name: 'USER', description: 'Standard user with basic access.', isSystem: true },
     ]
 
-    for (const role of defaultRoles) {
-        await prisma.role.upsert({
-            where: { name: role.name },
-            update: {},
-            create: role,
+    await Promise.all(
+        defaultRoles.map(async (role) => {
+            await prisma.role.upsert({
+                where: { name: role.name },
+                update: {},
+                create: role,
+            })
+            console.log(`Ensured role: ${role.name}`)
         })
-        console.log(`Ensured role: ${role.name}`)
-    }
+    )
 
     console.log('Seeding completed successfully.')
 }
