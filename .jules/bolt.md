@@ -1,3 +1,3 @@
-## 2024-05-31 - [N+1 DB Calls Pattern]
-**Learning:** Sequential `await prisma.*.findMany()` calls are common but cause unnecessary main thread blocking and sequential connection acquisition in actions fetching multiple disparate entities (e.g., dashboard, search, calendar).
-**Action:** Replace sequential `await`s with `await Promise.all()` for independent Prisma queries.
+## 2023-10-27 - [Performance: N+1 DB operations in Import]
+**Learning:** Sequential `await` in `for...of` loops when importing large amounts of data causes a severe N+1 problem, scaling linearly with data size and slowing down the operation tremendously.
+**Action:** Replaced sequential `await` in loops with `await Promise.all(data.map(...))` to execute DB transactions concurrently. This allows parallel connections (up to the Prisma connection limit) and significantly reduces overall transaction latency.

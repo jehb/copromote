@@ -71,26 +71,31 @@ export async function importData(entity: string, data: any[]) {
                 break
 
             case 'projects':
-                for (const row of data) {
-                    await prisma.project.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            name: row.Name,
-                            description: row.Description,
-                            status: row.Status || 'active',
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate)
-                        },
-                        create: {
-                            name: row.Name,
-                            description: row.Description,
-                            status: row.Status || 'active',
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate)
-                        }
-                    })
-                    count++
-                }
+                // ⚡ Bolt: Performance optimization
+                // Using Promise.all to execute DB operations concurrently instead of an N+1 sequential loop.
+                // This batches DB requests and significantly improves import speed.
+                await Promise.all(
+                    data.map((row) =>
+                        prisma.project.upsert({
+                            where: { id: row.ID || '' },
+                            update: {
+                                name: row.Name,
+                                description: row.Description,
+                                status: row.Status || 'active',
+                                startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                                endDate: parseDate(row['End Date'] || row.EndDate)
+                            },
+                            create: {
+                                name: row.Name,
+                                description: row.Description,
+                                status: row.Status || 'active',
+                                startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                                endDate: parseDate(row['End Date'] || row.EndDate)
+                            }
+                        })
+                    )
+                )
+                count += data.length
                 break
 
             case 'tasks':
