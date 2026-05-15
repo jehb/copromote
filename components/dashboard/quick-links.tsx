@@ -7,13 +7,20 @@ import Link from 'next/link'
 
 // Helper to dynamically render icon
 const DynamicIcon = ({ name, className }: { name: string; className?: string }) => {
-    // @ts-ignore
-    const IconComponent = Icons[name]
+    const IconComponent = Icons[name as keyof typeof Icons] as React.ElementType
     if (!IconComponent) return <ExternalLink className={className} />
     return <IconComponent className={className} />
 }
 
-export function QuickLinks({ hyperlinks }: { hyperlinks: any[] }) {
+interface QuickLink {
+    id: string | number;
+    url: string;
+    icon?: string;
+    title: string;
+    description?: string;
+}
+
+export function QuickLinks({ hyperlinks }: { hyperlinks: QuickLink[] }) {
     if (!hyperlinks || hyperlinks.length === 0) return null
 
     return (
