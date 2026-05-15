@@ -1,3 +1,4 @@
 ## 2024-05-31 - [N+1 DB Calls Pattern]
 **Learning:** Sequential `await prisma.*.findMany()` calls are common but cause unnecessary main thread blocking and sequential connection acquisition in actions fetching multiple disparate entities (e.g., dashboard, search, calendar).
 **Action:** Replace sequential `await`s with `await Promise.all()` for independent Prisma queries.
+## 2024-05-18 - [Eliminate N+1 Query in Event Seeding]\n**Learning:** Sequential database operations inside loops (e.g., upserts or creates) create N+1 query bottlenecks that significantly degrade performance during data seeding or bulk imports.\n**Action:** Utilize a Set to deduplicate prerequisite entities, perform batch resolutions via `Promise.all(upserts)`, and use Prisma's `createMany` for bulk insert operations to optimize performance.
