@@ -9,6 +9,11 @@ import { Button } from '@/components/ui/button'
 
 export const dynamic = 'force-dynamic'
 
+interface ActivityLogMetadataChange {
+    from: unknown;
+    to: unknown;
+}
+
 export default async function ActivityLogsPage() {
     const logs = await getActivityLogs()
 
@@ -108,11 +113,9 @@ export default async function ActivityLogsPage() {
                                     <TableCell className="text-sm text-slate-600">
                                         <div className="space-y-1">
                                             <div className="text-sm text-slate-600 font-medium">{log.details || '-'}</div>
-                                            {/* @ts-ignore */}
                                             {log.metadata && (
                                                 <div className="text-xs space-y-1 mt-1 bg-slate-50 p-2 rounded border border-slate-100">
-                                                    {/* @ts-ignore */}
-                                                    {Object.entries(JSON.parse(log.metadata)).map(([field, change]: [string, any]) => (
+                                                    {(Object.entries(JSON.parse(log.metadata)) as [string, ActivityLogMetadataChange][]).map(([field, change]) => (
                                                         <div key={field} className="flex flex-col sm:flex-row sm:gap-2">
                                                             <span className="font-semibold text-slate-700 capitalize w-24 shrink-0">{field}:</span>
                                                             <div className="flex items-center gap-1.5 flex-1 min-w-0">
