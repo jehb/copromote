@@ -27,7 +27,7 @@ export function UserAvatar({ name = "", email = "", avatarUrl, className, size =
 
     return (
         <Avatar className={cn("h-8 w-8", className)}>
-            <AvatarImage src={finalAvatarUrl} alt={name || "User avatar"} />
+            <AvatarImage src={finalAvatarUrl || undefined} alt={name || "User avatar"} />
             <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
     )
