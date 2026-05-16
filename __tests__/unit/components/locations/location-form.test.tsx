@@ -114,4 +114,23 @@ describe('LocationForm', () => {
             expect(screen.getByText('Invalid name')).toBeInTheDocument()
         })
     })
+
+    it('displays unexpected error message on thrown exception', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        ;(createLocation as jest.Mock).mockRejectedValue(new Error('Test error'))
+        render(<LocationForm />)
+
+        await userEvent.click(screen.getByRole('button', { name: /Add Location/i }))
+        await userEvent.type(screen.getByLabelText(/Name/), 'Room')
+
+        const form = screen.getByRole('button', { name: 'Save Location' }).closest('form')
+        fireEvent.submit(form!)
+
+        await waitFor(() => {
+            expect(screen.getByText('An unexpected error occurred.')).toBeInTheDocument()
+        })
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error))
+
+        consoleErrorSpy.mockRestore()
+    })
 })
