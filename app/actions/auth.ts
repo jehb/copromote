@@ -74,7 +74,7 @@ export async function login(prevState: any, formData: FormData) {
     } catch (error: any) {
         console.error('Login error detailed:', error)
         return {
-            message: `Error: ${error.message || JSON.stringify(error)}`,
+            message: 'An unexpected error occurred during login. Please try again later.',
         }
     }
 

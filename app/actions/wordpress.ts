@@ -63,7 +63,7 @@ export async function testWordPressConnection() {
 
     } catch (error: any) {
         console.error('Wordpress connection error:', error)
-        return { success: false, message: `Connection error: ${error.message}` }
+        return { success: false, message: 'Connection failed due to an internal error' }
     }
 }
 

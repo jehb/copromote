@@ -49,7 +49,7 @@ export async function testExternalConnection() {
         return { success: true, message: 'Successfully connected to Azure MSSQL.' }
     } catch (error: any) {
         console.error('DB Connection error:', error)
-        return { success: false, message: `Connection failed: ${error.message}` }
+        return { success: false, message: 'Connection failed due to an internal error' }
     }
 }
 

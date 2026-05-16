@@ -131,7 +131,7 @@ describe('Auth Actions', () => {
                 ; (prisma.user.findUnique as jest.Mock).mockRejectedValue(new Error('DB Error'))
 
             const result = await login({}, formData)
-            expect(result?.message).toBe('Error: DB Error')
+            expect(result?.message).toBe('An unexpected error occurred during login. Please try again later.')
         })
     })
 
