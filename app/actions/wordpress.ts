@@ -143,7 +143,6 @@ export async function searchWordPressEvents(query: string) {
         }
 
         const data = await response.json()
-        console.log(`[WordPress] Found ${data.total} events. Response keys: ${Object.keys(data).join(', ')}`)
 
         // The Events Calendar API returns { events: [], rest_url: ..., total: ... }
         if (!data.events || !Array.isArray(data.events)) {
