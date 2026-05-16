@@ -7,6 +7,16 @@ import { format } from 'date-fns'
 describe('DatePicker Component', () => {
     const mockSetDate = jest.fn()
 
+    beforeAll(() => {
+        jest.useFakeTimers()
+        // Lock time to May 1, 2023 for predictable calendar rendering
+        jest.setSystemTime(new Date(2023, 4, 1))
+    })
+
+    afterAll(() => {
+        jest.useRealTimers()
+    })
+
     beforeEach(() => {
         jest.clearAllMocks()
     })
@@ -36,7 +46,7 @@ describe('DatePicker Component', () => {
     })
 
     it('should open the calendar popover when clicked', async () => {
-        const user = userEvent.setup()
+        const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
         render(<DatePicker date={undefined} setDate={mockSetDate} />)
 
         const button = screen.getByRole('button', { name: /pick a date/i })
@@ -50,31 +60,36 @@ describe('DatePicker Component', () => {
     })
 
     it('should call setDate when a date is selected', async () => {
-        const user = userEvent.setup()
+        // Need to pass advanceTimers option when using userEvent with fake timers
+        const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
         const initialDate = new Date(2023, 4, 15) // May 15, 2023
         render(<DatePicker date={initialDate} setDate={mockSetDate} />)
 
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: /May 15th, 2023/i })
         await user.click(button)
 
-        // When using `initialFocus` and standard Calendar behavior, react-day-picker
-        // will open the month corresponding to the selected date by default
-        // if `defaultMonth` is passed, OR the current actual month if `defaultMonth` is not explicitly set,
-        // although setting `selected` normally opens the month of the `selected` date.
-        // Let's explicitly look for the date in the component. We can rely on react-day-picker's aria labels
-        // or just accept whatever month it rendered and just verify the day was clicked.
-        // If it renders the current system month (2026), we just expect the year to be 2026.
-        // A better approach is to mock the system time, but we can also just verify the day of the selected date.
-
+        // The calendar should open on May 2023
         const dayButtons = screen.getAllByRole('button').filter(btn => btn.textContent === '20')
         await user.click(dayButtons[0])
 
-        expect(mockSetDate).toHaveBeenCalled()
+        expect(mockSetDate).toHaveBeenCalledTimes(1)
         const selectedDate = mockSetDate.mock.calls[0][0]
+        expect(selectedDate).toEqual(new Date(2023, 4, 20)) // May 20, 2023
+    })
 
-        // Since react-day-picker defaults to showing the current system month if defaultMonth isn't set
-        // and we haven't forced a specific month via props to Calendar, let's just assert the day is correctly picked.
-        // This is safe because DatePicker only wraps Calendar.
-        expect(selectedDate.getDate()).toBe(20)
+    it('should call setDate with undefined when the selected date is clicked again', async () => {
+        const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+        const initialDate = new Date(2023, 4, 15) // May 15, 2023
+        render(<DatePicker date={initialDate} setDate={mockSetDate} />)
+
+        const button = screen.getByRole('button', { name: /May 15th, 2023/i })
+        await user.click(button)
+
+        // Click the already selected date. Let's find it by text since aria-selected might be on the gridcell
+        const selectedDayButtons = screen.getAllByRole('button').filter(btn => btn.textContent === '15')
+        await user.click(selectedDayButtons[0])
+
+        expect(mockSetDate).toHaveBeenCalledTimes(1)
+        expect(mockSetDate).toHaveBeenCalledWith(undefined, expect.anything(), expect.anything(), expect.anything())
     })
 })

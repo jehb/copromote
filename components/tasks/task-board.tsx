@@ -22,7 +22,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                     <span className="font-medium text-sm line-clamp-2 leading-tight">{task.title}</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Task options">
                                 <MoreHorizontal className="h-3 w-3" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -115,7 +115,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full overflow-hidden">
-            {/* TODO Column */}
+            {/* To Do Column */}
             <div className="flex flex-col h-full bg-slate-50/50 rounded-lg border border-slate-100">
                 <div className="p-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-slate-50/50 backdrop-blur-sm z-10">
                     <div className="flex items-center gap-2">
@@ -123,14 +123,14 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                         <h3 className="font-semibold text-sm text-slate-700">To Do</h3>
                         <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center">{todoTasks.length}</Badge>
                     </div>
-                    <TaskDialog users={users} projects={projects} defaultStatus="todo" trigger={<Button variant="ghost" size="icon" className="h-6 w-6"><Plus className="h-4 w-4" /></Button>} />
+                    <TaskDialog users={users} projects={projects} defaultStatus="todo" trigger={<Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Add task to To Do"><Plus className="h-4 w-4" /></Button>} />
                 </div>
                 <div className="p-3 overflow-y-auto flex-1">
                     {todoTasks.map(task => <TaskCard key={task.id} task={task} />)}
                 </div>
             </div>
 
-            {/* IN PROGRESS Column */}
+            {/* In Progress Column */}
             <div className="flex flex-col h-full bg-blue-50/30 rounded-lg border border-blue-100">
                 <div className="p-4 border-b border-blue-100 flex justify-between items-center sticky top-0 bg-blue-50/30 backdrop-blur-sm z-10">
                     <div className="flex items-center gap-2">
@@ -138,14 +138,14 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                         <h3 className="font-semibold text-sm text-blue-900">In Progress</h3>
                         <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center bg-blue-100 text-blue-700">{progressTasks.length}</Badge>
                     </div>
-                    <TaskDialog users={users} projects={projects} defaultStatus="in-progress" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-blue-100 text-blue-700"><Plus className="h-4 w-4" /></Button>} />
+                    <TaskDialog users={users} projects={projects} defaultStatus="in-progress" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-blue-100 text-blue-700" aria-label="Add task to In Progress"><Plus className="h-4 w-4" /></Button>} />
                 </div>
                 <div className="p-3 overflow-y-auto flex-1">
                     {progressTasks.map(task => <TaskCard key={task.id} task={task} />)}
                 </div>
             </div>
 
-            {/* DONE Column */}
+            {/* Done Column */}
             <div className="flex flex-col h-full bg-green-50/30 rounded-lg border border-green-100">
                 <div className="p-4 border-b border-green-100 flex justify-between items-center sticky top-0 bg-green-50/30 backdrop-blur-sm z-10">
                     <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                         <h3 className="font-semibold text-sm text-green-900">Done</h3>
                         <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center bg-green-100 text-green-700">{doneTasks.length}</Badge>
                     </div>
-                    <TaskDialog users={users} projects={projects} defaultStatus="done" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-green-100 text-green-700"><Plus className="h-4 w-4" /></Button>} />
+                    <TaskDialog users={users} projects={projects} defaultStatus="done" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-green-100 text-green-700" aria-label="Add task to Done"><Plus className="h-4 w-4" /></Button>} />
                 </div>
                 <div className="p-3 overflow-y-auto flex-1">
                     {doneTasks.map(task => <TaskCard key={task.id} task={task} />)}
