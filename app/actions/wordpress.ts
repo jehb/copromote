@@ -127,7 +127,6 @@ export async function searchWordPressEvents(query: string) {
         // Search events using The Events Calendar REST API
         // Documentation: https://theeventscalendar.com/knowledgebase/introduction-to-the-events-calendar-rest-api/
         const searchUrl = `${baseUrl}/wp-json/tribe/events/v1/events?search=${encodeURIComponent(query)}&per_page=10`
-        console.log(`[WordPress] Searching events: ${searchUrl}`)
 
         const response = await fetch(searchUrl, {
             headers
