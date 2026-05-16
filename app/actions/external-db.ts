@@ -89,17 +89,10 @@ export async function getExternalProducts(
         request.input('pageSize', sql.Int, pageSize)
 
         // Execute queries
-        console.log('Executing Product Query:', query)
-        console.log('Executing Count Query:', countQuery)
-        console.log('Search Param:', search)
-
         const [productsResult, countResult] = await Promise.all([
             request.query(query),
             pool.request().input('search', sql.NVarChar, `%${search}%`).query(countQuery) // Re-bind input for separate request
         ])
-
-        console.log('Products Found:', productsResult.recordset.length)
-        console.log('Total Count Found:', countResult.recordset[0].count)
 
         await pool.close()
 
@@ -143,9 +136,6 @@ export async function getExternalProductByUPC(upc: string): Promise<Record<strin
         const query = 'SELECT * FROM positems WHERE F01 = @upc'
         request.input('upc', sql.NVarChar, upc)
 
-        console.log('Executing Single Product Query:', query)
-        console.log('UPC Param:', upc)
-
         const result = await request.query(query)
 
         await pool.close()
@@ -172,8 +162,6 @@ export async function getExternalBrands(): Promise<string[]> {
 
         const query = 'SELECT DISTINCT F155 as brand FROM positems WHERE F155 IS NOT NULL AND F155 != \'\' ORDER BY F155'
 
-        console.log('Executing Brands Query:', query)
-
         const result = await pool.request().query(query)
 
         await pool.close()
@@ -197,9 +185,6 @@ export async function getExternalProductsByBrand(brand: string): Promise<Product
 
         const query = 'SELECT F01 as upc, F155 as brand, F22 as size, F238 as department, F29 as name FROM positems WHERE F155 = @brand ORDER BY F29 ASC'
         request.input('brand', sql.NVarChar, brand)
-
-        console.log('Executing Products By Brand Query:', query)
-        console.log('Brand Param:', brand)
 
         const result = await request.query(query)
 
