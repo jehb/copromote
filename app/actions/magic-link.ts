@@ -51,11 +51,6 @@ export async function sendMagicLink(prevState: any, formData: FormData) {
         })
 
         // Simulate sending email
-        const link = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-magic-link?token=${token}`
-        console.log('----------------------------------------------------------------')
-        console.log(`MAGIC LINK SENT TO ${email}:`)
-        console.log(link)
-        console.log('----------------------------------------------------------------')
 
         return {
             success: true,
