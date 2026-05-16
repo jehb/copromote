@@ -51,6 +51,7 @@ export function EventCalendarView({ events }: EventCalendarViewProps) {
                         <button
                             onClick={prevMonth}
                             className="p-2 hover:bg-slate-50 transition-colors border-r"
+                            aria-label="Previous month"
                         >
                             <ChevronLeft className="h-4 w-4" />
                         </button>
@@ -63,6 +64,7 @@ export function EventCalendarView({ events }: EventCalendarViewProps) {
                         <button
                             onClick={nextMonth}
                             className="p-2 hover:bg-slate-50 transition-colors"
+                            aria-label="Next month"
                         >
                             <ChevronRight className="h-4 w-4" />
                         </button>
