@@ -92,4 +92,27 @@ describe('DatePicker Component', () => {
         expect(mockSetDate).toHaveBeenCalledTimes(1)
         expect(mockSetDate).toHaveBeenCalledWith(undefined, expect.anything(), expect.anything(), expect.anything())
     })
+
+    describe('Boundary Cases', () => {
+        it('should correctly render a leap year date (Feb 29)', () => {
+            const leapYearDate = new Date(2024, 1, 29) // Feb 29, 2024
+            render(<DatePicker date={leapYearDate} setDate={mockSetDate} />)
+            const expectedFormat = format(leapYearDate, 'PPP')
+            expect(screen.getByText(expectedFormat)).toBeInTheDocument()
+        })
+
+        it('should correctly render an end-of-year date (Dec 31)', () => {
+            const endOfYearDate = new Date(2023, 11, 31) // Dec 31, 2023
+            render(<DatePicker date={endOfYearDate} setDate={mockSetDate} />)
+            const expectedFormat = format(endOfYearDate, 'PPP')
+            expect(screen.getByText(expectedFormat)).toBeInTheDocument()
+        })
+
+        it('should correctly render a date at the UNIX epoch (Jan 1, 1970)', () => {
+            const epochDate = new Date(1970, 0, 1) // Jan 1, 1970
+            render(<DatePicker date={epochDate} setDate={mockSetDate} />)
+            const expectedFormat = format(epochDate, 'PPP')
+            expect(screen.getByText(expectedFormat)).toBeInTheDocument()
+        })
+    })
 })
