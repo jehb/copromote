@@ -55,7 +55,6 @@ export async function sendMagicLink(prevState: any, formData: FormData) {
         console.log('----------------------------------------------------------------')
         console.log(`MAGIC LINK SENT TO ${email}:`)
         console.log(link)
-        console.log('----------------------------------------------------------------')
 
         return {
             success: true,
