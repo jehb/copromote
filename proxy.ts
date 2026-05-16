@@ -2,47 +2,60 @@ import { NextRequest, NextResponse } from 'next/server'
 import { decrypt, updateSession } from './lib/session'
 
 export async function proxy(request: NextRequest) {
+    const getRedirectUrl = (path: string) => {
+        const url = request.nextUrl.clone()
+        url.pathname = path
+        const hostHeader = request.headers.get('x-forwarded-host') || request.headers.get('host')
+        if (hostHeader) {
+            const tmpUrl = new URL(`http://${hostHeader}`)
+            url.hostname = tmpUrl.hostname
+            url.port = tmpUrl.port
+        }
+        const forwardedProto = request.headers.get('x-forwarded-proto')
+        if (forwardedProto) {
+            url.protocol = forwardedProto + ':'
+        }
+        return url
+    }
+
     const currentUser = request.cookies.get('session')?.value
+    const payload = currentUser ? await decrypt(currentUser) : null
+    const isLoginPage = request.nextUrl.pathname.startsWith('/login')
 
-    // If trying to access protected routes
-    if (
-        !currentUser &&
-        !request.nextUrl.pathname.startsWith('/login')
-    ) {
-        return NextResponse.redirect(new URL('/login', request.url))
+    // If no session or invalid session, enforce login page
+    if (!payload) {
+        if (!isLoginPage) {
+            const response = NextResponse.redirect(getRedirectUrl('/login'))
+            if (currentUser) {
+                // If there was a cookie but it was invalid, clear it
+                response.cookies.delete('session')
+            }
+            return response
+        }
+        // If they are already on login, let them proceed. Just clear invalid cookie if present.
+        if (currentUser) {
+            const response = NextResponse.next()
+            response.cookies.delete('session')
+            return response
+        }
+        return NextResponse.next()
     }
 
-    // If user is logged in
-    if (currentUser) {
-        const payload = await decrypt(currentUser)
-
-        // Invalid session -> redirect to login
-        if (!payload && !request.nextUrl.pathname.startsWith('/login')) {
-            return NextResponse.redirect(new URL('/login', request.url))
+    // From this point, payload is guaranteed to be valid
+    if (payload.mustChangePassword) {
+        if (
+            !request.nextUrl.pathname.startsWith('/change-password') &&
+            !request.nextUrl.pathname.startsWith('/logout')
+        ) {
+            return NextResponse.redirect(getRedirectUrl('/change-password'))
         }
-
-        // Force password change logic
-        if (payload?.mustChangePassword) {
-            // Allow access to change-password and logout
-            if (
-                !request.nextUrl.pathname.startsWith('/change-password') &&
-                !request.nextUrl.pathname.startsWith('/logout')
-            ) {
-                return NextResponse.redirect(new URL('/change-password', request.url))
-            }
-        } else {
-            // If NOT forced to change password, but trying to access login or change-password (when not needed)
-            // Redirect to home (except if they explicitly went to change-password via profile - logic can be refined)
-            if (request.nextUrl.pathname.startsWith('/login')) {
-                return NextResponse.redirect(new URL('/', request.url))
-            }
+    } else {
+        if (isLoginPage) {
+            return NextResponse.redirect(getRedirectUrl('/'))
         }
-
-        // Refresh session if needed
-        return await updateSession(request)
     }
 
-    return NextResponse.next()
+    return await updateSession(request)
 }
 
 export const config = {
