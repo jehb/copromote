@@ -3,17 +3,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Link2, ExternalLink } from 'lucide-react'
 import * as Icons from 'lucide-react'
-import Link from 'next/link'
+import { Hyperlink } from '@prisma/client'
 
 // Helper to dynamically render icon
 const DynamicIcon = ({ name, className }: { name: string; className?: string }) => {
-    // @ts-ignore
-    const IconComponent = Icons[name]
+    const IconComponent = Icons[name as keyof typeof Icons] as React.ElementType
     if (!IconComponent) return <ExternalLink className={className} />
     return <IconComponent className={className} />
 }
 
-export function QuickLinks({ hyperlinks }: { hyperlinks: any[] }) {
+export function QuickLinks({ hyperlinks }: { hyperlinks: Hyperlink[] }) {
     if (!hyperlinks || hyperlinks.length === 0) return null
 
     return (
