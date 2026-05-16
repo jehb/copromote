@@ -1,3 +1,6 @@
+## 2024-05-18 - Added Accessible Labels to Icon-Only Buttons
+**Learning:** Found several icon-only buttons in the task board component that were missing `aria-label` attributes. Without text or `aria-label`, screen readers just announce 'button', which is confusing.
+**Action:** When adding icon-only buttons, always include an `aria-label` to ensure accessibility.
 ## 2024-05-15 - Added ARIA labels to Asset Editor template and saved asset load and delete buttons
 **Learning:** Found an accessibility issue pattern where visual previews were acting as buttons but lacked aria labels for screen readers. Deleting items also lacked aria labels, relying only on title.
 **Action:** Always ensure any icon-only button or purely visual button (such as a preview image acting as a load button) explicitly has an `aria-label` providing full context (e.g. `aria-label="Load template ${template.name}"`).
