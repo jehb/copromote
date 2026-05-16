@@ -177,10 +177,10 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                         <div className="flex space-x-1 ml-4">
                             {!isEditing && (
                                 <>
-                                    <Button size="icon" variant="ghost" onClick={() => setIsEditing(true)}>
+                                    <Button size="icon" variant="ghost" onClick={() => setIsEditing(true)} aria-label="Edit email item">
                                         <Pencil className="h-4 w-4" />
                                     </Button>
-                                    <Button size="icon" variant="ghost" className="text-red-500" onClick={handleDelete}>
+                                    <Button size="icon" variant="ghost" className="text-red-500" onClick={handleDelete} aria-label="Delete email item">
                                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                                     </Button>
                                 </>
@@ -220,6 +220,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                                 <button
                                                     onClick={() => handleRemoveEvent(event.id)}
                                                     className="ml-1 hover:text-red-500"
+                                                    aria-label="Remove event"
                                                 >
                                                     <X className="h-3 w-3" />
                                                 </button>
@@ -255,6 +256,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                                     <button
                                                         onClick={() => handleRemoveProduct(prod.upc)}
                                                         className="ml-1 hover:text-red-500"
+                                                        aria-label="Remove product"
                                                     >
                                                         <X className="h-3 w-3" />
                                                     </button>
@@ -296,6 +298,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                                     <button
                                                         onClick={() => handleRemovePhoto(fullPhoto.id)}
                                                         className="ml-1 hover:text-red-500 bg-white/50 rounded-full p-0.5"
+                                                        aria-label="Remove photo"
                                                     >
                                                         <X className="h-3 w-3" />
                                                     </button>
