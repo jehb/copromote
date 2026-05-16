@@ -115,7 +115,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full overflow-hidden">
-            {/* TODO Column */}
+            {/* To Do Column */}
             <div className="flex flex-col h-full bg-slate-50/50 rounded-lg border border-slate-100">
                 <div className="p-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-slate-50/50 backdrop-blur-sm z-10">
                     <div className="flex items-center gap-2">
@@ -130,7 +130,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                 </div>
             </div>
 
-            {/* IN PROGRESS Column */}
+            {/* In Progress Column */}
             <div className="flex flex-col h-full bg-blue-50/30 rounded-lg border border-blue-100">
                 <div className="p-4 border-b border-blue-100 flex justify-between items-center sticky top-0 bg-blue-50/30 backdrop-blur-sm z-10">
                     <div className="flex items-center gap-2">
@@ -145,7 +145,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                 </div>
             </div>
 
-            {/* DONE Column */}
+            {/* Done Column */}
             <div className="flex flex-col h-full bg-green-50/30 rounded-lg border border-green-100">
                 <div className="p-4 border-b border-green-100 flex justify-between items-center sticky top-0 bg-green-50/30 backdrop-blur-sm z-10">
                     <div className="flex items-center gap-2">
