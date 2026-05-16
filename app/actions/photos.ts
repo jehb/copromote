@@ -10,16 +10,12 @@ export async function getPhotos(tagId?: string) {
     const assets = await getImmichAssets(tagId)
     const allTags = await getPhotoTags()
 
-    // For each tag, map which assets have it
-    const tagStore = new Map<string, string[]>()
-    await Promise.all(allTags.map(async (tag) => {
-        const tAssets = await getImmichAssets(tag.id)
-        tagStore.set(tag.id, tAssets.map(a => a.id))
-    }))
-
-    // Map to the shape expected by the frontend
+    // Optimization: Immich assets already include their assigned tags.
+    // Map to the shape expected by the frontend by filtering allTags against a.tags
     return assets.map(a => {
-        const assetTags = allTags.filter(t => tagStore.get(t.id)?.includes(a.id))
+        // Find which known tags are present on this asset's built-in tags array
+        const assetTags = allTags.filter(t => a.tags?.some(assetTag => assetTag.id === t.id))
+
         return {
             id: a.id,
             url: `/api/immich/asset/${a.id}`,

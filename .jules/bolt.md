@@ -8,3 +8,6 @@
 
 **Learning:** Sequential database queries within loops introduce an N+1 performance bottleneck due to cumulative round-trip time (RTT).
 **Action:** Replaced a sequential `for...of` loop executing `prisma.location.upsert` with an array mapping inside `Promise.all` to run queries concurrently.
+## 2024-05-16 - [Immich Tag Fetching Optimization]
+**Learning:** The `@immich/sdk` returns an `AssetResponseDto` from queries like `getImmichAssets` which already includes the associated tags array (`a.tags`). Making separate, sequential API requests per tag (`getImmichAssets(tag.id)`) to build an asset-to-tag map creates a severe N+1 bottleneck and is entirely unnecessary.
+**Action:** Replaced the N+1 API calls with an efficient internal map filter leveraging the pre-existing `tags` property on the returned asset objects.
