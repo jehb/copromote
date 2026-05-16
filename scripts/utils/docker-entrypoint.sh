@@ -19,7 +19,7 @@ fi
 # Only chown if necessary to speed up startup
 if [ -d "/app/data" ]; then
     echo "Checking permissions for /app/data..."
-    find /app/data ! -user nextjs -o ! -group nodejs -exec chown nextjs:nodejs {} +
+    find /app/data \( ! -user nextjs -o ! -group nodejs \) -exec chown nextjs:nodejs {} +
 fi
 
 # Ensure /app is owned by nextjs (especially for .npm cache)
