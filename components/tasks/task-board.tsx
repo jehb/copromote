@@ -22,7 +22,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                     <span className="font-medium text-sm line-clamp-2 leading-tight">{task.title}</span>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Task options">
                                 <MoreHorizontal className="h-3 w-3" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -123,7 +123,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                         <h3 className="font-semibold text-sm text-slate-700">To Do</h3>
                         <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center">{todoTasks.length}</Badge>
                     </div>
-                    <TaskDialog users={users} projects={projects} defaultStatus="todo" trigger={<Button variant="ghost" size="icon" className="h-6 w-6"><Plus className="h-4 w-4" /></Button>} />
+                    <TaskDialog users={users} projects={projects} defaultStatus="todo" trigger={<Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Add task to To Do"><Plus className="h-4 w-4" /></Button>} />
                 </div>
                 <div className="p-3 overflow-y-auto flex-1">
                     {todoTasks.map(task => <TaskCard key={task.id} task={task} />)}
@@ -138,7 +138,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                         <h3 className="font-semibold text-sm text-blue-900">In Progress</h3>
                         <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center bg-blue-100 text-blue-700">{progressTasks.length}</Badge>
                     </div>
-                    <TaskDialog users={users} projects={projects} defaultStatus="in-progress" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-blue-100 text-blue-700"><Plus className="h-4 w-4" /></Button>} />
+                    <TaskDialog users={users} projects={projects} defaultStatus="in-progress" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-blue-100 text-blue-700" aria-label="Add task to In Progress"><Plus className="h-4 w-4" /></Button>} />
                 </div>
                 <div className="p-3 overflow-y-auto flex-1">
                     {progressTasks.map(task => <TaskCard key={task.id} task={task} />)}
@@ -153,7 +153,7 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
                         <h3 className="font-semibold text-sm text-green-900">Done</h3>
                         <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center bg-green-100 text-green-700">{doneTasks.length}</Badge>
                     </div>
-                    <TaskDialog users={users} projects={projects} defaultStatus="done" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-green-100 text-green-700"><Plus className="h-4 w-4" /></Button>} />
+                    <TaskDialog users={users} projects={projects} defaultStatus="done" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-green-100 text-green-700" aria-label="Add task to Done"><Plus className="h-4 w-4" /></Button>} />
                 </div>
                 <div className="p-3 overflow-y-auto flex-1">
                     {doneTasks.map(task => <TaskCard key={task.id} task={task} />)}
