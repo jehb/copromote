@@ -133,8 +133,6 @@ export async function searchWordPressEvents(query: string) {
             headers
         })
 
-        console.log(`[WordPress] Response status: ${response.status}`)
-
         if (!response.ok) {
             console.error(`[WordPress] Search failed: ${response.status} ${response.statusText}`)
             const errorText = await response.text()
