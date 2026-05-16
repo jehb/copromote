@@ -182,9 +182,6 @@ describe('useOfflineMutation', () => {
         // Verify custom onSuccess not called for offline queueing
         expect(onSuccess).not.toHaveBeenCalled()
 
-        // Verify log was called
-        expect(console.log).toHaveBeenCalledWith(expect.stringContaining('[OfflineSync] Queued testAction'))
-
         // Verify invalidate queries was NOT called
         expect(invalidateQueriesSpy).not.toHaveBeenCalled()
     })

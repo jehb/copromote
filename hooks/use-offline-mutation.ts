@@ -29,7 +29,7 @@ export function useOfflineMutation(mutationFn: (variables: any) => Promise<any>,
                     actionName: options.actionName,
                     payload: variables
                 })
-                console.log(`[OfflineSync] Queued ${options.actionName}`); return { offline: true }
+                return { offline: true }
             }
             // If online, execute the server action directly
             return mutationFn(variables)
