@@ -115,15 +115,15 @@ export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full overflow-hidden">
-            {/* To Do Column */}
-            <div className="flex flex-col h-full bg-slate-50/50 rounded-lg border border-slate-100">
-                <div className="p-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-slate-50/50 backdrop-blur-sm z-10">
+            {/* To-Do Column */}
+            <div className="flex flex-col h-full bg-slate-50/30 rounded-lg border border-slate-100">
+                <div className="p-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-slate-50/30 backdrop-blur-sm z-10">
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-slate-400"></div>
-                        <h3 className="font-semibold text-sm text-slate-700">To Do</h3>
-                        <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center">{todoTasks.length}</Badge>
+                        <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+                        <h3 className="font-semibold text-sm text-slate-900">To Do</h3>
+                        <Badge variant="secondary" className="text-xs h-5 px-1.5 min-w-[20px] justify-center bg-slate-100 text-slate-700">{todoTasks.length}</Badge>
                     </div>
-                    <TaskDialog users={users} projects={projects} defaultStatus="todo" trigger={<Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Add task to To Do"><Plus className="h-4 w-4" /></Button>} />
+                    <TaskDialog users={users} projects={projects} defaultStatus="todo" trigger={<Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-slate-100 text-slate-700" aria-label="Add task to To Do"><Plus className="h-4 w-4" /></Button>} />
                 </div>
                 <div className="p-3 overflow-y-auto flex-1">
                     {todoTasks.map(task => <TaskCard key={task.id} task={task} />)}
