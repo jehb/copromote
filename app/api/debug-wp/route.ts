@@ -47,12 +47,6 @@ export async function GET(request: Request) {
         }
 
         return NextResponse.json({
-            config: {
-                url: urlConfig.value,
-                username: usernameConfig?.value,
-                hasPassword: !!passwordConfig?.value,
-                usingAuth: !!headers['Authorization']
-            },
             request: {
                 endpoint,
                 query
@@ -64,6 +58,6 @@ export async function GET(request: Request) {
         })
 
     } catch (error: any) {
-        return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 })
+        return NextResponse.json({ error: error.message }, { status: 500 })
     }
 }
