@@ -72,11 +72,13 @@ describe('Promotion Actions', () => {
         })
 
         it('should return error on invalid data', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { })
             const formData = new FormData()
             // Missing required fields
 
             await expect(createPromotion(formData)).rejects.toThrow('Invalid data')
             expect(prisma.promotionPeriod.create).not.toHaveBeenCalled()
+            consoleSpy.mockRestore()
         })
     })
 

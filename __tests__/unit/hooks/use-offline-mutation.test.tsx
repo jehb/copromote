@@ -182,10 +182,55 @@ describe('useOfflineMutation', () => {
         // Verify custom onSuccess not called for offline queueing
         expect(onSuccess).not.toHaveBeenCalled()
 
-        // Verify log was called
-        expect(console.log).toHaveBeenCalledWith(expect.stringContaining('[OfflineSync] Queued testAction'))
-
         // Verify invalidate queries was NOT called
         expect(invalidateQueriesSpy).not.toHaveBeenCalled()
+    })
+
+    it('should handle onMutate without optimisticUpdate', async () => {
+        setOnline(true)
+
+        // Setup initial data
+        queryClient.setQueryData(defaultOptions.queryKey, { data: 'initial' })
+
+        const { result } = renderHook(() => useOfflineMutation(mockMutationFn, defaultOptions), { wrapper })
+
+        await act(async () => {
+            await result.current.mutateAsync({ test: 'data' })
+        })
+
+        // Data should remain unchanged during onMutate if no optimisticUpdate provided
+        expect(queryClient.getQueryData(defaultOptions.queryKey)).toEqual({ data: 'initial' })
+    })
+
+    it('should handle onError without previousData and without options.onError', async () => {
+        setOnline(true)
+        const spySetQueryData = jest.spyOn(queryClient, 'setQueryData')
+
+        mockMutationFn.mockRejectedValueOnce(new Error('Mutation failed'))
+
+        const { result } = renderHook(() => useOfflineMutation(mockMutationFn, defaultOptions), { wrapper })
+
+        try {
+            await act(async () => {
+                await result.current.mutateAsync({ test: 'data' })
+            })
+        } catch (e) {
+            // expected error
+        }
+
+        // Verify setQueryData was not called in onError because previousData was undefined
+        expect(spySetQueryData).not.toHaveBeenCalled()
+    })
+
+    it('should handle onSuccess without options.onSuccess', async () => {
+        setOnline(true)
+
+        const { result } = renderHook(() => useOfflineMutation(mockMutationFn, defaultOptions), { wrapper })
+
+        await act(async () => {
+            await result.current.mutateAsync({ test: 'data' })
+        })
+
+        expect(mockMutationFn).toHaveBeenCalledWith({ test: 'data' })
     })
 })

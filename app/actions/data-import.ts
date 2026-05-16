@@ -119,33 +119,53 @@ export async function importData(entity: string, data: any[]) {
                 }
                 break
 
-            case 'events':
-                for (const row of data) {
-                    // Try to find location by name given
-                    let locationId = undefined
-                    if (row.Location) {
-                        const loc = await prisma.location.findUnique({
-                            where: { name: row.Location }
-                        })
-                        if (loc) {
-                            locationId = loc.id
-                        } else {
-                            // Create it? Let's create it to be safe
-                            const newLoc = await prisma.location.create({
-                                data: { name: row.Location }
-                            })
-                            locationId = newLoc.id
+            case 'events': {
+                // Pre-fetch and cache locations to avoid N+1 query issue
+                const uniqueLocationNames = [...new Set(data.map(row => row.Location).filter(Boolean))] as string[];
+                const locationMap = new Map<string, string>();
+
+                if (uniqueLocationNames.length > 0) {
+                    const existingLocations = await prisma.location.findMany({
+                        where: { name: { in: uniqueLocationNames } }
+                    });
+
+                    for (const loc of existingLocations) {
+                        locationMap.set(loc.name, loc.id);
+                    }
+
+                    const missingLocationNames = uniqueLocationNames.filter(name => !locationMap.has(name));
+                    if (missingLocationNames.length > 0) {
+                        // Create missing locations
+                        const newLocations = await Promise.all(
+                            missingLocationNames.map(name => prisma.location.create({ data: { name } }))
+                        );
+                        for (const loc of newLocations) {
+                            locationMap.set(loc.name, loc.id);
                         }
+                    }
+                }
+
+                // Pre-fetch default location (TBD) if needed
+                let defaultLocationId: string | undefined = undefined;
+
+                for (const row of data) {
+                    let locationId = undefined;
+
+                    if (row.Location) {
+                        locationId = locationMap.get(row.Location);
                     }
 
                     // Provide a default location if one wasn't found or created (schema requires it)
                     if (!locationId) {
-                        // Find any location or create a default "TBD"
-                        let defaultLoc = await prisma.location.findFirst()
-                        if (!defaultLoc) {
-                            defaultLoc = await prisma.location.create({ data: { name: 'TBD' } })
+                        if (!defaultLocationId) {
+                            // Find any location or create a default "TBD"
+                            let defaultLoc = await prisma.location.findFirst();
+                            if (!defaultLoc) {
+                                defaultLoc = await prisma.location.create({ data: { name: 'TBD' } });
+                            }
+                            defaultLocationId = defaultLoc.id;
                         }
-                        locationId = defaultLoc.id
+                        locationId = defaultLocationId;
                     }
 
                     await prisma.event.upsert({
@@ -167,11 +187,12 @@ export async function importData(entity: string, data: any[]) {
                     })
                     count++
                 }
-                break
+                break;
+            }
 
-            case 'social-posts':
-                for (const row of data) {
-                    await prisma.socialPost.upsert({
+            case 'social-posts': {
+                const upsertPromises = data.map(row =>
+                    prisma.socialPost.upsert({
                         where: { id: row.ID || '' },
                         update: {
                             content: row.Content,
@@ -186,9 +207,11 @@ export async function importData(entity: string, data: any[]) {
                             status: row.Status || 'draft'
                         }
                     })
-                    count++
-                }
+                )
+                await Promise.all(upsertPromises)
+                count += data.length
                 break
+            }
 
             case 'hyperlinks':
                 for (const row of data) {

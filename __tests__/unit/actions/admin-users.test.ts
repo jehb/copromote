@@ -144,6 +144,7 @@ describe('Admin Users Actions', () => {
         })
 
         it('should handle errors in createUser', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { })
             const formData = new FormData()
             formData.append('name', 'Test')
             formData.append('username', 'testuser')
@@ -156,6 +157,7 @@ describe('Admin Users Actions', () => {
             const result = await createUser(formData)
             expect(result.success).toBe(false)
             expect(result.message).toContain('Failed: DB Error')
+            consoleSpy.mockRestore()
         })
     })
 
@@ -238,6 +240,7 @@ describe('Admin Users Actions', () => {
         })
 
         it('should handle errors in updateUser', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { })
             const formData = new FormData()
             formData.append('id', '1')
             formData.append('name', 'Test')
@@ -251,6 +254,7 @@ describe('Admin Users Actions', () => {
             const result = await updateUser(formData)
             expect(result.success).toBe(false)
             expect(result.message).toContain('Failed: Update failed')
+            consoleSpy.mockRestore()
         })
     })
 
@@ -283,12 +287,14 @@ describe('Admin Users Actions', () => {
         })
 
         it('should handle errors in deleteUser', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { })
             ; (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: '1', username: 'testuser' })
                 ; (prisma.user.delete as jest.Mock).mockRejectedValue(new Error('Delete Error'))
 
             const result = await deleteUser('1')
             expect(result.success).toBe(false)
             expect(result.message).toBe('Failed to delete user')
+            consoleSpy.mockRestore()
         })
     })
 })
