@@ -4,7 +4,20 @@ import userEvent from '@testing-library/user-event'
 import { format, addMonths, subMonths } from 'date-fns'
 
 describe('EventCalendarView', () => {
-    const today = new Date()
+    // Set a fixed system time
+    const fixedTime = new Date('2024-03-15T12:00:00Z')
+
+    beforeAll(() => {
+        jest.useFakeTimers().setSystemTime(fixedTime)
+    })
+
+    afterAll(() => {
+        jest.useRealTimers()
+    })
+
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+
+    const today = fixedTime
     
     // Create an event for today
     const mockEvents = [
@@ -42,17 +55,10 @@ describe('EventCalendarView', () => {
         const nextMonthDate = addMonths(today, 1)
         const expectedHeader = format(nextMonthDate, 'MMMM yyyy')
 
-        // There's only one ChevronRight icon, inside a button
-        // Let's find it by getting all buttons and clicking the second one (Today is middle, so index 2)
-        const buttons = screen.getAllByRole('button')
-        // [0] = prev, [1] = today, [2] = next
-        await userEvent.click(buttons[2])
+        const nextBtn = screen.getByRole('button', { name: /Next month/i })
+        await user.click(nextBtn)
 
         expect(screen.getByText(expectedHeader)).toBeInTheDocument()
-        
-        // Since we moved to next month, today's events shouldn't be visible (unless it's the exact same day overlapping weeks, but typically not)
-        // Actually, if today is the 31st, it might overlap into next month's first week view.
-        // Let's just trust the header change.
     })
 
     it('navigates to previous month', async () => {
@@ -61,8 +67,8 @@ describe('EventCalendarView', () => {
         const prevMonthDate = subMonths(today, 1)
         const expectedHeader = format(prevMonthDate, 'MMMM yyyy')
 
-        const buttons = screen.getAllByRole('button')
-        await userEvent.click(buttons[0])
+        const prevBtn = screen.getByRole('button', { name: /Previous month/i })
+        await user.click(prevBtn)
 
         expect(screen.getByText(expectedHeader)).toBeInTheDocument()
     })
@@ -71,13 +77,38 @@ describe('EventCalendarView', () => {
         render(<EventCalendarView events={mockEvents} />)
         
         // Go next month first
-        const buttons = screen.getAllByRole('button')
-        await userEvent.click(buttons[2])
+        const nextBtn = screen.getByRole('button', { name: /Next month/i })
+        await user.click(nextBtn)
         
         // Now click Today
-        await userEvent.click(screen.getByRole('button', { name: /Today/i }))
+        await user.click(screen.getByRole('button', { name: /Today/i }))
 
         const expectedHeader = format(today, 'MMMM yyyy')
         expect(screen.getByText(expectedHeader)).toBeInTheDocument()
+    })
+
+    it('renders correctly with an empty events array', () => {
+        render(<EventCalendarView events={[]} />)
+
+        const expectedHeader = format(today, 'MMMM yyyy')
+        expect(screen.getByText(expectedHeader)).toBeInTheDocument()
+
+        // Ensure no event titles are shown
+        expect(screen.queryByText(/Meeting with Client/)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Team Lunch/)).not.toBeInTheDocument()
+    })
+
+    it('renders out-of-month events on the visible calendar grid', () => {
+        // Since we fixed time to March 15, 2024, the calendar week starts in late February (Feb 25)
+        const outOfMonthEvent = {
+            id: 'e3',
+            title: 'Late February Planning',
+            startTime: new Date(2024, 1, 28, 14, 0, 0).toISOString() // Feb 28, 2024
+        }
+
+        render(<EventCalendarView events={[...mockEvents, outOfMonthEvent]} />)
+
+        // It should display the event because Feb 28 is part of the first week row shown in March 2024 grid
+        expect(screen.getByText(/Late February Planning/)).toBeInTheDocument()
     })
 })
