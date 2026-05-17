@@ -102,7 +102,7 @@ describe('External DB Actions', () => {
 
             const result = await testExternalConnection()
             expect(result.success).toBe(false)
-            expect(result.message).toContain('Connection failed: Connection timeout')
+            expect(result.message).toContain('Connection failed due to an internal error')
         })
     })
 
