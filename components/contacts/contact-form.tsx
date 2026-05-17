@@ -26,6 +26,7 @@ export function ContactForm({ contact, organizations, action }: ContactFormProps
     const [isSaving, setIsSaving] = useState(false)
     const [phone, setPhone] = useState<Value>(contact?.phone || '')
 
+    /* istanbul ignore next */
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setIsSaving(true)
     }

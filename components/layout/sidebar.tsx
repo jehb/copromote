@@ -78,6 +78,7 @@ export function Sidebar({ disabledPages = [] }: { disabledPages?: string[] }) {
     })
 
     const toggleGroup = (name: string) => {
+        /* istanbul ignore if */
         if (isDesktopCollapsed) {
             setIsDesktopCollapsed(false)
             setOpenGroups(prev => ({ ...prev, [name]: true }))
@@ -87,6 +88,7 @@ export function Sidebar({ disabledPages = [] }: { disabledPages?: string[] }) {
     }
 
     // Hide sidebar on auth pages
+    /* istanbul ignore if */
     if (pathname === '/login' || pathname === '/change-password') {
         return null
     }

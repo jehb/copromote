@@ -95,8 +95,9 @@ export function SocialFilterBar({ promotions, events }: SocialFilterBarProps) {
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label className="text-[10px] uppercase font-bold text-slate-500">From Date</Label>
+                            <Label htmlFor="startDate" className="text-[10px] uppercase font-bold text-slate-500">From Date</Label>
                             <Input
+                                id="startDate"
                                 type="date"
                                 className="h-9 bg-slate-50/50 border-slate-200"
                                 value={searchParams.get('startDate') || ''}
@@ -105,8 +106,9 @@ export function SocialFilterBar({ promotions, events }: SocialFilterBarProps) {
                         </div>
 
                         <div className="space-y-1.5">
-                            <Label className="text-[10px] uppercase font-bold text-slate-500">To Date</Label>
+                            <Label htmlFor="endDate" className="text-[10px] uppercase font-bold text-slate-500">To Date</Label>
                             <Input
+                                id="endDate"
                                 type="date"
                                 className="h-9 bg-slate-50/50 border-slate-200"
                                 value={searchParams.get('endDate') || ''}

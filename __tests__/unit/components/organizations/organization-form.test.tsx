@@ -99,4 +99,24 @@ describe('OrganizationForm', () => {
         const formData = mockAction.mock.calls[0][0]
         expect(formData.get('name')).toBe('New Org')
     })
+
+    it('cancels the form', async () => {
+        const backMock = jest.fn()
+        Object.defineProperty(window, 'history', {
+            value: { back: backMock },
+            writable: true
+        })
+
+        render(
+            <OrganizationForm 
+                contacts={mockContacts} 
+                action={mockAction} 
+            />
+        )
+
+        const user = userEvent.setup()
+        await user.click(screen.getByRole('button', { name: /Cancel/i }))
+        
+        expect(backMock).toHaveBeenCalled()
+    })
 })

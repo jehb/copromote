@@ -1,40 +1,74 @@
-
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import {
     Select,
-    SelectTrigger,
+    SelectGroup,
     SelectValue,
+    SelectTrigger,
     SelectContent,
-    SelectItem
+    SelectLabel,
+    SelectItem,
+    SelectSeparator,
+    SelectScrollUpButton,
+    SelectScrollDownButton,
 } from '@/components/ui/select'
 import userEvent from '@testing-library/user-event'
 
-// Select component is tricky to test in JSDOM because of pointer events and Portal.
-// We might need to rely on basic rendering and trigger click, 
-// ensuring at least the component mounts without error and trigger opens.
-
 describe('Select', () => {
-    it('renders and opens', async () => {
+    beforeEach(() => {
+        if (typeof window !== 'undefined') {
+            window.PointerEvent = class PointerEvent extends Event {
+                button: number;
+                ctrlKey: boolean;
+                pointerType: string;
+                constructor(type: string, props: PointerEventInit = {}) {
+                    super(type, props);
+                    this.button = props.button ?? 0;
+                    this.ctrlKey = props.ctrlKey ?? false;
+                    this.pointerType = props.pointerType ?? 'mouse';
+                }
+            } as any;
+        }
+    })
+
+    it('renders full select hierarchy', async () => {
+        const user = userEvent.setup()
+        
         render(
             <Select>
                 <SelectTrigger>
                     <SelectValue placeholder="Select a fruit" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
+                    <SelectScrollUpButton />
+                    <SelectGroup>
+                        <SelectLabel>Fruits</SelectLabel>
+                        <SelectItem value="apple">Apple</SelectItem>
+                        <SelectItem value="banana">Banana</SelectItem>
+                        <SelectItem value="blueberry">Blueberry</SelectItem>
+                    </SelectGroup>
+                    <SelectSeparator />
+                    <SelectGroup>
+                        <SelectLabel>Meat</SelectLabel>
+                        <SelectItem value="beef">Beef</SelectItem>
+                    </SelectGroup>
+                    <SelectScrollDownButton />
                 </SelectContent>
             </Select>
         )
-
-        const trigger = screen.getByText('Select a fruit')
-        expect(trigger).toBeInTheDocument()
-
-        await userEvent.click(trigger, { pointerEventsCheck: 0 })
-
-        // In some JSDOM envs, Radix Select Content might not appear easily without more mocks.
-        // But with PointerEvent mock added, it has a better chance.
-        // We check if content appears or at least no error occurs.
-        // expect(await screen.findByText('Apple')).toBeInTheDocument() 
+        
+        // Initially closed
+        expect(screen.getByText('Select a fruit')).toBeInTheDocument()
+        expect(screen.queryByText('Apple')).not.toBeInTheDocument()
+        
+        // Open
+        await user.click(screen.getByRole('combobox'))
+        
+        await waitFor(() => {
+            expect(screen.getByText('Fruits')).toBeInTheDocument()
+            expect(screen.getByText('Apple')).toBeInTheDocument()
+            expect(screen.getByText('Banana')).toBeInTheDocument()
+            expect(screen.getByText('Meat')).toBeInTheDocument()
+            expect(screen.getByText('Beef')).toBeInTheDocument()
+        })
     })
 })

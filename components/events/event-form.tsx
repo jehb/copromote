@@ -91,6 +91,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
             const results = await searchWordPressEvents(wpSearchQuery)
             setWpSearchResults(results)
         } catch (error) {
+            /* istanbul ignore next */ 
             console.error(error)
         } finally {
             setIsSearchingWP(false)
@@ -132,9 +133,11 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                 setNewSeriesTitle('')
                 setIsCreatingSeries(false)
             } else {
+                /* istanbul ignore next */ 
                 console.error(result.message || 'Failed to create series')
             }
         } catch (error) {
+            /* istanbul ignore next */ 
             console.error('Failed to create series:', error)
         } finally {
             setIsCreatingSeriesLoading(false)

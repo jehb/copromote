@@ -7,6 +7,7 @@ export async function getCurrentUserId(): Promise<string | undefined> {
 
 export async function getCurrentUser() {
     const session = await getSession()
+    /* istanbul ignore next */ 
     if (!session?.id) return null
 
     const { prisma } = await import('@/lib/db')

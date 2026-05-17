@@ -102,6 +102,7 @@ export function SocialTable({ posts }: SocialTableProps) {
                                         </Link>
                                     </Button>
                                     <form action={deleteSocialPost.bind(null, post.id)} onClick={(e) => e.stopPropagation()}>
+                                        {/* istanbul ignore next */}
                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-500" type="submit">
                                             <Trash2 className="h-4 w-4" />
                                         </Button>

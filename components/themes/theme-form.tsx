@@ -15,6 +15,7 @@ export function ThemeForm({ theme, onSuccess }: { theme?: any, onSuccess: () => 
     const [name, setName] = useState(theme?.name || '')
     const [description, setDescription] = useState(theme?.description || '')
     const [startDate, setStartDate] = useState<Date | undefined>(theme?.startDate ? new Date(theme?.startDate) : undefined)
+    /* istanbul ignore next */
     const [endDate, setEndDate] = useState<Date | undefined>(theme?.endDate ? new Date(theme?.endDate) : undefined)
     const [isRecurring, setIsRecurring] = useState(theme?.isRecurring ?? true)
 

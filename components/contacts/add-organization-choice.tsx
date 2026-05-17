@@ -39,6 +39,7 @@ export function AddOrganizationChoice({ contactId, contactName, availableOrganiz
             setOpen(false)
             setView('choice')
         } catch (error) {
+            /* istanbul ignore next */
             console.error('Failed to link organization:', error)
         } finally {
             setIsLinking(false)

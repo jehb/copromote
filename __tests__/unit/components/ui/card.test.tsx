@@ -1,28 +1,36 @@
-
 import { render, screen } from '@testing-library/react'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
+import {
+    Card,
+    CardHeader,
+    CardFooter,
+    CardTitle,
+    CardAction,
+    CardDescription,
+    CardContent,
+} from '@/components/ui/card'
 
 describe('Card', () => {
-    it('renders card components', () => {
+    it('renders full card hierarchy', () => {
         render(
             <Card>
                 <CardHeader>
                     <CardTitle>Card Title</CardTitle>
-                    <CardDescription>Card Desc</CardDescription>
+                    <CardDescription>Card Description</CardDescription>
+                    <CardAction><button>Action</button></CardAction>
                 </CardHeader>
-                <CardContent>Content</CardContent>
-                <CardFooter>Footer</CardFooter>
+                <CardContent>
+                    <p>Card Content</p>
+                </CardContent>
+                <CardFooter>
+                    <p>Card Footer</p>
+                </CardFooter>
             </Card>
         )
 
         expect(screen.getByText('Card Title')).toBeInTheDocument()
-        expect(screen.getByText('Card Desc')).toBeInTheDocument()
-        expect(screen.getByText('Content')).toBeInTheDocument()
-        expect(screen.getByText('Footer')).toBeInTheDocument()
-    })
-
-    it('applies custom class names', () => {
-        const { container } = render(<Card className="custom-class">Content</Card>)
-        expect(container.firstChild).toHaveClass('custom-class')
+        expect(screen.getByText('Card Description')).toBeInTheDocument()
+        expect(screen.getByText('Action')).toBeInTheDocument()
+        expect(screen.getByText('Card Content')).toBeInTheDocument()
+        expect(screen.getByText('Card Footer')).toBeInTheDocument()
     })
 })

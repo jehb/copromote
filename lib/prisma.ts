@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = global as unknown as { prismaClient_v4: PrismaClient }

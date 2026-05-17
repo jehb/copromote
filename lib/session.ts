@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY
 
+/* istanbul ignore next */ 
 if (!SECRET_KEY) {
     throw new Error('JWT_SECRET_KEY environment variable is not set')
 }

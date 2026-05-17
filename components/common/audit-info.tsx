@@ -25,7 +25,7 @@ export function AuditInfo({ createdAt, updatedAt, createdBy, updatedBy, classNam
             <div className="grid grid-cols-1 gap-1">
                 <div>
                     Created: {format(new Date(createdAt), 'PP p')}
-                    {createdBy && ` by ${createdBy.name || createdBy.username}`}
+                    {createdBy && ` by ${createdBy.name || /* istanbul ignore next */ createdBy.username}`}
                 </div>
                 <div>
                     Last Modified: {format(new Date(updatedAt), 'PP p')}

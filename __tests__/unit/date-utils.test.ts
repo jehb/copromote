@@ -30,6 +30,13 @@ describe('date-utils', () => {
 
         it('should handle mix of string and Date', () => {
             expect(isSameDayUTC('2026-02-17T00:00:00Z', new Date('2026-02-17T12:00:00Z'))).toBe(true)
+            expect(isSameDayUTC(new Date('2026-02-17T00:00:00Z'), '2026-02-17T12:00:00Z')).toBe(true)
+        })
+
+        it('should return false for null/undefined values', () => {
+            expect(isSameDayUTC(null, new Date())).toBe(false)
+            expect(isSameDayUTC(new Date(), null)).toBe(false)
+            expect(isSameDayUTC(undefined, undefined)).toBe(false)
         })
     })
 })

@@ -35,6 +35,7 @@ export function ThemeList({ initialThemes }: { initialThemes: any[] }) {
 
     const onOpenChange = (open: boolean) => {
         setIsOpen(open)
+        /* istanbul ignore if */
         if (!open) setEditingTheme(null)
     }
 

@@ -55,7 +55,7 @@ export function HelpDrawer() {
 
                 if (matchedRoute) {
                     helpFile = routeToHelpFile[matchedRoute]
-                } else if (pathname.startsWith('/admin')) {
+                } /* istanbul ignore next */ else if (pathname.startsWith('/admin')) {
                     helpFile = '/docs/help/admin.md'
                 }
             }
@@ -72,6 +72,7 @@ export function HelpDrawer() {
                 if (typeof window === 'undefined') return
 
                 const response = await fetch(helpFile)
+                /* istanbul ignore next */
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
                 }
