@@ -8,3 +8,6 @@
 ## 2024-05-16 - Added ARIA label to Event Card delete button
 **Learning:** The project heavily uses `Button size="icon"` from Shadcn UI containing only lucide-react icons, particularly for common actions like delete or edit. These are invisible to screen readers without explicit `aria-label` attributes.
 **Action:** When adding or modifying any icon-only buttons (especially common actions like delete or edit), ensure they have an explicit and descriptive `aria-label` attribute (e.g., `aria-label="Delete Event"`).
+## 2024-05-17 - Added Accessible Labels to Icon-Only Buttons in Gallery Component
+**Learning:** Found several icon-only buttons (like Grid View, Table View, View Photo Details, Delete Photo, Edit Metadata) in the gallery component that were missing `aria-label` attributes. Without text or `aria-label`, screen readers just announce 'button', which is confusing.
+**Action:** When adding icon-only buttons, always include an `aria-label` to ensure accessibility.
