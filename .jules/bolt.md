@@ -8,3 +8,9 @@
 
 **Learning:** Sequential database queries within loops introduce an N+1 performance bottleneck due to cumulative round-trip time (RTT).
 **Action:** Replaced a sequential `for...of` loop executing `prisma.location.upsert` with an array mapping inside `Promise.all` to run queries concurrently.
+## 2024-05-15 - [Performance: N+1 DB operations in Import loops]
+**Learning:** Sequential `upsert` queries inside `for...of` loops when doing bulk data imports (e.g. for contacts, tasks, organizations, events, etc.) create severe N+1 bottlenecks due to the cumulative wait time for each database roundtrip.
+**Action:** Replaced sequential `await prisma.[entity].upsert()` operations in all import loops with concurrent `await Promise.all(data.map(...))` calls to batch the queries and execute them in parallel, significantly improving import speed.
+## 2024-05-15 - [Performance: Chunked DB operations in Import loops]
+**Learning:** While replacing sequential `for...of` loops with `Promise.all` solves the N+1 database querying issue, using it directly on very large user-uploaded datasets is a dangerous Node.js/Prisma anti-pattern. It can flood the event loop and overwhelm Prisma's connection queue, leading to connection pool exhaustion and `PrismaClientKnownRequestError: P2024` timeouts.
+**Action:** Implemented a generic `chunkArray` helper to batch `Promise.all` executions into smaller sizes (e.g., chunks of 100). This balances the concurrency benefits of `Promise.all` while maintaining system stability under high-load data imports.

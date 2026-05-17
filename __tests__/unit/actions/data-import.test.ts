@@ -119,6 +119,7 @@ describe('Data Import Actions', () => {
         it('should import events and handle locations successfully', async () => {
             ; (prisma.event.upsert as jest.Mock).mockResolvedValue({})
             ; (prisma.location.findMany as jest.Mock).mockResolvedValue([{ id: 'loc1', name: 'Conference Hall' }])
+            ; (prisma.location.findFirst as jest.Mock).mockResolvedValue({ id: 'loc2', name: 'TBD' })
 
             const mockData = [
                 {
