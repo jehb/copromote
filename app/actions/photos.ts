@@ -7,19 +7,15 @@ import { getImmichAssets, getImmichTags, uploadImmichAsset, deleteImmichAsset, c
 export async function getPhotos(tagId?: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    const assets = await getImmichAssets(tagId)
-    const allTags = await getPhotoTags()
 
-    // For each tag, map which assets have it
-    const tagStore = new Map<string, string[]>()
-    await Promise.all(allTags.map(async (tag) => {
-        const tAssets = await getImmichAssets(tag.id)
-        tagStore.set(tag.id, tAssets.map(a => a.id))
-    }))
+    // Performance Optimization: Previously, this function suffered from an N+1 API fetching
+    // problem where it iteratively requested all assets per tag to map the relationships.
+    // We now utilize the native `tags` property returned directly within the AssetResponseDto.
+    // This reduces the complexity from O(T+1) network calls to O(1), significantly dropping latency.
+    const assets = await getImmichAssets(tagId)
 
     // Map to the shape expected by the frontend
     return assets.map(a => {
-        const assetTags = allTags.filter(t => tagStore.get(t.id)?.includes(a.id))
         return {
             id: a.id,
             url: `/api/immich/asset/${a.id}`,
@@ -27,7 +23,7 @@ export async function getPhotos(tagId?: string) {
             createdAt: a.fileCreatedAt,
             updatedAt: a.updatedAt,
             description: a.exifInfo?.description || null,
-            tags: assetTags
+            tags: a.tags || []
         }
     })
 }
