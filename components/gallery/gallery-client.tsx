@@ -77,6 +77,7 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                             size="icon"
                             className={cn("h-8 w-8 rounded-md", view === 'grid' && "bg-white shadow-sm")}
                             onClick={() => setView('grid')}
+                            aria-label="Grid view"
                         >
                             <LayoutGrid className="h-4 w-4" />
                         </Button>
@@ -85,6 +86,7 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                             size="icon"
                             className={cn("h-8 w-8 rounded-md", view === 'table' && "bg-white shadow-sm")}
                             onClick={() => setView('table')}
+                            aria-label="Table view"
                         >
                             <List className="h-4 w-4" />
                         </Button>
@@ -151,7 +153,7 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                                 </Link>
                                 <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 pointer-events-none">
                                     <div className="pointer-events-auto flex gap-2">
-                                        <Button size="icon" variant="secondary" className="h-9 w-9 rounded-full" asChild>
+                                        <Button size="icon" variant="secondary" className="h-9 w-9 rounded-full" aria-label={`View photo ${photo.name || 'details'}`} asChild>
                                             <Link href={`/gallery/${photo.id}`}>
                                                 <Eye className="h-4 w-4" />
                                             </Link>
@@ -161,6 +163,7 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                                             variant="destructive"
                                             className="h-9 w-9 rounded-full bg-red-500 hover:bg-red-600"
                                             onClick={() => handleDelete(photo.id)}
+                                            aria-label={`Delete photo ${photo.name || 'details'}`}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -237,7 +240,7 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button size="icon" variant="ghost" className="h-8 w-8" asChild>
+                                            <Button size="icon" variant="ghost" className="h-8 w-8" aria-label={`View photo ${photo.name || 'details'}`} asChild>
                                                 <Link href={`/gallery/${photo.id}`}>
                                                     <Eye className="h-4 w-4" />
                                                 </Link>
@@ -247,6 +250,7 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
                                                 variant="ghost"
                                                 className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                                                 onClick={() => handleDelete(photo.id)}
+                                                aria-label={`Delete photo ${photo.name || 'details'}`}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
