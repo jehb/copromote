@@ -13,7 +13,6 @@ import { OpenAI } from 'openai'
 export async function fetchLocalModels(baseUrl: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    console.log('Fetching local models from:', baseUrl);
     try {
         const url = await getFinalBaseUrl(baseUrl, 'openai')!;
         // The models endpoint is usually at /v1/models or just /models depending on the server
