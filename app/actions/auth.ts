@@ -43,7 +43,7 @@ export async function login(prevState: any, formData: FormData) {
         if (!user || !(await verifyPassword(password, user.password))) {
             await logSecurityEvent(
                 'FAILED_LOGIN',
-                `Failed login attempt. Username: "${username}", Password: "${password}"`,
+                `Failed login attempt. Username: "${username}"`,
                 user?.id,
                 undefined,
                 undefined // Let logSecurityEvent detect User Agent
