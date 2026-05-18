@@ -137,7 +137,7 @@ describe('WordPress Actions', () => {
 
             const result = await testWordPressConnection()
             expect(result.success).toBe(false)
-            expect(result.message).toContain('Connection error: Network error')
+            expect(result.message).toContain('Connection failed due to an internal error')
         })
     })
 

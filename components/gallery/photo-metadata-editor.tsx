@@ -106,7 +106,7 @@ export function PhotoMetadataEditor({
                     <TagIcon className="h-4 w-4" /> Tags
                 </div>
                 {!isEditing && (
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsEditing(true)}>
+                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsEditing(true)} aria-label="Edit metadata">
                         <Pencil className="h-3.5 w-3.5" />
                     </Button>
                 )}

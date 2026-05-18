@@ -13,6 +13,14 @@ function parseDate(value: any) {
     return fromZonedTime(value, TIMEZONE)
 }
 
+function chunkArray<T>(array: T[], size: number): T[][] {
+    const chunked: T[][] = [];
+    for (let i = 0; i < array.length; i += size) {
+        chunked.push(array.slice(i, i + size));
+    }
+    return chunked;
+}
+
 export async function importData(entity: string, data: any[]) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
@@ -20,104 +28,126 @@ export async function importData(entity: string, data: any[]) {
         let count = 0
 
         switch (entity) {
-            case 'contacts':
-                for (const row of data) {
-                    await prisma.contact.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            firstName: row['First Name'],
-                            lastName: row['Last Name'],
-                            email: row.Email,
-                            phone: row.Phone,
-                            company: row.Company,
-                            jobTitle: row['Job Title'],
-                            type: row.Type || 'Contact',
-                            notes: row.Notes
-                        },
-                        create: {
-                            firstName: row['First Name'],
-                            lastName: row['Last Name'],
-                            email: row.Email,
-                            phone: row.Phone,
-                            company: row.Company,
-                            jobTitle: row['Job Title'],
-                            type: row.Type || 'Contact',
-                            notes: row.Notes
-                        }
-                    })
-                    count++
-                }
-                break
-
-            case 'organizations':
-                for (const row of data) {
-                    await prisma.organization.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            name: row.Name,
-                            category: row.Category || 'Organization',
-                            description: row.Description,
-                            website: row.Website
-                        },
-                        create: {
-                            name: row.Name,
-                            category: row.Category || 'Organization',
-                            description: row.Description,
-                            website: row.Website
-                        }
-                    })
-                    count++
-                }
-                break
-
-            case 'projects':
-                // ⚡ Bolt: Performance optimization
-                // Using Promise.all to execute DB operations concurrently instead of an N+1 sequential loop.
-                // This batches DB requests and significantly improves import speed.
-                await Promise.all(
-                    data.map((row) =>
-                        prisma.project.upsert({
-                            where: { id: row.ID || '' },
-                            update: {
-                                name: row.Name,
-                                description: row.Description,
-                                status: row.Status || 'active',
-                                startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                                endDate: parseDate(row['End Date'] || row.EndDate)
-                            },
-                            create: {
-                                name: row.Name,
-                                description: row.Description,
-                                status: row.Status || 'active',
-                                startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                                endDate: parseDate(row['End Date'] || row.EndDate)
-                            }
-                        })
+            case 'contacts': {
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) =>
+                            prisma.contact.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    firstName: row['First Name'],
+                                    lastName: row['Last Name'],
+                                    email: row.Email,
+                                    phone: row.Phone,
+                                    company: row.Company,
+                                    jobTitle: row['Job Title'],
+                                    type: row.Type || 'Contact',
+                                    notes: row.Notes
+                                },
+                                create: {
+                                    firstName: row['First Name'],
+                                    lastName: row['Last Name'],
+                                    email: row.Email,
+                                    phone: row.Phone,
+                                    company: row.Company,
+                                    jobTitle: row['Job Title'],
+                                    type: row.Type || 'Contact',
+                                    notes: row.Notes
+                                }
+                            })
+                        )
                     )
-                )
-                count += data.length
-                break
-
-            case 'tasks':
-                for (const row of data) {
-                    await prisma.task.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            title: row.Title,
-                            description: row.Description,
-                            status: row.Status || 'todo',
-                            dueDate: parseDate(row['Due Date'])
-                        },
-                        create: {
-                            title: row.Title,
-                            description: row.Description,
-                            status: row.Status || 'todo',
-                            dueDate: parseDate(row['Due Date'])
-                        }
-                    })
-                    count++
+                    count += chunk.length
                 }
                 break
+            }
+
+            case 'organizations': {
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) =>
+                            prisma.organization.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    name: row.Name,
+                                    category: row.Category || 'Organization',
+                                    description: row.Description,
+                                    website: row.Website
+                                },
+                                create: {
+                                    name: row.Name,
+                                    category: row.Category || 'Organization',
+                                    description: row.Description,
+                                    website: row.Website
+                                }
+                            })
+                        )
+                    )
+                    count += chunk.length
+                }
+                break
+            }
+
+            case 'projects': {
+                // ⚡ Bolt: Performance optimization
+                // Using Promise.all in chunks to execute DB operations concurrently avoiding N+1 sequential loops,
+                // while preventing Prisma connection pool exhaustion on large imports.
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) =>
+                            prisma.project.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    name: row.Name,
+                                    description: row.Description,
+                                    status: row.Status || 'active',
+                                    startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                                    endDate: parseDate(row['End Date'] || row.EndDate)
+                                },
+                                create: {
+                                    name: row.Name,
+                                    description: row.Description,
+                                    status: row.Status || 'active',
+                                    startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                                    endDate: parseDate(row['End Date'] || row.EndDate)
+                                }
+                            })
+                        )
+                    )
+                    count += chunk.length
+                }
+                break
+            }
+
+            case 'tasks': {
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) =>
+                            prisma.task.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    title: row.Title,
+                                    description: row.Description,
+                                    status: row.Status || 'todo',
+                                    dueDate: parseDate(row['Due Date'])
+                                },
+                                create: {
+                                    title: row.Title,
+                                    description: row.Description,
+                                    status: row.Status || 'todo',
+                                    dueDate: parseDate(row['Due Date'])
+                                }
+                            })
+                        )
+                    )
+                    count += chunk.length
+                }
+                break
+            }
 
             case 'events': {
                 // Pre-fetch and cache locations to avoid N+1 query issue
@@ -148,150 +178,177 @@ export async function importData(entity: string, data: any[]) {
                 // Pre-fetch default location (TBD) if needed
                 let defaultLocationId: string | undefined = undefined;
 
-                for (const row of data) {
-                    let locationId = undefined;
-
-                    if (row.Location) {
-                        locationId = locationMap.get(row.Location);
+                const hasMissingLocations = data.some(row => !row.Location || !locationMap.has(row.Location));
+                if (hasMissingLocations) {
+                    let defaultLoc = await prisma.location.findFirst();
+                    if (!defaultLoc) {
+                        defaultLoc = await prisma.location.create({ data: { name: 'TBD' } });
                     }
+                    defaultLocationId = defaultLoc.id;
+                }
 
-                    // Provide a default location if one wasn't found or created (schema requires it)
-                    if (!locationId) {
-                        if (!defaultLocationId) {
-                            // Find any location or create a default "TBD"
-                            let defaultLoc = await prisma.location.findFirst();
-                            if (!defaultLoc) {
-                                defaultLoc = await prisma.location.create({ data: { name: 'TBD' } });
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) => {
+                            let locationId = undefined;
+
+                            if (row.Location) {
+                                locationId = locationMap.get(row.Location);
                             }
-                            defaultLocationId = defaultLoc.id;
-                        }
-                        locationId = defaultLocationId;
-                    }
 
-                    await prisma.event.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            title: row.Title,
-                            description: row.Description,
-                            startTime: parseDate(row['Start Time'] || row.Date) || new Date(),
-                            endTime: parseDate(row['End Time'] || row.Date) || new Date(),
-                            locationId
-                        },
-                        create: {
-                            title: row.Title,
-                            description: row.Description,
-                            startTime: parseDate(row['Start Time'] || row.Date) || new Date(),
-                            endTime: parseDate(row['End Time'] || row.Date) || new Date(Date.now() + 3600000), // Default 1 hour
-                            locationId
-                        }
-                    })
-                    count++
+                            // Provide a default location if one wasn't found or created (schema requires it)
+                            if (!locationId) {
+                                locationId = defaultLocationId;
+                            }
+
+                            return prisma.event.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    title: row.Title,
+                                    description: row.Description,
+                                    startTime: parseDate(row['Start Time'] || row.Date) || new Date(),
+                                    endTime: parseDate(row['End Time'] || row.Date) || new Date(),
+                                    locationId: locationId as string
+                                },
+                                create: {
+                                    title: row.Title,
+                                    description: row.Description,
+                                    startTime: parseDate(row['Start Time'] || row.Date) || new Date(),
+                                    endTime: parseDate(row['End Time'] || row.Date) || new Date(Date.now() + 3600000), // Default 1 hour
+                                    locationId: locationId as string
+                                }
+                            });
+                        })
+                    );
+                    count += chunk.length;
                 }
                 break;
             }
 
             case 'social-posts': {
-                const upsertPromises = data.map(row =>
-                    prisma.socialPost.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            content: row.Content,
-                            platform: row.Platform || 'Twitter',
-                            scheduledDate: parseDate(row['Scheduled Date']),
-                            status: row.Status || 'draft'
-                        },
-                        create: {
-                            content: row.Content,
-                            platform: row.Platform || 'Twitter',
-                            scheduledDate: parseDate(row['Scheduled Date']),
-                            status: row.Status || 'draft'
-                        }
-                    })
-                )
-                await Promise.all(upsertPromises)
-                count += data.length
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    const upsertPromises = chunk.map(row =>
+                        prisma.socialPost.upsert({
+                            where: { id: row.ID || '' },
+                            update: {
+                                content: row.Content,
+                                platform: row.Platform || 'Twitter',
+                                scheduledDate: parseDate(row['Scheduled Date']),
+                                status: row.Status || 'draft'
+                            },
+                            create: {
+                                content: row.Content,
+                                platform: row.Platform || 'Twitter',
+                                scheduledDate: parseDate(row['Scheduled Date']),
+                                status: row.Status || 'draft'
+                            }
+                        })
+                    )
+                    await Promise.all(upsertPromises)
+                    count += chunk.length
+                }
                 break
             }
 
-            case 'hyperlinks':
-                for (const row of data) {
-                    await prisma.hyperlink.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            title: row.Title,
-                            url: row.URL || row.Url,
-                            description: row.Description,
-                            icon: row.Icon
-                        },
-                        create: {
-                            title: row.Title,
-                            url: row.URL || row.Url,
-                            description: row.Description,
-                            icon: row.Icon
-                        }
-                    })
-                    count++
+            case 'hyperlinks': {
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) =>
+                            prisma.hyperlink.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    title: row.Title,
+                                    url: row.URL || row.Url,
+                                    description: row.Description,
+                                    icon: row.Icon
+                                },
+                                create: {
+                                    title: row.Title,
+                                    url: row.URL || row.Url,
+                                    description: row.Description,
+                                    icon: row.Icon
+                                }
+                            })
+                        )
+                    )
+                    count += chunk.length
                 }
                 break
+            }
 
 
-            case 'promotions':
-                for (const row of data) {
-                    await prisma.promotionPeriod.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            name: row.Name,
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate) || new Date(),
-                            adLiveDate: parseDate(row['Ad Live Date']),
-                            adImageDeadline: parseDate(row['Ad Image Deadline']),
-                            adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
-                        },
-                        create: {
-                            name: row.Name,
-                            startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
-                            endDate: parseDate(row['End Date'] || row.EndDate) || new Date(Date.now() + 86400000 * 7), // Default 1 week
-                            adLiveDate: parseDate(row['Ad Live Date']),
-                            adImageDeadline: parseDate(row['Ad Image Deadline']),
-                            adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
-                        }
-                    })
-                    count++
+            case 'promotions': {
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) =>
+                            prisma.promotionPeriod.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    name: row.Name,
+                                    startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                                    endDate: parseDate(row['End Date'] || row.EndDate) || new Date(),
+                                    adLiveDate: parseDate(row['Ad Live Date']),
+                                    adImageDeadline: parseDate(row['Ad Image Deadline']),
+                                    adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
+                                },
+                                create: {
+                                    name: row.Name,
+                                    startDate: parseDate(row['Start Date'] || row.StartDate) || new Date(),
+                                    endDate: parseDate(row['End Date'] || row.EndDate) || new Date(Date.now() + 86400000 * 7), // Default 1 week
+                                    adLiveDate: parseDate(row['Ad Live Date']),
+                                    adImageDeadline: parseDate(row['Ad Image Deadline']),
+                                    adPublishingDeadline: parseDate(row['Ad Publishing Deadline'])
+                                }
+                            })
+                        )
+                    )
+                    count += chunk.length
                 }
                 break
+            }
 
-            case 'color-palettes':
-                for (const row of data) {
-                    let colorsArray: string[] = []
-                    const colorsInput = row.Colors
+            case 'color-palettes': {
+                const chunks = chunkArray(data, 100);
+                for (const chunk of chunks) {
+                    await Promise.all(
+                        chunk.map((row) => {
+                            let colorsArray: string[] = []
+                            const colorsInput = row.Colors
 
-                    if (colorsInput) {
-                        try {
-                            if (colorsInput.startsWith('[')) {
-                                colorsArray = JSON.parse(colorsInput)
-                            } else {
-                                colorsArray = colorsInput.split(',').map((c: string) => c.trim()).filter(Boolean)
+                            if (colorsInput) {
+                                try {
+                                    if (colorsInput.startsWith('[')) {
+                                        colorsArray = JSON.parse(colorsInput)
+                                    } else {
+                                        colorsArray = colorsInput.split(',').map((c: string) => c.trim()).filter(Boolean)
+                                    }
+                                } catch (e) {
+                                    console.error('Failed to parse colors for palette:', row.Name)
+                                    colorsArray = []
+                                }
                             }
-                        } catch (e) {
-                            console.error('Failed to parse colors for palette:', row.Name)
-                            colorsArray = []
-                        }
-                    }
 
-                    await prisma.colorPalette.upsert({
-                        where: { id: row.ID || '' },
-                        update: {
-                            name: row.Name,
-                            colors: JSON.stringify(colorsArray) // Store as a serialized JSON string in Prisma Json field as designed
-                        },
-                        create: {
-                            name: row.Name,
-                            colors: JSON.stringify(colorsArray)
-                        }
-                    })
-                    count++
+                            return prisma.colorPalette.upsert({
+                                where: { id: row.ID || '' },
+                                update: {
+                                    name: row.Name,
+                                    colors: JSON.stringify(colorsArray) // Store as a serialized JSON string in Prisma Json field as designed
+                                },
+                                create: {
+                                    name: row.Name,
+                                    colors: JSON.stringify(colorsArray)
+                                }
+                            })
+                        })
+                    )
+                    count += chunk.length
                 }
                 break
+            }
         }
 
         revalidatePath('/admin/data')
