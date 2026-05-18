@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic"
-import { createEvent, getLocations, getUsers } from '@/app/actions/events'
+import { createEvent, getLocations, getUsers, getEvent } from '@/app/actions/events'
 import { getEventSeries } from '@/app/actions/event-series'
 import { getContacts } from '@/app/actions/contacts'
 import { getOrganizations } from '@/app/actions/organizations'
@@ -13,14 +13,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
-export default async function NewEventPage() {
-    const [locations, users, contacts, organizations, eventSeries] = await Promise.all([
+export default async function NewEventPage(props: {
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+    const searchParams = await props.searchParams;
+    const cloneId = searchParams?.clone as string | undefined;
+
+    const [locations, users, contacts, organizations, eventSeries, eventToClone] = await Promise.all([
         getLocations(),
         getUsers(),
         getContacts(),
         getOrganizations(),
-        getEventSeries()
+        getEventSeries(),
+        cloneId ? getEvent(cloneId) : Promise.resolve(null)
     ])
+
+    let initialEvent = undefined;
+    if (eventToClone) {
+        const { id, createdById, updatedById, createdAt, updatedAt, ...rest } = eventToClone;
+        initialEvent = {
+            ...rest,
+            title: `Copy of ${rest.title}`
+        };
+    }
 
     return (
         <div className="max-w-2xl mx-auto p-8 space-y-8">
@@ -42,6 +57,7 @@ export default async function NewEventPage() {
                 </CardHeader>
                 <CardContent className="p-8">
                     <EventForm
+                        event={initialEvent}
                         locations={locations}
                         users={users}
                         contacts={contacts}

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
-import { Pencil, Calendar, MapPin, User, ArrowLeft, MessageSquare, Building2, UserCircle2, Trash2, Clock, Library } from 'lucide-react'
+import { Pencil, Calendar, MapPin, User, ArrowLeft, MessageSquare, Building2, UserCircle2, Trash2, Clock, Library, Copy } from 'lucide-react'
 import { updateEvent, deleteEvent } from '@/app/actions/events'
 import { EventForm } from './event-form'
 import { Product } from '@/app/actions/external-db'
@@ -110,6 +110,9 @@ export function EventDetails({
                     </div>
                 </div>
                 <div className="flex gap-2 w-full md:w-auto">
+                    <Button variant="outline" className="flex-1 md:flex-none gap-2" onClick={() => router.push(`/events/new?clone=${event.id}`)}>
+                        <Copy className="h-4 w-4" /> Clone
+                    </Button>
                     <Button variant="outline" className="flex-1 md:flex-none gap-2" onClick={() => setIsEditing(true)}>
                         <Pencil className="h-4 w-4" /> Edit Event
                     </Button>

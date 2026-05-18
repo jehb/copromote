@@ -14,6 +14,23 @@ const TIMEZONE = 'America/New_York'
 export async function getEvents() {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
+
+    // Automatically mark events older than 1 day as PAST
+    const oneDayAgo = new Date();
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+    
+    await prisma.event.updateMany({
+        where: {
+            status: EventStatus.SCHEDULED,
+            endTime: {
+                lt: oneDayAgo
+            }
+        },
+        data: {
+            status: EventStatus.PAST
+        }
+    });
+
     return await prisma.event.findMany({
         orderBy: { startTime: 'asc' },
         include: {

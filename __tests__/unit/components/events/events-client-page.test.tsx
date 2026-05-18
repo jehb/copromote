@@ -92,7 +92,7 @@ describe('EventsClientPage', () => {
         
         // Switch to Cards
         await userEvent.click(screen.getByRole('button', { name: /Cards/i }))
-        expect(screen.getAllByTestId('event-card').length).toBe(2)
+        expect(screen.getAllByTestId('event-card').length).toBe(1)
         
         // Switch to Calendar
         await userEvent.click(screen.getByRole('button', { name: /Calendar/i }))
@@ -106,24 +106,25 @@ describe('EventsClientPage', () => {
     it('filters events by status', async () => {
         render(<EventsClientPage initialData={mockInitialData} />)
         
+        // By default, showing 1 event (SCHEDULED)
+        expect(screen.getByText('Showing 1 event')).toBeInTheDocument()
+        
         // Open filter dropdown
         await userEvent.click(screen.getByRole('button', { name: /Status/i }))
         
-        // Check "Scheduled"
+        // Uncheck "Scheduled"
         await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Scheduled' }))
         
         await waitFor(() => {
-            // Should only show 1 event now
-            expect(screen.getByText('Showing 1 event')).toBeInTheDocument()
+            // Filter is now just ['TENTATIVE'], so no events found
+            expect(screen.getByText('No events found')).toBeInTheDocument()
         })
 
-        // Re-open filter dropdown because it closed on select
-        await userEvent.click(screen.getByRole('button', { name: /Status/i }))
-
-        // Uncheck "Scheduled"
-        await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Scheduled' }))
+        // Re-open filter dropdown because it closed on select (or use Clear Filters)
+        await userEvent.click(screen.getByRole('button', { name: 'Clear Filters' }))
 
         await waitFor(() => {
+            // Empty filter means all events shown
             expect(screen.getByText('Showing 2 events')).toBeInTheDocument()
         })
     })
@@ -134,9 +135,13 @@ describe('EventsClientPage', () => {
         // Open filter dropdown
         await userEvent.click(screen.getByRole('button', { name: /Status/i }))
         
-        // Check "Past" (which we don't have)
+        // Check "Past"
         await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Past' }))
         
+        // Re-open filter dropdown and uncheck "Scheduled"
+        await userEvent.click(screen.getByRole('button', { name: /Status/i }))
+        await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Scheduled' }))
+
         await waitFor(() => {
             expect(screen.getByText('No events found')).toBeInTheDocument()
         })

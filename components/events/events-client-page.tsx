@@ -73,7 +73,7 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
     })
 
     const [view, setView] = useState<'list' | 'calendar' | 'cards'>('list')
-    const [statusFilter, setStatusFilter] = useState<string[]>([])
+    const [statusFilter, setStatusFilter] = useState<string[]>(['SCHEDULED', 'TENTATIVE'])
 
     const isLoadingAny = isLoadingEvents
 

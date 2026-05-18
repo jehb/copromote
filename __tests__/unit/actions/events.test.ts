@@ -24,6 +24,7 @@ jest.mock('@/lib/db', () => ({
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
+            updateMany: jest.fn(),
         },
         location: {
             findMany: jest.fn(),

@@ -148,7 +148,12 @@ export function Sidebar({ disabledPages = [] }: { disabledPages?: string[] }) {
                             return (
                                 <div key={item.name} className="flex flex-col">
                                     <button
-                                        onClick={() => toggleGroup(item.name)}
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            toggleGroup(item.name)
+                                        }}
                                         title={isDesktopCollapsed ? item.name : undefined}
                                         className={cn(
                                             "flex items-center gap-3 rounded-md transition-colors hover:bg-slate-800",

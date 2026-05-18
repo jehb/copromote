@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Trash2, Calendar, User, MessageSquare, Instagram, Facebook, Linkedin, Twitter } from 'lucide-react'
+import { Trash2, Calendar, User, MessageSquare, Instagram, Facebook, Linkedin, Twitter, Copy } from 'lucide-react'
 import { format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
 import { deleteEvent } from '@/app/actions/events'
@@ -60,18 +60,33 @@ export function EventCard({ event, locations, users, contacts, organizations, ev
                             </span>
                         )}
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Delete Event"
-                        className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50"
-                        onClick={async (e) => {
-                            e.stopPropagation();
-                            await deleteEvent(event.id);
-                        }}
-                    >
-                        <Trash2 className="h-3 w-3" />
-                    </Button>
+                    <div className="flex gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Clone Event"
+                            title="Clone Event"
+                            className="h-6 w-6 text-slate-400 hover:text-primary hover:bg-primary/10"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/events/new?clone=${event.id}`);
+                            }}
+                        >
+                            <Copy className="h-3 w-3" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Delete Event"
+                            className="h-6 w-6 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                            onClick={async (e) => {
+                                e.stopPropagation();
+                                await deleteEvent(event.id);
+                            }}
+                        >
+                            <Trash2 className="h-3 w-3" />
+                        </Button>
+                    </div>
                 </div>
 
                 <div>

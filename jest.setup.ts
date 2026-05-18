@@ -178,6 +178,7 @@ const mockPrisma = {
         create: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
         update: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
         delete: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
+        updateMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
     task: {
         findUnique: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
