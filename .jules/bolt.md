@@ -14,3 +14,6 @@
 ## 2024-05-15 - [Performance: Chunked DB operations in Import loops]
 **Learning:** While replacing sequential `for...of` loops with `Promise.all` solves the N+1 database querying issue, using it directly on very large user-uploaded datasets is a dangerous Node.js/Prisma anti-pattern. It can flood the event loop and overwhelm Prisma's connection queue, leading to connection pool exhaustion and `PrismaClientKnownRequestError: P2024` timeouts.
 **Action:** Implemented a generic `chunkArray` helper to batch `Promise.all` executions into smaller sizes (e.g., chunks of 100). This balances the concurrency benefits of `Promise.all` while maintaining system stability under high-load data imports.
+## 2024-05-18 - [Performance: N+1 API operations in Photos Retrieval]
+**Learning:** Sequential logic that tries to map tags to photos by looping over all tags and making an API call per tag to retrieve associated assets creates a massive N+1 bottleneck, scaling latency linearly with the number of tags.
+**Action:** Replaced the mapped `Promise.all` logic inside `getPhotos` with a direct O(1) attribute lookup, utilizing the native `tags` property embedded in the Immich SDK's `AssetResponseDto`. This eliminated all redundant tag API calls entirely.
