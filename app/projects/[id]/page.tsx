@@ -57,7 +57,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                             </Badge>
                             <Dialog>
                                 <DialogTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" aria-label="Project settings">
                                         <Settings className="h-4 w-4" />
                                     </Button>
                                 </DialogTrigger>
@@ -170,6 +170,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                                             variant="ghost"
                                             size="icon"
                                             className={task.status === 'done' ? 'text-green-600 hover:text-green-700' : 'text-slate-300 hover:text-slate-400'}
+                                            aria-label={task.status === 'done' ? 'Mark task as todo' : 'Mark task as done'}
                                         >
                                             {task.status === 'done' ? <CheckCircle2 className="h-6 w-6" /> : <Circle className="h-6 w-6" />}
                                         </Button>
@@ -200,12 +201,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <TaskDialog users={users} task={task} trigger={
-                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Edit task">
                                                 <LinkIcon className="h-4 w-4" />
                                             </Button>
                                         } />
                                         <form action={deleteTask.bind(null, task.id)}>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50">
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50" aria-label="Delete task">
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </form>
@@ -291,7 +292,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                                     </div>
                                 </div>
                                 <form action={deleteAsset.bind(null, asset.id, project.id)}>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-600 hover:bg-red-50">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-600 hover:bg-red-50" aria-label="Delete asset">
                                         <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
                                 </form>
