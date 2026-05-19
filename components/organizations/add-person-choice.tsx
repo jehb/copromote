@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -27,10 +27,13 @@ export function AddPersonChoice({ organizationId, organizationName, availableCon
     const [isLinking, setIsLinking] = useState(false)
     const [open, setOpen] = useState(false)
 
-    const filteredContacts = availableContacts.filter(contact => {
-        const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase()
-        return fullName.includes(search.toLowerCase()) && contact.organizationId !== organizationId
-    })
+    // ⚡ Bolt: Cache array filters to bypass redundant iterations on non-related render passes
+    const filteredContacts = useMemo(() => {
+        return availableContacts.filter(contact => {
+            const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase()
+            return fullName.includes(search.toLowerCase()) && contact.organizationId !== organizationId
+        })
+    }, [availableContacts, search, organizationId])
 
     const handleLink = async (contactId: string) => {
         setIsLinking(true)

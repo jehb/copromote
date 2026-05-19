@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -37,12 +37,15 @@ export function GalleryClient({ initialPhotos, tags }: GalleryClientProps) {
     const [searchQuery, setSearchQuery] = useState('')
     const [view, setView] = useState<'grid' | 'table'>('grid')
 
-    const filteredPhotos = initialPhotos.filter(photo => {
-        const matchesTag = selectedTag === 'all' || photo.tags.some((t) => t.id === selectedTag)
-        const matchesSearch = !!photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            photo.tags.some((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        return matchesTag && matchesSearch
-    })
+    // ⚡ Bolt: Cache filtered array mapping to reduce CPU spikes when toggling gallery views
+    const filteredPhotos = useMemo(() => {
+        return initialPhotos.filter(photo => {
+            const matchesTag = selectedTag === 'all' || photo.tags.some((t) => t.id === selectedTag)
+            const matchesSearch = !!photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                photo.tags.some((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
+            return matchesTag && matchesSearch
+        })
+    }, [initialPhotos, selectedTag, searchQuery])
 
     async function handleDelete(id: string) {
         if (!confirm('Are you sure you want to delete this photo?')) return

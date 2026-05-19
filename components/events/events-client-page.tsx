@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { EventListView } from '@/components/events/event-list-view'
 import { EventCalendarView } from '@/components/events/event-calendar-view'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 
 interface EventsClientPageProps {
@@ -77,10 +77,13 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
 
     const isLoadingAny = isLoadingEvents
 
-    const filteredEvents = events.filter((event: any) => {
-        if (statusFilter.length === 0) return true
-        return statusFilter.includes(event.status)
-    })
+    // ⚡ Bolt: Cache filtered array output to prevent unnecessary O(N) evaluations when switching views
+    const filteredEvents = useMemo(() => {
+        return events.filter((event: any) => {
+            if (statusFilter.length === 0) return true
+            return statusFilter.includes(event.status)
+        })
+    }, [events, statusFilter])
 
     const viewSwitcher = (
         <div className="flex items-center bg-slate-100 p-1 rounded-lg border shadow-sm">
