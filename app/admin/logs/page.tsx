@@ -30,7 +30,7 @@ export default async function LogsPage() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Link href="/admin">
-                        <Button variant="outline" size="icon">
+                        <Button variant="outline" size="icon" aria-label="Back to admin dashboard">
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
                     </Link>
