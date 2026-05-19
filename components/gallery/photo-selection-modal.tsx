@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Card, CardContent } from '@/components/ui/card'
@@ -50,12 +50,15 @@ export function PhotoSelectionModal({ selectedPhotoIds, onSelect }: PhotoSelecti
         }
     }
 
-    const filteredPhotos = photos.filter(photo => {
-        const matchesTag = selectedTag === 'all' || photo.tags.some((t: any) => t.id === selectedTag)
-        const matchesSearch = photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            photo.tags.some((t: any) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        return matchesTag && matchesSearch
-    })
+    // ⚡ Bolt: Prevent unnecessary derived computations when modifying temp selections
+    const filteredPhotos = useMemo(() => {
+        return photos.filter(photo => {
+            const matchesTag = selectedTag === 'all' || photo.tags.some((t: any) => t.id === selectedTag)
+            const matchesSearch = photo.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                photo.tags.some((t: any) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
+            return matchesTag && matchesSearch
+        })
+    }, [photos, selectedTag, searchQuery])
 
     const togglePhoto = (id: string) => {
         setTempSelectedIds(prev =>

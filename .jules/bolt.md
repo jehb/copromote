@@ -17,3 +17,6 @@
 ## 2024-05-18 - [Performance: N+1 API operations in Photos Retrieval]
 **Learning:** Sequential logic that tries to map tags to photos by looping over all tags and making an API call per tag to retrieve associated assets creates a massive N+1 bottleneck, scaling latency linearly with the number of tags.
 **Action:** Replaced the mapped `Promise.all` logic inside `getPhotos` with a direct O(1) attribute lookup, utilizing the native `tags` property embedded in the Immich SDK's `AssetResponseDto`. This eliminated all redundant tag API calls entirely.
+## 2024-05-18 - [Performance: React Filtering Computations]
+**Learning:** Re-computing expensive array filter operations on every render without `useMemo` slows down frontend performance, especially in pages rendering large lists like galleries, contacts, and events.
+**Action:** Wrapped derived filter arrays (e.g. `filteredEvents`, `filteredContacts`, `filteredPhotos`) inside `useMemo` hooks. This memoizes the filtered data, preventing redundant filtering computations on subsequent re-renders if the underlying array and search inputs haven't changed.

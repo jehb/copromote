@@ -24,7 +24,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 interface ContactsClientPageProps {
     initialContacts: any[]
@@ -48,12 +48,15 @@ export function ContactsClientPage({ initialContacts }: ContactsClientPageProps)
         }
     )
 
-    const filteredContacts = contacts.filter((contact: any) =>
-        `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.organization?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    // ⚡ Bolt: Memoized derived filtering to eliminate unnecessary recalculation bottlenecks on render
+    const filteredContacts = useMemo(() => {
+        return contacts.filter((contact: any) =>
+            `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            contact.organization?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            contact.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            contact.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    }, [contacts, searchTerm])
 
     return (
         <div className="p-4 md:p-8 space-y-4 md:space-y-8 h-full">

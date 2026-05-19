@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import {
     Dialog,
@@ -28,9 +28,12 @@ export function AddOrganizationChoice({ contactId, contactName, availableOrganiz
     const [isLinking, setIsLinking] = useState(false)
     const [open, setOpen] = useState(false)
 
-    const filteredOrgs = availableOrganizations.filter(org => {
-        return org.name.toLowerCase().includes(search.toLowerCase())
-    })
+    // ⚡ Bolt: Memoized array filtering to avoid redundant O(N) operations on render
+    const filteredOrgs = useMemo(() => {
+        return availableOrganizations.filter(org => {
+            return org.name.toLowerCase().includes(search.toLowerCase())
+        })
+    }, [availableOrganizations, search])
 
     const handleLink = async (orgId: string) => {
         setIsLinking(true)

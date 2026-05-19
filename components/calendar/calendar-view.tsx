@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { EventItem } from '@/app/actions/calendar'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -45,14 +45,17 @@ export function CalendarView({
         themes: true
     })
 
-    const filteredEvents = initialEvents.filter(event => {
-        if (event.type.startsWith('promotion_') && !filters.promotions) return false
-        if (event.type === 'social_post' && !filters.social) return false
-        if ((event.type.startsWith('project_') || event.type === 'event') && !filters.projects) return false
-        if (event.type === 'logistics_event' && !filters.events) return false
-        if (event.type === 'theme' && !filters.themes) return false
-        return true
-    })
+    // ⚡ Bolt: Memoized derived filtering to prevent O(N) recalculations on unrelated state changes
+    const filteredEvents = useMemo(() => {
+        return initialEvents.filter(event => {
+            if (event.type.startsWith('promotion_') && !filters.promotions) return false
+            if (event.type === 'social_post' && !filters.social) return false
+            if ((event.type.startsWith('project_') || event.type === 'event') && !filters.projects) return false
+            if (event.type === 'logistics_event' && !filters.events) return false
+            if (event.type === 'theme' && !filters.themes) return false
+            return true
+        })
+    }, [initialEvents, filters])
 
     return (
         <div className="h-full flex gap-6">
