@@ -58,7 +58,7 @@ describe('LocationList', () => {
         const editButtons = screen.getAllByRole('button', { name: 'Edit Location' })
         expect(editButtons).toHaveLength(2)
 
-        const deleteButtons = screen.getAllByRole('button', { name: 'Delete' })
+        const deleteButtons = screen.getAllByRole('button', { name: 'Delete Location' })
         expect(deleteButtons).toHaveLength(2)
     })
 
@@ -67,7 +67,7 @@ describe('LocationList', () => {
 
         render(<LocationList locations={mockLocations} />)
         
-        const deleteButtons = screen.getAllByRole('button', { name: 'Delete' })
+        const deleteButtons = screen.getAllByRole('button', { name: 'Delete Location' })
         await userEvent.click(deleteButtons[0])
 
         await waitFor(() => {
@@ -81,7 +81,7 @@ describe('LocationList', () => {
 
         render(<LocationList locations={mockLocations} />)
         
-        const deleteButtons = screen.getAllByRole('button', { name: 'Delete' })
+        const deleteButtons = screen.getAllByRole('button', { name: 'Delete Location' })
         await userEvent.click(deleteButtons[0])
 
         await waitFor(() => {
@@ -95,7 +95,7 @@ describe('LocationList', () => {
 
         render(<LocationList locations={mockLocations} />)
         
-        const deleteButtons = screen.getAllByRole('button', { name: 'Delete' })
+        const deleteButtons = screen.getAllByRole('button', { name: 'Delete Location' })
         await userEvent.click(deleteButtons[0])
 
         await waitFor(() => {

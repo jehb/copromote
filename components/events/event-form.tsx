@@ -304,7 +304,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                 </div>
                                 <Dialog open={isCreatingSeries} onOpenChange={setIsCreatingSeries}>
                                     <DialogTrigger asChild>
-                                        <Button type="button" variant="outline" size="icon" title="Create New Series">
+                                        <Button type="button" variant="outline" size="icon" aria-label="Create New Series" title="Create New Series">
                                             <Plus className="h-4 w-4" />
                                         </Button>
                                     </DialogTrigger>

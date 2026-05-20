@@ -11,3 +11,7 @@
 ## 2024-05-17 - Added Accessible Labels to Icon-Only Buttons in Gallery Component
 **Learning:** Found several icon-only buttons (like Grid View, Table View, View Photo Details, Delete Photo, Edit Metadata) in the gallery component that were missing `aria-label` attributes. Without text or `aria-label`, screen readers just announce 'button', which is confusing.
 **Action:** When adding icon-only buttons, always include an `aria-label` to ensure accessibility.
+
+## 2026-05-20 - ARIA Labels for Icon-Only Buttons
+**Learning:** Many icon-only buttons with `size="icon"` lack an `aria-label` for screen readers, relying entirely on visual context or standard HTML `title` attributes. Adding an explicit `aria-label` is critical for true keyboard accessibility and screen-reader usability, particularly for destructive or primary actions.
+**Action:** Add `aria-label` attributes consistently to all such `Button size="icon"` elements without one.
