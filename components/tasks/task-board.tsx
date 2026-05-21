@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 interface TaskBoardProps {
     tasks: any[]
@@ -11,9 +11,10 @@ interface TaskBoardProps {
 export function TaskBoard({ tasks, users, projects }: TaskBoardProps) {
     const [editingTask, setEditingTask] = useState<any>(null)
 
-    const todoTasks = tasks.filter(t => t.status === 'todo')
-    const progressTasks = tasks.filter(t => t.status === 'in-progress')
-    const doneTasks = tasks.filter(t => t.status === 'done')
+    // Memoize derived filtered arrays to prevent redundant O(N) recalculations on every re-render (e.g. when opening/closing the edit modal)
+    const todoTasks = useMemo(() => tasks.filter(t => t.status === 'todo'), [tasks])
+    const progressTasks = useMemo(() => tasks.filter(t => t.status === 'in-progress'), [tasks])
+    const doneTasks = useMemo(() => tasks.filter(t => t.status === 'done'), [tasks])
 
     const TaskCard = ({ task }: { task: any }) => (
         <Card className="mb-3 hover:shadow-md transition-shadow group">
