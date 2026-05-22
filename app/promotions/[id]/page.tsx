@@ -128,7 +128,7 @@ export default async function PromotionDetailPage({ params }: { params: { id: st
                                     </div>
                                 </div>
                                 <form action={deletePromotionAsset.bind(null, asset.id, promotion.id)}>
-                                    <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                    <Button variant="ghost" size="icon" aria-label="Delete asset" className="text-red-500 hover:text-red-700 hover:bg-red-50">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </form>

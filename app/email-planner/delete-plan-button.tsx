@@ -22,7 +22,7 @@ export function DeletePlanButton({ id }: { id: string }) {
     }
 
     return (
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-stone-500 hover:text-red-500" onClick={handleDelete} disabled={loading}>
+        <Button variant="ghost" size="icon" aria-label="Delete email plan" className="h-8 w-8 text-stone-500 hover:text-red-500" onClick={handleDelete} disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
         </Button>
     )

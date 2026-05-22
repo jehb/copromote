@@ -57,7 +57,7 @@ export function PromotionGridView({ promotions }: PromotionGridViewProps) {
                                 </div>
                                 <div className="flex gap-2">
                                     <form action={deletePromotion.bind(null, promo.id)}>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-500">
+                                        <Button variant="ghost" size="icon" aria-label="Delete promotion" className="h-8 w-8 text-muted-foreground hover:text-red-500">
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </form>
