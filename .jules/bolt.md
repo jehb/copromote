@@ -23,3 +23,6 @@
 ## 2024-05-18 - [Performance: Dashboard Data Fetching]
 **Learning:** Sequential data fetching (`await func1()`, `await func2()`, `await func3()`) in Next.js Server Components blocks subsequent requests until the previous one completes, increasing overall latency.
 **Action:** Replaced sequential `await` calls with `await Promise.all([func1(), func2(), func3()])` to fetch independent data concurrently, reducing total load time.
+## 2026-05-23 - [Performance: React Filtering Computations in Task Board]
+**Learning:** The `TaskBoard` component was previously filtering the `tasks` array three times on every render (O(N) operations) to derive lists for different statuses. This degrades performance when state changes (like opening the edit dialog) trigger re-renders.
+**Action:** Wrapped the derived task filtering arrays (`todoTasks`, `progressTasks`, `doneTasks`) using `useMemo` in `components/tasks/task-board.tsx`. This ensures the O(N) recalculations only happen when the underlying `tasks` array actually changes, improving UI responsiveness.
