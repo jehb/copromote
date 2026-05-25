@@ -37,13 +37,10 @@ import {
 import { createEventSeries } from '@/app/actions/event-series'
 import { ProductSelector } from '@/components/email-planner/product-selector'
 import { Product } from '@/app/actions/external-db'
+import { EventCommonProps } from '@/types/events'
 
-interface EventFormProps {
+interface EventFormProps extends EventCommonProps {
     event?: any
-    locations: any[]
-    users: any[]
-    contacts: any[]
-    organizations: any[]
     eventSeries?: any[]
     availableProducts?: Product[]
     action: (formData: FormData) => Promise<void>

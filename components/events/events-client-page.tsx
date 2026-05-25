@@ -22,14 +22,11 @@ import { EventListView } from '@/components/events/event-list-view'
 import { EventCalendarView } from '@/components/events/event-calendar-view'
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
+import { EventCommonProps } from '@/types/events'
 
 interface EventsClientPageProps {
-    initialData: {
+    initialData: EventCommonProps & {
         events: any[]
-        locations: any[]
-        users: any[]
-        contacts: any[]
-        organizations: any[]
         eventSeries: any[]
     }
 }

@@ -10,9 +10,13 @@ import { ArrowRight, BarChart3, Clock, Layout, LayoutDashboard } from 'lucide-re
 import { PageHeader } from '@/components/ui/page-header'
 
 export default async function DashboardPage() {
-  const projects = await getProjects()
-  const hyperlinks = await getHyperlinks()
-  const events = await getEvents()
+  // ⚡ Bolt: Execute independent data fetching concurrently to improve TTFB
+  const [projects, hyperlinks, events] = await Promise.all([
+    getProjects(),
+    getHyperlinks(),
+    getEvents()
+  ])
+
   const activeProjects = projects.filter(p => ['active', 'in progress'].includes(p.status.toLowerCase()))
   const upcomingEvents = events.filter(e => e.status === 'SCHEDULED')
 

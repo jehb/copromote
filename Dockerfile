@@ -21,7 +21,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npx prisma generate
-RUN npm run build
+RUN JWT_SECRET_KEY=temporary_build_placeholder npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
