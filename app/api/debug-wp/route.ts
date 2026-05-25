@@ -1,12 +1,13 @@
 
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getSession } from '@/lib/session'
+import { getCurrentUser } from '@/lib/user-util'
 
 export async function GET(request: Request) {
     try {
-        const session = await getSession()
-        if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        const user = await getCurrentUser()
+        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        if (user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
         const { searchParams } = new URL(request.url)
         const query = searchParams.get('q')
