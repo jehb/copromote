@@ -11,9 +11,12 @@ import { PageHeader } from '@/components/ui/page-header'
 import { ProtectedRoute } from '@/components/layout/protected-route'
 
 export default async function TasksPage() {
-    const tasks = await getTasks()
-    const users = await getUsers()
-    const projects = await getProjects()
+    // ⚡ Bolt: Execute independent data fetching concurrently to improve TTFB
+    const [tasks, users, projects] = await Promise.all([
+        getTasks(),
+        getUsers(),
+        getProjects()
+    ])
 
     return (
         <ProtectedRoute pageName="tasks">
