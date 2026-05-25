@@ -2,7 +2,7 @@
 import { getSession } from '@/lib/session'
 
 import { revalidatePath } from 'next/cache'
-import { getImmichAssets, getImmichTags, uploadImmichAsset, deleteImmichAsset, createImmichTag, addTagToImmichAsset, updateImmichAsset, removeTagFromImmichAsset, getImmichAlbums, createImmichAlbum, deleteImmichAlbum, addAssetToImmichAlbum, removeAssetFromImmichAlbum } from './immich'
+import { getImmichAssets, getImmichTags, uploadImmichAsset, deleteImmichAsset, createImmichTag, addTagToImmichAsset, updateImmichAsset, updateTagsOnImmichAsset, removeTagFromImmichAsset, getImmichAlbums, createImmichAlbum, deleteImmichAlbum, addAssetToImmichAlbum, removeAssetFromImmichAlbum } from './immich'
 
 export async function getPhotos(tagId?: string) {
     const session = await getSession();
@@ -112,6 +112,14 @@ export async function updatePhotoDescription(id: string, description: string) {
     await updateImmichAsset(id, description)
     revalidatePath('/gallery')
     revalidatePath(`/gallery/${id}`)
+}
+
+export async function updatePhotoTags(photoId: string, tagsToAdd: string[], tagsToRemove: string[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+    await updateTagsOnImmichAsset(photoId, tagsToAdd, tagsToRemove)
+    revalidatePath('/gallery')
+    revalidatePath(`/gallery/${photoId}`)
 }
 
 export async function addPhotoTag(photoId: string, tagId: string) {

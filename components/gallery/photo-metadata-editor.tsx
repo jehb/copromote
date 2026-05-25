@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { TagIcon, AlignLeft, Pencil, X, Plus, Loader2 } from 'lucide-react'
-import { updatePhotoDescription, addPhotoTag, removePhotoTag, createPhotoTag } from '@/app/actions/photos'
+import { updatePhotoDescription, updatePhotoTags, createPhotoTag } from '@/app/actions/photos'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -46,23 +46,26 @@ export function PhotoMetadataEditor({
                 const initialTagIds = new Set((initialTags || []).map(t => t.id))
                 const currentTagIds = new Set(tags.map(t => t.id))
 
-                const tagPromises = []
+                const tagsToRemove: string[] = []
+                const tagsToAdd: string[] = []
 
                 // Tags to remove
                 for (const initTag of initialTags || []) {
                     if (!currentTagIds.has(initTag.id)) {
-                        tagPromises.push(removePhotoTag(photoId, initTag.id))
+                        tagsToRemove.push(initTag.id)
                     }
                 }
 
                 // Tags to add
                 for (const currTag of tags) {
                     if (!initialTagIds.has(currTag.id)) {
-                        tagPromises.push(addPhotoTag(photoId, currTag.id))
+                        tagsToAdd.push(currTag.id)
                     }
                 }
 
-                await Promise.all(tagPromises)
+                if (tagsToAdd.length > 0 || tagsToRemove.length > 0) {
+                    await updatePhotoTags(photoId, tagsToAdd, tagsToRemove)
+                }
 
                 setIsEditing(false)
             } catch (error) {
