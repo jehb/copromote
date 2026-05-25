@@ -166,9 +166,13 @@ export async function importData(entity: string, data: any[]) {
                     const missingLocationNames = uniqueLocationNames.filter(name => !locationMap.has(name));
                     if (missingLocationNames.length > 0) {
                         // Create missing locations
-                        const newLocations = await Promise.all(
-                            missingLocationNames.map(name => prisma.location.create({ data: { name } }))
-                        );
+                        await prisma.location.createMany({
+                            data: missingLocationNames.map(name => ({ name })),
+                            skipDuplicates: true,
+                        });
+                        const newLocations = await prisma.location.findMany({
+                            where: { name: { in: missingLocationNames } },
+                        });
                         for (const loc of newLocations) {
                             locationMap.set(loc.name, loc.id);
                         }
