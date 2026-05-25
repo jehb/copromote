@@ -36,7 +36,6 @@ export async function GET(request: Request) {
             headers['Authorization'] = `Basic ${auth}`
         }
 
-        console.log(`[DebugAPI] Fetching: ${endpoint}`)
         const response = await fetch(endpoint, { headers })
 
         const responseText = await response.text()
