@@ -69,14 +69,23 @@ async function main() {
       break;
     }
 
+    // Extract all wordpress IDs from this page to batch query
+    const wpIds = data.events.map((ev: any) => ev.id);
+
+    // Fetch existing events in one query
+    const existingEvents = await prisma.event.findMany({
+      where: { wordpressId: { in: wpIds } },
+      select: { wordpressId: true }
+    });
+
+    // Create a Set for O(1) lookups
+    const existingIds = new Set(existingEvents.map(e => e.wordpressId));
+
     for (const ev of data.events) {
       const wpId = ev.id;
-      // Deduplicate
-      const existing = await prisma.event.findFirst({
-        where: { wordpressId: wpId }
-      });
 
-      if (existing) {
+      // Deduplicate
+      if (existingIds.has(wpId)) {
         // console.log(`Skipping event ${wpId} - already exists.`);
         totalSkipped++;
         continue;
