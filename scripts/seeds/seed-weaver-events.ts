@@ -72,28 +72,34 @@ const events = [
 async function main() {
     console.log("Seeding Weaver Street Market events...");
 
-    for (const event of events) {
-        // Upsert the location first
-        const location = await prisma.location.upsert({
-            where: { name: event.locationName },
-            update: {},
-            create: { name: event.locationName }
-        });
+    const uniqueLocationNames = [...new Set(events.map(event => event.locationName))];
 
-        // Create the event
-        await prisma.event.create({
-            data: {
-                title: event.title,
-                description: event.description,
-                startTime: event.startTime,
-                endTime: event.endTime,
-                status: event.status,
-                locationId: location.id
-            }
-        });
-        console.log(`Created event: ${event.title}`);
-    }
+    console.log("Upserting locations...");
+    const upsertedLocations = await Promise.all(
+        uniqueLocationNames.map(name =>
+            prisma.location.upsert({
+                where: { name },
+                update: {},
+                create: { name }
+            })
+        )
+    );
 
+    const locationMap = new Map(upsertedLocations.map(loc => [loc.name, loc.id]));
+
+    console.log("Creating events in bulk...");
+    await prisma.event.createMany({
+        data: events.map(event => ({
+            title: event.title,
+            description: event.description,
+            startTime: event.startTime,
+            endTime: event.endTime,
+            status: event.status,
+            locationId: locationMap.get(event.locationName)!
+        }))
+    });
+
+    console.log(`Created ${events.length} events!`);
     console.log("Seeding complete!");
 }
 
