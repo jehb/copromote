@@ -100,7 +100,7 @@ export async function syncPostToPostiz(postParams: {
         }
 
         // Upload assets if any exist
-        const postizMedia: any[] = []
+        let postizMedia: any[] = []
         if (postParams.assets && postParams.assets.length > 0) {
             const uploadPromises = postParams.assets.map(async (asset) => {
                 try {
@@ -128,17 +128,18 @@ export async function syncPostToPostiz(postParams: {
 
             const results = await Promise.all(uploadPromises)
 
-            for (const uploadedMedia of results) {
-                if (!uploadedMedia) continue
+            postizMedia = results.reduce((acc: any[], uploadedMedia: any) => {
+                if (!uploadedMedia) return acc
 
                 if (uploadedMedia.id || uploadedMedia.path) {
-                    postizMedia.push(uploadedMedia)
+                    acc.push(uploadedMedia)
                 } else if (Array.isArray(uploadedMedia)) {
-                    postizMedia.push(...uploadedMedia)
+                    acc.push(...uploadedMedia)
                 } else if (typeof uploadedMedia === 'string') {
-                    postizMedia.push({ id: uploadedMedia })
+                    acc.push({ id: uploadedMedia })
                 }
-            }
+                return acc
+            }, [])
         }
 
         const dateStr = postParams.scheduledDate ? postParams.scheduledDate.toISOString() : new Date().toISOString()
