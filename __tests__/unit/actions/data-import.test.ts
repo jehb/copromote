@@ -15,6 +15,7 @@ jest.mock('@/lib/prisma', () => ({
         location: {
             findUnique: jest.fn(),
             create: jest.fn(),
+            createMany: jest.fn(),
             findFirst: jest.fn(),
             findMany: jest.fn(),
         },
@@ -139,8 +140,10 @@ describe('Data Import Actions', () => {
 
         it('should create default location if not found during event import', async () => {
             ; (prisma.event.upsert as jest.Mock).mockResolvedValue({})
-            ; (prisma.location.findMany as jest.Mock).mockResolvedValue([])
-            ; (prisma.location.create as jest.Mock).mockResolvedValue({ id: 'loc2', name: 'New Hall' })
+            ; (prisma.location.findMany as jest.Mock)
+                .mockResolvedValueOnce([]) // First findMany returns empty (checking existing)
+                .mockResolvedValueOnce([{ id: 'loc2', name: 'New Hall' }]) // Second findMany returns the created one
+            ; (prisma.location.createMany as jest.Mock).mockResolvedValue({ count: 1 })
 
             const mockData = [
                 {
@@ -152,8 +155,9 @@ describe('Data Import Actions', () => {
             const result = await importData('events', mockData)
 
             expect(result.success).toBe(true)
-            expect(prisma.location.create).toHaveBeenCalledWith({
-                data: { name: 'New Hall' },
+            expect(prisma.location.createMany).toHaveBeenCalledWith({
+                data: [{ name: 'New Hall' }],
+                skipDuplicates: true
             })
         })
 
