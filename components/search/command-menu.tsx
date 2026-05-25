@@ -63,10 +63,8 @@ export function CommandMenu({ isCollapsed }: { isCollapsed?: boolean }) {
 
         async function fetchResults() {
             setLoading(true)
-            console.log("Fetching results for:", debouncedQuery)
             try {
                 const data = await search(debouncedQuery)
-                console.log("Received data:", data)
                 setResults(data)
             } catch (error) {
                 console.error("Search failed:", error)
