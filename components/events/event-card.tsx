@@ -11,16 +11,13 @@ import { format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
 import { deleteEvent } from '@/app/actions/events'
 import { cn } from '@/lib/utils'
+import { EventCommonProps } from '@/types/events'
 
 const TIMEZONE = 'America/New_York'
 
 
-interface EventCardProps {
+interface EventCardProps extends EventCommonProps {
     event: any
-    locations: any[]
-    users: any[]
-    contacts: any[]
-    organizations: any[]
     eventSeries: any[]
 }
 
