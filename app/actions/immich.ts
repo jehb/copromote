@@ -170,6 +170,30 @@ export async function addTagToImmichAsset(assetId: string, tagId: string) {
     }
 }
 
+export async function updateTagsOnImmichAsset(assetId: string, tagsToAdd: string[], tagsToRemove: string[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+    await initImmich()
+
+    try {
+        if (tagsToAdd.length > 0) {
+            await immich.bulkTagAssets({
+                tagBulkAssetsDto: { tagIds: tagsToAdd, assetIds: [assetId] }
+            })
+        }
+
+        for (const tagId of tagsToRemove) {
+            await immich.untagAssets({
+                id: tagId,
+                bulkIdsDto: { ids: [assetId] }
+            })
+        }
+    } catch (e: any) {
+        console.error('Failed to update tags on Immich asset:', e?.response?.data || e.message)
+        throw new Error('Failed to update photo tags.')
+    }
+}
+
 export async function updateImmichAsset(id: string, description: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");

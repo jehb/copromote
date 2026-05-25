@@ -1,13 +1,12 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { PhotoMetadataEditor } from '@/components/gallery/photo-metadata-editor'
 import userEvent from '@testing-library/user-event'
-import { updatePhotoDescription, addPhotoTag, removePhotoTag, createPhotoTag } from '@/app/actions/photos'
+import { updatePhotoDescription, updatePhotoTags, createPhotoTag } from '@/app/actions/photos'
 
 // Mock dependencies
 jest.mock('@/app/actions/photos', () => ({
     updatePhotoDescription: jest.fn(),
-    addPhotoTag: jest.fn(),
-    removePhotoTag: jest.fn(),
+    updatePhotoTags: jest.fn(),
     createPhotoTag: jest.fn()
 }))
 
@@ -98,8 +97,7 @@ describe('PhotoMetadataEditor', () => {
         await userEvent.click(saveButton)
 
         await waitFor(() => {
-            expect(removePhotoTag).toHaveBeenCalledWith('p1', 't1')
-            expect(addPhotoTag).toHaveBeenCalledWith('p1', 't2')
+            expect(updatePhotoTags).toHaveBeenCalledWith('p1', ['t2'], ['t1'])
         })
     })
 
@@ -141,7 +139,7 @@ describe('PhotoMetadataEditor', () => {
         await userEvent.click(saveButton)
 
         await waitFor(() => {
-            expect(addPhotoTag).toHaveBeenCalledWith('p1', 't3')
+            expect(updatePhotoTags).toHaveBeenCalledWith('p1', ['t3'], [])
         })
     })
 
