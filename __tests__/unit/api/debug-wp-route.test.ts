@@ -1,6 +1,6 @@
 import { GET } from '@/app/api/debug-wp/route'
 import { prisma } from '@/lib/prisma'
-import { getSession } from '@/lib/session'
+import { getCurrentUser } from '@/lib/user-util'
 
 jest.mock('@/lib/prisma', () => ({
     prisma: {
@@ -10,8 +10,8 @@ jest.mock('@/lib/prisma', () => ({
     },
 }))
 
-jest.mock('@/lib/session', () => ({
-    getSession: jest.fn(),
+jest.mock('@/lib/user-util', () => ({
+    getCurrentUser: jest.fn(),
 }))
 
 global.fetch = jest.fn(() =>
@@ -26,18 +26,30 @@ describe('GET /api/debug-wp', () => {
         jest.clearAllMocks()
     })
 
-    it('returns unauthorized if no session', async () => {
-        ;(getSession as jest.Mock).mockResolvedValue(null)
+    it('returns unauthorized if no user', async () => {
+        ;(getCurrentUser as jest.Mock).mockResolvedValue(null)
         const req = new Request('http://localhost/api/debug-wp')
         const res = await GET(req) as any
 
         expect(res).toBeDefined()
         const data = await res.json()
         expect(data).toHaveProperty('error', 'Unauthorized')
+        expect(res.status).toBe(401)
+    })
+
+    it('returns forbidden if user is not admin', async () => {
+        ;(getCurrentUser as jest.Mock).mockResolvedValue({ id: '1', role: 'USER' })
+        const req = new Request('http://localhost/api/debug-wp')
+        const res = await GET(req) as any
+
+        expect(res).toBeDefined()
+        const data = await res.json()
+        expect(data).toHaveProperty('error', 'Forbidden')
+        expect(res.status).toBe(403)
     })
 
     it('does not leak config in response', async () => {
-        ;(getSession as jest.Mock).mockResolvedValue({ user: { id: 1 } })
+        ;(getCurrentUser as jest.Mock).mockResolvedValue({ id: '1', role: 'ADMIN' })
         ;(prisma.config.findUnique as jest.Mock).mockImplementation(({ where: { key } }) => {
             if (key === 'WORDPRESS_URL') return Promise.resolve({ value: 'https://example.com' })
             if (key === 'WORDPRESS_USERNAME') return Promise.resolve({ value: 'admin' })

@@ -104,8 +104,9 @@ jest.mock('next/server', () => {
                 delete: jest.fn(),
             },
         }),
-        json: jest.fn((data: any) => ({
+        json: jest.fn((data: any, options?: { status?: number, headers?: any }) => ({
             json: async () => data,
+            status: options?.status || 200,
         })),
     }
 
