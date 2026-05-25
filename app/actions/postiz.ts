@@ -118,7 +118,6 @@ export async function syncPostToPostiz(postParams: {
 
                     // Upload to Postiz
                     const uploadedMedia: any = await client.upload(buffer, ext)
-                    console.log('Postiz Upload Media Result:', uploadedMedia)
                     return uploadedMedia
                 } catch (err: any) {
                     console.error('Failed to upload asset to Postiz:', asset.url, err?.message || err)
