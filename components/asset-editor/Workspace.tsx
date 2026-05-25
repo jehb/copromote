@@ -254,17 +254,12 @@ export default function Workspace({
                                 const isSelected = selectedIds.includes(id);
 
                                 if (!metaPressed && !isSelected) {
-                                    // if no key pressed and the node is not selected
-                                    // select just one
                                     setSelectedIds([id]);
                                 } else if (metaPressed && isSelected) {
-                                    // if we pressed keys and node was selected
-                                    // we should remove it from selection:
                                     const rects = selectedIds.slice();
                                     rects.splice(rects.indexOf(id), 1);
                                     setSelectedIds(rects);
                                 } else if (metaPressed && !isSelected) {
-                                    // add the node into selection
                                     setSelectedIds([...selectedIds, id]);
                                 }
                             };
