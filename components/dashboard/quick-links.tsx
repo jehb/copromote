@@ -1,8 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Link2, ExternalLink } from 'lucide-react'
-import * as Icons from 'lucide-react'
+import { Link2, ExternalLink, icons as Icons } from 'lucide-react'
 import { Hyperlink } from '@prisma/client'
 
 // Helper to dynamically render icon
