@@ -46,6 +46,48 @@ export function SocialPostForm({ post, promotions, users, events, availablePlatf
     const [error, setError] = useState<string | null>(null)
     const [selectedPhotos, setSelectedPhotos] = useState<any[]>(post?.assets || [])
 
+    const handleGenerateAlternatives = async () => {
+        if (!content.trim() || content.length < 10) {
+            setError('Please enter at least 10 characters to get meaningful suggestions.')
+            return
+        }
+        setIsGenerating(true)
+        setError(null)
+        try {
+            const results = await generateSocialPostAlternatives(content, platform)
+            if (!results || results.length === 0) {
+                throw new Error('AI could not generate any variations. Try changing your content.')
+            }
+            setAlternatives(results)
+            setShowSuggestions(true)
+        } catch (err: any) {
+            /* istanbul ignore next */
+            console.error('AI Suggestion Error:', err)
+            /* istanbul ignore next */
+            setError(err.message || 'Failed to generate suggestions. Check your AI settings.')
+        } finally {
+            setIsGenerating(false)
+        }
+    }
+
+    const handleAlternativeSelect = (alt: string) => {
+        setContent(alt)
+        setShowSuggestions(false)
+    }
+
+    const handlePhotoSelect = async (ids: string[]) => {
+        // This depends on getPhotos but for simplicity we could refetch or trust the modal
+        // Since the modal already has the data, but we only return IDs
+        // Let's just fetch them here or update the modal to return full objects
+        const allPhotos = await import('@/app/actions/photos').then(m => m.getPhotos())
+        const selected = allPhotos.filter((p: any) => ids.includes(p.id))
+        setSelectedPhotos(selected)
+    }
+
+    const handleRemovePhoto = (photoId: string) => {
+        setSelectedPhotos(prev => prev.filter(p => p.id !== photoId))
+    }
+
     return (
         <form action={action} className="space-y-6">
             {post?.id && <input type="hidden" name="id" value={post.id} />}
@@ -60,29 +102,7 @@ export function SocialPostForm({ post, promotions, users, events, availablePlatf
                             variant="outline"
                             size="sm"
                             className="h-8 text-xs gap-1.5 border-blue-200 text-blue-700 bg-blue-50/50 hover:bg-blue-100"
-                            onClick={async () => {
-                                if (!content.trim() || content.length < 10) {
-                                    setError('Please enter at least 10 characters to get meaningful suggestions.')
-                                    return
-                                }
-                                setIsGenerating(true)
-                                setError(null)
-                                try {
-                                    const results = await generateSocialPostAlternatives(content, platform)
-                                    if (!results || results.length === 0) {
-                                        throw new Error('AI could not generate any variations. Try changing your content.')
-                                    }
-                                    setAlternatives(results)
-                                    setShowSuggestions(true)
-                                } catch (err: any) {
-                                    /* istanbul ignore next */ 
-                                    console.error('AI Suggestion Error:', err)
-                                    /* istanbul ignore next */ 
-                                    setError(err.message || 'Failed to generate suggestions. Check your AI settings.')
-                                } finally {
-                                    setIsGenerating(false)
-                                }
-                            }}
+                            onClick={handleGenerateAlternatives}
                             disabled={isGenerating}
                         >
                             {isGenerating ? (
@@ -130,10 +150,7 @@ export function SocialPostForm({ post, promotions, users, events, availablePlatf
                                     key={i}
                                     type="button"
                                     className="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition-all group relative"
-                                    onClick={() => {
-                                        setContent(alt)
-                                        setShowSuggestions(false)
-                                    }}
+                                    onClick={() => handleAlternativeSelect(alt)}
                                 >
                                     <div className="text-sm leading-relaxed text-slate-700">{alt}</div>
                                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -163,14 +180,8 @@ export function SocialPostForm({ post, promotions, users, events, availablePlatf
                         selectedPhotoIds={useMemo(() => selectedPhotos.map(p => p.url?.split('/api/immich/asset/')[1] || p.id), [selectedPhotos])}
                         onSelect={
                             /* istanbul ignore next */ 
-                            async (ids) => {
-                            // This depends on getPhotos but for simplicity we could refetch or trust the modal
-                            // Since the modal already has the data, but we only return IDs
-                            // Let's just fetch them here or update the modal to return full objects
-                            const allPhotos = await import('@/app/actions/photos').then(m => m.getPhotos())
-                            const selected = allPhotos.filter((p: any) => ids.includes(p.id))
-                            setSelectedPhotos(selected)
-                        }}
+                            handlePhotoSelect
+                        }
                     />
                 </div>
 
@@ -189,7 +200,7 @@ export function SocialPostForm({ post, promotions, users, events, availablePlatf
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setSelectedPhotos(prev => prev.filter(p => p.id !== photo.id))}
+                                    onClick={() => handleRemovePhoto(photo.id)}
                                     className="absolute top-1 right-1 h-6 w-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
                                 >
                                     <X className="h-3.5 w-3.5" />
