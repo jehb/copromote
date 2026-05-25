@@ -44,6 +44,7 @@ export function HyperlinkList({ hyperlinks }: { hyperlinks: Hyperlink[] }) {
                                     <Button
                                         variant="ghost"
                                         size="icon"
+                                        aria-label="Delete Hyperlink"
                                         className="h-8 w-8 text-muted-foreground hover:text-red-500"
                                         title="Delete Hyperlink"
                                     >

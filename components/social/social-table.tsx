@@ -96,14 +96,14 @@ export function SocialTable({ posts }: SocialTableProps) {
                             </TableCell>
                             <TableCell className="text-right">
                                 <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button asChild variant="ghost" size="icon" aria-label="View social post" className="h-8 w-8 text-slate-500 hover:text-foreground" onClick={(e) => e.stopPropagation()}>
+                                    <Button asChild variant="ghost" size="icon" aria-label="View Post" className="h-8 w-8 text-slate-500 hover:text-foreground" onClick={(e) => e.stopPropagation()}>
                                         <Link href={`/social/${post.id}`}>
                                             <Eye className="h-4 w-4" />
                                         </Link>
                                     </Button>
                                     <form action={deleteSocialPost.bind(null, post.id)} onClick={(e) => e.stopPropagation()}>
                                         {/* istanbul ignore next */}
-                                        <Button variant="ghost" size="icon" aria-label="Delete social post" className="h-8 w-8 text-slate-400 hover:text-red-500" type="submit">
+                                        <Button variant="ghost" size="icon" aria-label="Delete Post" className="h-8 w-8 text-slate-400 hover:text-red-500" type="submit">
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </form>

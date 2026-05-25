@@ -68,7 +68,7 @@ export function HyperlinkForm({ hyperlink }: { hyperlink?: Hyperlink }) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {isEditing ? (
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600">
+                    <Button variant="ghost" size="icon" aria-label="Edit Hyperlink" className="h-8 w-8 text-muted-foreground hover:text-blue-600">
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                     </Button>

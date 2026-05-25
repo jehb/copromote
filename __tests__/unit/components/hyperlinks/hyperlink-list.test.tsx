@@ -59,7 +59,7 @@ describe('HyperlinkList', () => {
         const editButtons = screen.getAllByRole('button', { name: 'Edit Hyperlink' })
         expect(editButtons).toHaveLength(2)
 
-        const deleteButtons = screen.getAllByRole('button', { name: 'Delete' })
+        const deleteButtons = screen.getAllByRole('button', { name: 'Delete Hyperlink' })
         expect(deleteButtons).toHaveLength(2)
     })
 })
