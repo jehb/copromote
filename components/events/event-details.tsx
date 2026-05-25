@@ -28,13 +28,10 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { EventCommonProps } from '@/types/events'
 
-interface EventDetailsProps {
+interface EventDetailsProps extends EventCommonProps {
     event: any
-    locations: any[]
-    users: any[]
-    contacts: any[]
-    organizations: any[]
     eventSeries: any[]
     availableProducts?: Product[]
     isAdmin: boolean
