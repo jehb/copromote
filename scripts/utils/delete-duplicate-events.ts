@@ -5,24 +5,50 @@ const prisma = new PrismaClient();
 async function main() {
     console.log("Finding and deleting duplicate events...");
 
-    const allEvents = await prisma.event.findMany({
-        orderBy: {
-            createdAt: 'asc'
+    // Find duplicates using database grouping
+    const duplicatesGrouped = await prisma.event.groupBy({
+        by: ['title', 'startTime', 'locationId'],
+        _count: {
+            id: true
+        },
+        having: {
+            id: {
+                _count: {
+                    gt: 1
+                }
+            }
         }
     });
 
-    const seenEvents = new Set();
-    const duplicateIds = [];
+    if (duplicatesGrouped.length === 0) {
+        console.log("No duplicate events found.");
+        return;
+    }
 
-    for (const event of allEvents) {
-        // A duplicate is an event with the same title, start time, and location
-        const uniqueKey = `${event.title}-${event.startTime.toISOString()}-${event.locationId}`;
+    const duplicateIds: string[] = [];
 
-        if (seenEvents.has(uniqueKey)) {
+    // For each group of duplicates, fetch the records and keep the oldest one
+    for (const group of duplicatesGrouped) {
+        const eventsInGroup = await prisma.event.findMany({
+            where: {
+                title: group.title,
+                startTime: group.startTime,
+                locationId: group.locationId
+            },
+            orderBy: {
+                createdAt: 'asc'
+            },
+            select: {
+                id: true,
+                title: true
+            }
+        });
+
+        // Skip the first (oldest) event, mark the rest for deletion
+        for (let i = 1; i < eventsInGroup.length; i++) {
+            const event = eventsInGroup[i];
             duplicateIds.push(event.id);
             console.log(`Found duplicate: ${event.title}`);
-        } else {
-            seenEvents.add(uniqueKey);
         }
     }
 
@@ -36,8 +62,6 @@ async function main() {
             }
         });
         console.log(`Deleted ${deleteResult.count} events.`);
-    } else {
-        console.log("No duplicate events found.");
     }
 }
 
