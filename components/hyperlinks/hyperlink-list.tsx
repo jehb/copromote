@@ -4,7 +4,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { deleteHyperlink } from '@/app/actions/hyperlinks'
-import { Trash2, ExternalLink } from 'lucide-react'
 import * as Icons from 'lucide-react'
 import { HyperlinkForm } from '@/components/hyperlinks/hyperlink-form'
 import { Hyperlink } from '@prisma/client'
@@ -12,7 +11,7 @@ import { Hyperlink } from '@prisma/client'
 // Helper to dynamically render icon
 const DynamicIcon = ({ name, className }: { name: string; className?: string }) => {
     const IconComponent = Icons[name as keyof typeof Icons] as React.ElementType
-    if (!IconComponent) return <ExternalLink className={className} />
+    if (!IconComponent) return <Icons.ExternalLink className={className} />
     return <IconComponent className={className} />
 }
 
@@ -48,7 +47,7 @@ export function HyperlinkList({ hyperlinks }: { hyperlinks: Hyperlink[] }) {
                                         className="h-8 w-8 text-muted-foreground hover:text-red-500"
                                         title="Delete Hyperlink"
                                     >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Icons.Trash2 className="h-4 w-4" />
                                         <span className="sr-only">Delete</span>
                                     </Button>
                                 </form>
