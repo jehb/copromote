@@ -140,6 +140,7 @@ export default function TopToolbar({
 
                     <div className="flex bg-neutral-100 rounded-md p-0.5 ml-2 border border-neutral-200">
                         <button
+                            aria-label="Bold text"
                             className={`p-1.5 rounded transition-colors ${selectedElement.fontStyle?.includes('bold') ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
                             onClick={() => {
                                 const current = selectedElement.fontStyle || '';
@@ -149,6 +150,7 @@ export default function TopToolbar({
                             }}
                         ><Bold size={14} /></button>
                         <button
+                            aria-label="Italic text"
                             className={`p-1.5 rounded transition-colors ${selectedElement.fontStyle?.includes('italic') ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
                             onClick={() => {
                                 const current = selectedElement.fontStyle || '';
@@ -158,6 +160,7 @@ export default function TopToolbar({
                             }}
                         ><Italic size={14} /></button>
                         <button
+                            aria-label="Underline text"
                             className={`p-1.5 rounded transition-colors ${selectedElement.fontStyle?.includes('underline') ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
                             onClick={() => {
                                 const current = selectedElement.fontStyle || '';
@@ -170,14 +173,17 @@ export default function TopToolbar({
 
                     <div className="flex bg-neutral-100 rounded-md p-0.5 ml-2 border border-neutral-200">
                         <button
+                            aria-label="Align text left"
                             className={`p-1.5 rounded transition-colors ${selectedElement.align === 'left' || !selectedElement.align ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
                             onClick={() => updateSelectedElement({ align: 'left' })}
                         ><AlignLeft size={14} /></button>
                         <button
+                            aria-label="Align text center"
                             className={`p-1.5 rounded transition-colors ${selectedElement.align === 'center' ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
                             onClick={() => updateSelectedElement({ align: 'center' })}
                         ><AlignCenter size={14} /></button>
                         <button
+                            aria-label="Align text right"
                             className={`p-1.5 rounded transition-colors ${selectedElement.align === 'right' ? 'bg-white shadow-sm' : 'hover:bg-white'} text-neutral-700`}
                             onClick={() => updateSelectedElement({ align: 'right' })}
                         ><AlignRight size={14} /></button>
