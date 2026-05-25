@@ -20,3 +20,9 @@
 ## 2024-05-18 - [Performance: React Filtering Computations]
 **Learning:** Re-computing expensive array filter operations on every render without `useMemo` slows down frontend performance, especially in pages rendering large lists like galleries, contacts, and events.
 **Action:** Wrapped derived filter arrays (e.g. `filteredEvents`, `filteredContacts`, `filteredPhotos`) inside `useMemo` hooks. This memoizes the filtered data, preventing redundant filtering computations on subsequent re-renders if the underlying array and search inputs haven't changed.
+## 2024-05-18 - [Performance: Dashboard Data Fetching]
+**Learning:** Sequential data fetching (`await func1()`, `await func2()`, `await func3()`) in Next.js Server Components blocks subsequent requests until the previous one completes, increasing overall latency.
+**Action:** Replaced sequential `await` calls with `await Promise.all([func1(), func2(), func3()])` to fetch independent data concurrently, reducing total load time.
+## 2026-05-24 - [Performance: React Filtering Computations in Task Board]
+**Learning:** Similar to the previous events/contacts optimization, re-computing array filter operations (e.g. `todoTasks`, `progressTasks`, `doneTasks`) on every render in the TaskBoard component without `useMemo` slows down frontend performance, especially when handling local state updates like `editingTask`.
+**Action:** Wrapped derived task filter arrays inside `useMemo` hooks in `components/tasks/task-board.tsx`. This memoizes the filtered data, preventing redundant O(N) recalculations on unrelated component re-renders.

@@ -11,6 +11,6 @@
 ## 2024-05-17 - Added Accessible Labels to Icon-Only Buttons in Gallery Component
 **Learning:** Found several icon-only buttons (like Grid View, Table View, View Photo Details, Delete Photo, Edit Metadata) in the gallery component that were missing `aria-label` attributes. Without text or `aria-label`, screen readers just announce 'button', which is confusing.
 **Action:** When adding icon-only buttons, always include an `aria-label` to ensure accessibility.
-## 2024-05-19 - Added Accessible Labels to Icon-Only Buttons in Social Component
-**Learning:** Found several icon-only buttons (like View Post, Delete Post) in the social component that were missing `aria-label` attributes.
-**Action:** Always ensure any icon-only button explicitly has an `aria-label` providing full context.
+## 2026-05-24 - Added Accessible Labels to Promotion Grid View Delete Button
+**Learning:** Found an icon-only button (delete button containing only a Trash2 icon) in PromotionGridView that lacked an `aria-label`. Without this, screen readers only announce 'button', providing poor accessibility context.
+**Action:** When working on grid or list views with inline actions, always ensure any icon-only button has an explicit `aria-label` (e.g. `aria-label="Delete promotion"`).
