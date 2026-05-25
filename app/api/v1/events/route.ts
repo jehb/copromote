@@ -26,7 +26,26 @@ export async function GET(req: NextRequest) {
     const events = await prisma.event.findMany({
       take: 100,
       orderBy: { startTime: "asc" },
-      include: { location: true },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        startTime: true,
+        endTime: true,
+        status: true,
+        locationId: true,
+        seriesId: true,
+        wordpressId: true,
+        wordpressUrl: true,
+        createdAt: true,
+        updatedAt: true,
+        location: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
     return NextResponse.json(events);
   } catch (e) {
