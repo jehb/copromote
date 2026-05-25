@@ -7,6 +7,11 @@ jest.mock('lucide-react', () => {
     const actual = jest.requireActual('lucide-react')
     return {
         ...actual,
+        icons: {
+            ...actual.icons,
+            Twitter: () => <div data-testid="icon-twitter" />,
+            Github: () => <div data-testid="icon-github" />,
+        },
         Twitter: () => <div data-testid="icon-twitter" />,
         Github: () => <div data-testid="icon-github" />,
         ExternalLink: () => <div data-testid="icon-external" />,
