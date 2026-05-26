@@ -123,4 +123,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Firefox button click fix: prevent SVG children from swallowing click events */
+  button svg,
+  .btn svg,
+  [role="button"] svg {
+    pointer-events: none !important;
+  }
 }
