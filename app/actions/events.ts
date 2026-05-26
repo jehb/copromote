@@ -24,7 +24,8 @@ export async function getEvents() {
             status: EventStatus.SCHEDULED,
             endTime: {
                 lt: oneDayAgo
-            }
+            },
+            deletedAt: null
         },
         data: {
             status: EventStatus.PAST
@@ -32,6 +33,7 @@ export async function getEvents() {
     });
 
     return await prisma.event.findMany({
+        where: { deletedAt: null },
         orderBy: { startTime: 'asc' },
         include: {
             location: true,
@@ -50,8 +52,8 @@ export async function getEvents() {
 export async function getEvent(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    return await prisma.event.findUnique({
-        where: { id },
+    return await prisma.event.findFirst({
+        where: { id, deletedAt: null },
         include: {
             location: true,
             primaryContact: true,
@@ -179,10 +181,15 @@ export async function updateEvent(id: string, formData: FormData) {
 export async function deleteEvent(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    await prisma.event.delete({
-        where: { id }
+    const userId = await getCurrentUserId()
+    await prisma.event.update({
+        where: { id },
+        data: {
+            deletedAt: new Date(),
+            updatedById: userId
+        }
     })
-    await logActivity('DELETE', 'Event', id, `Deleted event`)
+    await logActivity('DELETE', 'Event', id, `Soft deleted event`)
     revalidatePath('/events')
     revalidatePath('/calendar')
 }
@@ -210,8 +217,11 @@ export async function searchEventsForAutocomplete(query: string) {
     // Fetch events matching query or just latest if query is empty
     const events = await prisma.event.findMany({
         where: query ? {
-            title: { contains: query }
-        } : {},
+            title: { contains: query },
+            deletedAt: null
+        } : {
+            deletedAt: null
+        },
         take: 10,
         select: {
             id: true,

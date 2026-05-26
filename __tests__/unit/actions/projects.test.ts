@@ -17,6 +17,7 @@ jest.mock('@/lib/db', () => ({
         project: {
             findMany: jest.fn(),
             findUnique: jest.fn(),
+            findFirst: jest.fn(),
             create: jest.fn(),
             delete: jest.fn(),
             update: jest.fn(),
@@ -57,6 +58,7 @@ describe('Projects Actions', () => {
 
             expect(result).toEqual(mockProjects)
             expect(prisma.project.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: { deletedAt: null },
                 orderBy: { createdAt: 'desc' },
                 include: expect.any(Object)
             }))
@@ -66,13 +68,13 @@ describe('Projects Actions', () => {
     describe('getProject', () => {
         it('should fetch a single project by id', async () => {
             const mockProject = { id: '1', name: 'Project A' }
-                ; (prisma.project.findUnique as jest.Mock).mockResolvedValue(mockProject)
+                ; (prisma.project.findFirst as jest.Mock).mockResolvedValue(mockProject)
 
             const result = await getProject('1')
 
             expect(result).toEqual(mockProject)
-            expect(prisma.project.findUnique).toHaveBeenCalledWith({
-                where: { id: '1' },
+            expect(prisma.project.findFirst).toHaveBeenCalledWith({
+                where: { id: '1', deletedAt: null },
                 include: expect.any(Object)
             })
         })
@@ -137,12 +139,18 @@ describe('Projects Actions', () => {
 
         it('should delete project if user is ADMIN', async () => {
             ; (getCurrentUser as jest.Mock).mockResolvedValue({ id: 'admin-1', role: 'ADMIN' })
-                ; (prisma.project.delete as jest.Mock).mockResolvedValue({ id: 'proj-1' })
+                ; (prisma.project.update as jest.Mock).mockResolvedValue({ id: 'proj-1' })
 
             await deleteProject('proj-1')
 
-            expect(prisma.project.delete).toHaveBeenCalledWith({ where: { id: 'proj-1' } })
-            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Project', 'proj-1', 'Deleted project')
+            expect(prisma.project.update).toHaveBeenCalledWith({
+                where: { id: 'proj-1' },
+                data: expect.objectContaining({
+                    deletedAt: expect.any(Date),
+                    updatedById: 'admin-1'
+                })
+            })
+            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Project', 'proj-1', 'Soft deleted project')
             expect(revalidatePath).toHaveBeenCalledWith('/projects')
             expect(revalidatePath).toHaveBeenCalledWith('/')
         })

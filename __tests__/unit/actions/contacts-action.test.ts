@@ -40,7 +40,7 @@ describe('Contact Actions', () => {
     describe('getContact', () => {
         it('should fetch single contact', async () => {
             const mockContact = { id: '1', firstName: 'John' }
-                ; (prisma.contact.findUnique as jest.Mock).mockResolvedValue(mockContact)
+                ; (prisma.contact.findFirst as jest.Mock).mockResolvedValue(mockContact)
 
             const contact = await getContact('1')
             expect(contact).toEqual(mockContact)
@@ -169,8 +169,11 @@ describe('Contact Actions', () => {
         it('should delete contact', async () => {
             await deleteContact('1')
 
-            expect(prisma.contact.delete).toHaveBeenCalledWith({
+            expect(prisma.contact.update).toHaveBeenCalledWith({
                 where: { id: '1' },
+                data: expect.objectContaining({
+                    deletedAt: expect.any(Date),
+                })
             })
         })
     })

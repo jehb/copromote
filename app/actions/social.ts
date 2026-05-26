@@ -19,7 +19,7 @@ export async function getSocialPosts(filters: {
     if (!session) throw new Error("Unauthorized");
     const { platform, status, startDate, endDate, promotionPeriodId, eventId } = filters
 
-    const where: any = {}
+    const where: any = { deletedAt: null }
     if (platform && platform !== 'all') where.platform = platform
     if (status && status !== 'all') where.status = status
 
@@ -309,21 +309,24 @@ export async function updateSocialPost(formData: FormData) {
 export async function deleteSocialPost(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    const post = await prisma.socialPost.findUnique({ where: { id } })
+    const post = await prisma.socialPost.findFirst({ where: { id, deletedAt: null } })
     if (post?.postizId) {
         await deletePostFromPostiz(post.postizId)
     }
 
-    await prisma.socialPost.delete({ where: { id } })
-    await logActivity('DELETE', 'SocialPost', id, 'Deleted social post')
+    await prisma.socialPost.update({
+        where: { id },
+        data: { deletedAt: new Date() }
+    })
+    await logActivity('DELETE', 'SocialPost', id, 'Soft deleted social post')
     revalidatePath('/social')
 }
 
 export async function getSocialPost(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    return await prisma.socialPost.findUnique({
-        where: { id },
+    return await prisma.socialPost.findFirst({
+        where: { id, deletedAt: null },
         include: {
             assets: true,
             promotionPeriod: true,

@@ -11,6 +11,7 @@ export async function getContacts() {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
     return await prisma.contact.findMany({
+        where: { deletedAt: null },
         include: {
             organization: true,
             createdBy: {
@@ -35,8 +36,8 @@ export async function getContacts() {
 export async function getContact(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    return await prisma.contact.findUnique({
-        where: { id },
+    return await prisma.contact.findFirst({
+        where: { id, deletedAt: null },
         include: {
             organization: true,
             primaryFor: true,
@@ -165,10 +166,17 @@ export async function updateContact(formData: FormData) {
 export async function deleteContact(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    await prisma.contact.delete({
-        where: { id }
+    const user = await getCurrentUser()
+    const userId = user?.id ?? null
+
+    await prisma.contact.update({
+        where: { id },
+        data: {
+            deletedAt: new Date(),
+            updatedById: userId
+        }
     })
-    await logActivity('DELETE', 'Contact', id, 'Deleted contact')
+    await logActivity('DELETE', 'Contact', id, 'Soft deleted contact')
     revalidatePath('/contacts')
     redirect('/contacts')
 }

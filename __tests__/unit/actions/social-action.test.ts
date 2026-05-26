@@ -11,6 +11,7 @@ jest.mock('@/lib/db', () => ({
         socialPost: {
             findMany: jest.fn(),
             findUnique: jest.fn(),
+            findFirst: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -124,8 +125,14 @@ describe('Social Actions', () => {
 
     describe('deleteSocialPost', () => {
         it('should delete post', async () => {
+            ; (prisma.socialPost.findFirst as jest.Mock).mockResolvedValue({ id: 'post-1' })
             await deleteSocialPost('post-1')
-            expect(prisma.socialPost.delete).toHaveBeenCalledWith({ where: { id: 'post-1' } })
+            expect(prisma.socialPost.update).toHaveBeenCalledWith({
+                where: { id: 'post-1' },
+                data: expect.objectContaining({
+                    deletedAt: expect.any(Date),
+                })
+            })
         })
     })
 

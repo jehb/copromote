@@ -25,12 +25,12 @@ export async function getCalendarEvents(): Promise<EventItem[]> {
         logisticsEvents,
         socialPosts
     ] = await Promise.all([
-        prisma.project.findMany(),
-        prisma.calendarEvent.findMany(),
+        prisma.project.findMany({ where: { deletedAt: null } }),
+        prisma.calendarEvent.findMany({ where: { deletedAt: null } }),
         prisma.promotionPeriod.findMany(),
         prisma.theme.findMany(),
-        prisma.event.findMany({ include: { location: true } }),
-        prisma.socialPost.findMany({ where: { scheduledDate: { not: null } } })
+        prisma.event.findMany({ where: { deletedAt: null }, include: { location: true } }),
+        prisma.socialPost.findMany({ where: { scheduledDate: { not: null }, deletedAt: null } })
     ])
 
     const items: EventItem[] = []

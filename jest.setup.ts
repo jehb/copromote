@@ -175,6 +175,7 @@ const mockPrisma = {
     },
     event: {
         findUnique: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
         findMany: jest.fn().mockResolvedValue([]),
         create: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
         update: jest.fn().mockResolvedValue({ id: 'mock_event_id' }),
@@ -183,6 +184,7 @@ const mockPrisma = {
     },
     task: {
         findUnique: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
         findMany: jest.fn().mockResolvedValue([]),
         create: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
         update: jest.fn().mockResolvedValue({ id: 'mock_task_id' }),
@@ -191,6 +193,7 @@ const mockPrisma = {
     },
     project: {
         findUnique: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
         findMany: jest.fn().mockResolvedValue([]),
         create: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
         update: jest.fn().mockResolvedValue({ id: 'mock_project_id' }),
@@ -198,6 +201,7 @@ const mockPrisma = {
     },
     organization: {
         findUnique: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
         findMany: jest.fn().mockResolvedValue([]),
         create: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
         update: jest.fn().mockResolvedValue({ id: 'mock_org_id' }),
@@ -205,6 +209,7 @@ const mockPrisma = {
     },
     contact: {
         findUnique: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
         findMany: jest.fn().mockResolvedValue([]),
         create: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
         update: jest.fn().mockResolvedValue({ id: 'mock_contact_id' }),
@@ -241,6 +246,11 @@ const mockPrisma = {
         findMany: jest.fn().mockResolvedValue([]),
     },
     socialPost: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'mock_post_id' }),
+        findFirst: jest.fn().mockResolvedValue({ id: 'mock_post_id' }),
+        create: jest.fn().mockResolvedValue({ id: 'mock_post_id' }),
+        update: jest.fn().mockResolvedValue({ id: 'mock_post_id' }),
+        delete: jest.fn().mockResolvedValue({ id: 'mock_post_id' }),
         findMany: jest.fn().mockResolvedValue([]),
     },
     asset: {

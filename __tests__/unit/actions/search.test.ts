@@ -99,6 +99,7 @@ describe('Search Actions', () => {
             // Verify query arguments
             expect(prisma.project.findMany).toHaveBeenCalledWith({
                 where: {
+                    deletedAt: null,
                     OR: [
                         { name: { contains: 'test query' } },
                         { description: { contains: 'test query' } }

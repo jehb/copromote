@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const events = await prisma.event.findMany({
+      where: { deletedAt: null },
       take: 100,
       orderBy: { startTime: "asc" },
       include: { location: true },

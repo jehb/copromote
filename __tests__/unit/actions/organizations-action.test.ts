@@ -17,11 +17,16 @@ jest.mock('@/lib/db', () => ({
         organization: {
             findMany: jest.fn(),
             findUnique: jest.fn(),
+            findFirst: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
         },
     },
+}))
+
+jest.mock('@/lib/user-util', () => ({
+    getCurrentUserId: jest.fn().mockResolvedValue('user-1'),
 }))
 
 jest.mock('@/app/actions/activity-logs', () => ({
@@ -93,7 +98,12 @@ describe('Organization Actions', () => {
     describe('deleteOrganization', () => {
         it('should delete organization', async () => {
             await deleteOrganization('1')
-            expect(prisma.organization.delete).toHaveBeenCalledWith({ where: { id: '1' } })
+            expect(prisma.organization.update).toHaveBeenCalledWith({
+                where: { id: '1' },
+                data: expect.objectContaining({
+                    deletedAt: expect.any(Date),
+                })
+            })
             expect(redirect).toHaveBeenCalledWith('/organizations')
         })
     })

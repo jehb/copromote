@@ -43,6 +43,7 @@ export async function search(query: string): Promise<SearchResults> {
             // Projects
             prisma.project.findMany({
                 where: {
+                    deletedAt: null,
                     OR: [
                         { name: { contains: query } },
                         { description: { contains: query } }
@@ -54,6 +55,7 @@ export async function search(query: string): Promise<SearchResults> {
             // Tasks
             prisma.task.findMany({
                 where: {
+                    deletedAt: null,
                     OR: [
                         { title: { contains: query } },
                         { description: { contains: query } }
@@ -65,6 +67,7 @@ export async function search(query: string): Promise<SearchResults> {
             // Contacts
             prisma.contact.findMany({
                 where: {
+                    deletedAt: null,
                     OR: [
                         { firstName: { contains: query } },
                         { lastName: { contains: query } },
@@ -78,6 +81,7 @@ export async function search(query: string): Promise<SearchResults> {
             // Organizations
             prisma.organization.findMany({
                 where: {
+                    deletedAt: null,
                     name: { contains: query }
                 },
                 take: 5,
@@ -86,6 +90,7 @@ export async function search(query: string): Promise<SearchResults> {
             // Events
             prisma.event.findMany({
                 where: {
+                    deletedAt: null,
                     OR: [
                         { title: { contains: query } },
                         { description: { contains: query } }
@@ -97,6 +102,7 @@ export async function search(query: string): Promise<SearchResults> {
             // Social Posts
             prisma.socialPost.findMany({
                 where: {
+                    deletedAt: null,
                     content: { contains: query }
                 },
                 take: 5,

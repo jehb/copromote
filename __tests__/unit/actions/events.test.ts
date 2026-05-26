@@ -21,6 +21,7 @@ jest.mock('@/lib/db', () => ({
         event: {
             findMany: jest.fn(),
             findUnique: jest.fn(),
+            findFirst: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -75,13 +76,13 @@ describe('Events Actions', () => {
     describe('getEvent', () => {
         it('should fetch a single event by id', async () => {
             const mockEvent = { id: '1' }
-                ; (prisma.event.findUnique as jest.Mock).mockResolvedValue(mockEvent)
+                ; (prisma.event.findFirst as jest.Mock).mockResolvedValue(mockEvent)
 
             const result = await getEvent('1')
 
             expect(result).toEqual(mockEvent)
-            expect(prisma.event.findUnique).toHaveBeenCalledWith(expect.objectContaining({
-                where: { id: '1' },
+            expect(prisma.event.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+                where: { id: '1', deletedAt: null },
                 include: expect.any(Object),
             }))
         })
@@ -251,12 +252,17 @@ describe('Events Actions', () => {
 
     describe('deleteEvent', () => {
         it('should delete an event and revalidate paths', async () => {
-            ; (prisma.event.delete as jest.Mock).mockResolvedValue({ id: 'event-1' })
+            ; (prisma.event.update as jest.Mock).mockResolvedValue({ id: 'event-1' })
 
             await deleteEvent('event-1')
 
-            expect(prisma.event.delete).toHaveBeenCalledWith({ where: { id: 'event-1' } })
-            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Event', 'event-1', 'Deleted event')
+            expect(prisma.event.update).toHaveBeenCalledWith({
+                where: { id: 'event-1' },
+                data: expect.objectContaining({
+                    deletedAt: expect.any(Date),
+                })
+            })
+            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Event', 'event-1', 'Soft deleted event')
             expect(revalidatePath).toHaveBeenCalledWith('/events')
             expect(revalidatePath).toHaveBeenCalledWith('/calendar')
         })
@@ -306,7 +312,7 @@ describe('Events Actions', () => {
             const result = await searchEventsForAutocomplete('')
 
             expect(prisma.event.findMany).toHaveBeenCalledWith({
-                where: {},
+                where: { deletedAt: null },
                 take: 10,
                 select: expect.any(Object)
             })
@@ -329,7 +335,7 @@ describe('Events Actions', () => {
             const result = await searchEventsForAutocomplete('Test')
 
             expect(prisma.event.findMany).toHaveBeenCalledWith({
-                where: { title: { contains: 'Test' } },
+                where: { title: { contains: 'Test' }, deletedAt: null },
                 take: 10,
                 select: expect.any(Object)
             })

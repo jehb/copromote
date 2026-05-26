@@ -11,6 +11,7 @@ export async function getOrganizations() {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
     return await prisma.organization.findMany({
+        where: { deletedAt: null },
         include: {
             primaryContact: true,
             _count: {
@@ -38,11 +39,13 @@ export async function getOrganizations() {
 export async function getOrganization(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    return await prisma.organization.findUnique({
-        where: { id },
+    return await prisma.organization.findFirst({
+        where: { id, deletedAt: null },
         include: {
             primaryContact: true,
-            contacts: true,
+            contacts: {
+                where: { deletedAt: null }
+            },
             createdBy: {
                 select: {
                     id: true,
@@ -148,10 +151,15 @@ export async function updateOrganization(formData: FormData) {
 export async function deleteOrganization(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    await prisma.organization.delete({
-        where: { id }
+    const userId = await getCurrentUserId()
+    await prisma.organization.update({
+        where: { id },
+        data: {
+            deletedAt: new Date(),
+            updatedById: userId
+        }
     })
-    await logActivity('DELETE', 'Organization', id, 'Deleted organization')
+    await logActivity('DELETE', 'Organization', id, 'Soft deleted organization')
     revalidatePath('/organizations')
     redirect('/organizations')
 }

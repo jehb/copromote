@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const organizations = await prisma.organization.findMany({
+      where: { deletedAt: null },
       take: 100,
       orderBy: { name: "asc" },
       include: { primaryContact: true },

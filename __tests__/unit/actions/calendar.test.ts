@@ -118,8 +118,8 @@ describe('Calendar Actions', () => {
             })
 
             // Verify query arguments
-            expect(prisma.event.findMany).toHaveBeenCalledWith({ include: { location: true } })
-            expect(prisma.socialPost.findMany).toHaveBeenCalledWith({ where: { scheduledDate: { not: null } } })
+            expect(prisma.event.findMany).toHaveBeenCalledWith({ where: { deletedAt: null }, include: { location: true } })
+            expect(prisma.socialPost.findMany).toHaveBeenCalledWith({ where: { scheduledDate: { not: null }, deletedAt: null } })
         })
 
         it('should handle empty returns from all sources', async () => {

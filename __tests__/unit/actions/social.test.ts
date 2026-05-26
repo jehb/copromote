@@ -17,6 +17,7 @@ jest.mock('@/lib/db', () => ({
         socialPost: {
             findMany: jest.fn(),
             findUnique: jest.fn(),
+            findFirst: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -65,7 +66,7 @@ describe('Social Actions', () => {
 
             expect(result).toEqual(mockPosts)
             expect(prisma.socialPost.findMany).toHaveBeenCalledWith(expect.objectContaining({
-                where: {},
+                where: { deletedAt: null },
                 orderBy: { scheduledDate: 'asc' },
             }))
         })
@@ -82,6 +83,7 @@ describe('Social Actions', () => {
 
             expect(prisma.socialPost.findMany).toHaveBeenCalledWith(expect.objectContaining({
                 where: {
+                    deletedAt: null,
                     platform: 'facebook',
                     status: 'draft',
                     promotionPeriodId: 'promo-1',
@@ -104,6 +106,7 @@ describe('Social Actions', () => {
 
             expect(prisma.socialPost.findMany).toHaveBeenCalledWith(expect.objectContaining({
                 where: {
+                    deletedAt: null,
                     promotionPeriodId: null,
                     eventId: null
                 }
@@ -114,13 +117,13 @@ describe('Social Actions', () => {
     describe('getSocialPost', () => {
         it('should fetch a single social post by id', async () => {
             const mockPost = { id: 'post-1', platform: 'twitter' }
-                ; (prisma.socialPost.findUnique as jest.Mock).mockResolvedValue(mockPost)
+                ; (prisma.socialPost.findFirst as jest.Mock).mockResolvedValue(mockPost)
 
             const result = await getSocialPost('post-1')
 
             expect(result).toEqual(mockPost)
-            expect(prisma.socialPost.findUnique).toHaveBeenCalledWith({
-                where: { id: 'post-1' },
+            expect(prisma.socialPost.findFirst).toHaveBeenCalledWith({
+                where: { id: 'post-1', deletedAt: null },
                 include: expect.any(Object)
             })
         })
@@ -320,12 +323,18 @@ describe('Social Actions', () => {
 
     describe('deleteSocialPost', () => {
         it('should delete a social post', async () => {
-            ; (prisma.socialPost.delete as jest.Mock).mockResolvedValue({ id: 'post-1' })
+            ; (prisma.socialPost.findFirst as jest.Mock).mockResolvedValue({ id: 'post-1' })
+            ; (prisma.socialPost.update as jest.Mock).mockResolvedValue({ id: 'post-1' })
 
             await deleteSocialPost('post-1')
 
-            expect(prisma.socialPost.delete).toHaveBeenCalledWith({ where: { id: 'post-1' } })
-            expect(logActivity).toHaveBeenCalledWith('DELETE', 'SocialPost', 'post-1', 'Deleted social post')
+            expect(prisma.socialPost.update).toHaveBeenCalledWith({
+                where: { id: 'post-1' },
+                data: expect.objectContaining({
+                    deletedAt: expect.any(Date),
+                })
+            })
+            expect(logActivity).toHaveBeenCalledWith('DELETE', 'SocialPost', 'post-1', 'Soft deleted social post')
             expect(revalidatePath).toHaveBeenCalledWith('/social')
         })
     })

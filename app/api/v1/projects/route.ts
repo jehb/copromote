@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const projects = await prisma.project.findMany({
+      where: { deletedAt: null },
       take: 100,
       orderBy: { createdAt: "desc" },
     });

@@ -22,6 +22,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const posts = await prisma.socialPost.findMany({
+      where: { deletedAt: null },
       take: 100,
       orderBy: { createdAt: "desc" },
     });

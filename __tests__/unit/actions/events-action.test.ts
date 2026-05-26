@@ -85,7 +85,13 @@ describe('Event Actions', () => {
     describe('deleteEvent', () => {
         it('should delete event', async () => {
             await deleteEvent('1')
-            expect(prisma.event.delete).toHaveBeenCalledWith({ where: { id: '1' } })
+            expect(prisma.event.update).toHaveBeenCalledWith({
+                where: { id: '1' },
+                data: {
+                    deletedAt: expect.any(Date),
+                    updatedById: 'mock_user_id'
+                }
+            })
             expect(revalidatePath).toHaveBeenCalledWith('/events')
         })
     })

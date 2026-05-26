@@ -16,6 +16,7 @@ jest.mock('@/lib/db', () => ({
         organization: {
             findMany: jest.fn(),
             findUnique: jest.fn(),
+            findFirst: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
@@ -54,6 +55,7 @@ describe('Organizations Actions', () => {
 
             expect(result).toEqual(mockOrgs)
             expect(prisma.organization.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: { deletedAt: null },
                 orderBy: { name: 'asc' },
                 include: expect.any(Object)
             }))
@@ -63,13 +65,13 @@ describe('Organizations Actions', () => {
     describe('getOrganization', () => {
         it('should fetch a single organization by id', async () => {
             const mockOrg = { id: '1', name: 'Org A' }
-                ; (prisma.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg)
+                ; (prisma.organization.findFirst as jest.Mock).mockResolvedValue(mockOrg)
 
             const result = await getOrganization('1')
 
             expect(result).toEqual(mockOrg)
-            expect(prisma.organization.findUnique).toHaveBeenCalledWith({
-                where: { id: '1' },
+            expect(prisma.organization.findFirst).toHaveBeenCalledWith({
+                where: { id: '1', deletedAt: null },
                 include: expect.any(Object)
             })
         })
@@ -211,13 +213,19 @@ describe('Organizations Actions', () => {
 
     describe('deleteOrganization', () => {
         it('should delete an organization and revalidate paths', async () => {
-            ; (prisma.organization.delete as jest.Mock).mockResolvedValue({ id: 'org-1' })
+            ; (prisma.organization.update as jest.Mock).mockResolvedValue({ id: 'org-1' })
                 ; (redirect as unknown as jest.Mock).mockImplementation(() => { throw new Error('NEXT_REDIRECT') })
 
             await expect(deleteOrganization('org-1')).rejects.toThrow('NEXT_REDIRECT')
 
-            expect(prisma.organization.delete).toHaveBeenCalledWith({ where: { id: 'org-1' } })
-            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Organization', 'org-1', 'Deleted organization')
+            expect(prisma.organization.update).toHaveBeenCalledWith({
+                where: { id: 'org-1' },
+                data: expect.objectContaining({
+                    deletedAt: expect.any(Date),
+                    updatedById: 'user-1'
+                })
+            })
+            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Organization', 'org-1', 'Soft deleted organization')
             expect(revalidatePath).toHaveBeenCalledWith('/organizations')
             expect(redirect).toHaveBeenCalledWith('/organizations')
         })

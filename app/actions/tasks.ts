@@ -10,6 +10,7 @@ export async function getTasks() {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
     return await prisma.task.findMany({
+        where: { deletedAt: null },
         orderBy: { createdAt: 'desc' },
         include: {
             assignee: true,
@@ -111,9 +112,14 @@ export async function updateTaskStatus(id: string, status: string) {
 export async function deleteTask(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    await prisma.task.delete({
-        where: { id }
+    const userId = await getCurrentUserId()
+    await prisma.task.update({
+        where: { id },
+        data: {
+            deletedAt: new Date(),
+            updatedById: userId
+        }
     })
-    await logActivity('DELETE', 'Task', id, `Deleted task`)
+    await logActivity('DELETE', 'Task', id, `Soft deleted task`)
     revalidatePath('/tasks')
 }

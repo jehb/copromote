@@ -35,8 +35,14 @@ describe('Task Actions', () => {
 
             expect(tasks).toEqual(mockTasks)
             expect(prisma.task.findMany).toHaveBeenCalledWith({
+                where: { deletedAt: null },
                 orderBy: { createdAt: 'desc' },
-                include: expect.objectContaining({ assignee: true, project: true }),
+                include: expect.objectContaining({
+                    assignee: true,
+                    project: true,
+                    createdBy: expect.any(Object),
+                    updatedBy: expect.any(Object)
+                }),
             })
         })
     })
@@ -131,10 +137,14 @@ describe('Task Actions', () => {
         it('should delete task', async () => {
             await deleteTask('task-1')
 
-            expect(prisma.task.delete).toHaveBeenCalledWith({
+            expect(prisma.task.update).toHaveBeenCalledWith({
                 where: { id: 'task-1' },
+                data: {
+                    deletedAt: expect.any(Date),
+                    updatedById: 'user-1'
+                }
             })
-            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Task', 'task-1', 'Deleted task')
+            expect(logActivity).toHaveBeenCalledWith('DELETE', 'Task', 'task-1', 'Soft deleted task')
         })
     })
 })

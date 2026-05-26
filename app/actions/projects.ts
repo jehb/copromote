@@ -11,6 +11,7 @@ export async function getProjects() {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
     return await prisma.project.findMany({
+        where: { deletedAt: null },
         orderBy: { createdAt: 'desc' },
         include: {
             _count: {
@@ -45,8 +46,8 @@ export async function getProjects() {
 export async function getProject(id: string) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
-    return await prisma.project.findUnique({
-        where: { id },
+    return await prisma.project.findFirst({
+        where: { id, deletedAt: null },
         include: {
             assets: true,
             events: true,
@@ -65,6 +66,7 @@ export async function getProject(id: string) {
                 }
             },
             tasks: {
+                where: { deletedAt: null },
                 orderBy: { createdAt: 'desc' },
                 include: {
                     assignee: true,
@@ -139,8 +141,14 @@ export async function deleteProject(id: string) {
         throw new Error('Only admins can delete projects')
     }
 
-    await prisma.project.delete({ where: { id } })
-    await logActivity('DELETE', 'Project', id, 'Deleted project')
+    await prisma.project.update({
+        where: { id },
+        data: {
+            deletedAt: new Date(),
+            updatedById: user.id
+        }
+    })
+    await logActivity('DELETE', 'Project', id, 'Soft deleted project')
     revalidatePath('/projects')
     revalidatePath('/')
 }
