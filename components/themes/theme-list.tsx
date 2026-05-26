@@ -42,27 +42,29 @@ export function ThemeList({ initialThemes }: { initialThemes: any[] }) {
     return (
         <div className="space-y-4">
             <div className="flex justify-end">
-                <Dialog open={isOpen} onOpenChange={onOpenChange}>
-                    <DialogTrigger asChild>
-                        <Button>
-                            <Plus className="h-4 w-4 mr-2" />
-                            New Theme
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]">
-                        <DialogHeader>
-                            <DialogTitle>{editingTheme ? 'Edit Theme' : 'New Theme'}</DialogTitle>
-                        </DialogHeader>
-                        <ThemeForm 
-                            theme={editingTheme} 
-                            onSuccess={() => {
-                                setIsOpen(false)
-                                router.refresh()
-                            }} 
-                        />
-                    </DialogContent>
-                </Dialog>
+                <Button onClick={() => {
+                    setEditingTheme(null)
+                    setIsOpen(true)
+                }}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Theme
+                </Button>
             </div>
+
+            <Dialog open={isOpen} onOpenChange={onOpenChange}>
+                <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                        <DialogTitle>{editingTheme ? 'Edit Theme' : 'New Theme'}</DialogTitle>
+                    </DialogHeader>
+                    <ThemeForm 
+                        theme={editingTheme} 
+                        onSuccess={() => {
+                            setIsOpen(false)
+                            router.refresh()
+                        }} 
+                    />
+                </DialogContent>
+            </Dialog>
 
             <div className="bg-white rounded-lg border shadow-sm">
                 <Table>
@@ -102,10 +104,10 @@ export function ThemeList({ initialThemes }: { initialThemes: any[] }) {
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
-                                        <Button variant="ghost" size="sm" onClick={() => openEdit(theme)}>
+                                        <Button variant="ghost" size="sm" type="button" onClick={() => openEdit(theme)}>
                                             <Edit className="h-4 w-4 text-slate-500" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" onClick={() => handleDelete(theme.id)}>
+                                        <Button variant="ghost" size="sm" type="button" onClick={() => handleDelete(theme.id)}>
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </Button>
                                     </div>
