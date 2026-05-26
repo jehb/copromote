@@ -85,13 +85,17 @@ export function TaskDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                {trigger || (
+            {trigger ? (
+                <div onClick={() => setIsOpen(true)} className="inline-block cursor-pointer">
+                    {trigger}
+                </div>
+            ) : (
+                <DialogTrigger asChild>
                     <Button>
                         <Plus className="mr-2 h-4 w-4" /> Add Task
                     </Button>
-                )}
-            </DialogTrigger>
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>{isEditing ? 'Edit Task' : 'Create Task'}</DialogTitle>
