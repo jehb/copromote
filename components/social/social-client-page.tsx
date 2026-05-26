@@ -60,6 +60,7 @@ export function SocialClientPage({ initialData, initialFilters }: SocialClientPa
                                 size="sm"
                                 className={`h-8 w-8 p-0 rounded-lg transition-all ${view === 'table' ? 'bg-white shadow-sm' : ''}`}
                                 onClick={() => setView('table')}
+                                aria-label="Table view"
                             >
                                 <List className="h-4 w-4" />
                             </Button>
@@ -68,6 +69,7 @@ export function SocialClientPage({ initialData, initialFilters }: SocialClientPa
                                 size="sm"
                                 className={`h-8 w-8 p-0 rounded-lg transition-all ${view === 'grid' ? 'bg-white shadow-sm' : ''}`}
                                 onClick={() => setView('grid')}
+                                aria-label="Grid view"
                             >
                                 <LayoutGrid className="h-4 w-4" />
                             </Button>
@@ -148,6 +150,7 @@ export function SocialClientPage({ initialData, initialFilters }: SocialClientPa
                                                     deleteSocialPost(post.id)
                                                 }
                                             }}
+                                            aria-label="Delete social post"
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />
                                         </Button>
