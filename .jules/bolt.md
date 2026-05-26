@@ -29,3 +29,6 @@
 ## 2024-05-24 - [Performance: N+1 API operations in Server Components]
 **Learning:** Sequential data fetching (`await func1()`, `await func2()`, `await func3()`) in Next.js Server Components blocks subsequent requests until the previous one completes, increasing overall latency (N+1 API problem).
 **Action:** Replaced sequential `await` calls with `await Promise.all([func1(), func2(), func3()])` in `app/tasks/page.tsx` to fetch independent data concurrently, reducing total load time to the duration of the longest request.
+## 2024-05-24 - [Performance: N+1 API operations in Gallery Details]
+**Learning:** Sequential data fetching (`await getPhoto()`, `await getPhotoTags()`, `await getAlbums()`) in Next.js Server Components for the gallery details page (`app/gallery/[id]/page.tsx`) blocks subsequent requests until the previous one completes, creating an unnecessary request waterfall and increasing overall latency.
+**Action:** Replaced the sequential `await` calls with a concurrent `await Promise.all([getPhoto(), getPhotoTags(), getAlbums()])` execution to fetch independent data concurrently, reducing the total load time to the duration of the longest request. Added explanatory comments to ensure the optimization's intent is clear.
