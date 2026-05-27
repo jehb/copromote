@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import * as bcrypt from 'bcrypt'
+import { hashPassword } from '../lib/auth'
 import * as fs from 'fs'
 
 const prisma = new PrismaClient()
@@ -32,38 +32,38 @@ async function main() {
 
         // 1. Locations
         log('Creating Locations...')
-        const locCarrboro = await prisma.location.create({ data: { name: 'Carrboro Lawn' } })
-        const locSouthernVillage = await prisma.location.create({ data: { name: 'Southern Village Patio' } })
-        const locHillsborough = await prisma.location.create({ data: { name: 'Hillsborough Store' } })
-        const locRaleigh = await prisma.location.create({ data: { name: 'Raleigh Store' } })
+        const locMainLawn = await prisma.location.create({ data: { name: 'Main Lawn' } })
+        const locWestside = await prisma.location.create({ data: { name: 'Westside Patio' } })
+        const locNorthside = await prisma.location.create({ data: { name: 'Northside Store' } })
+        const locDowntown = await prisma.location.create({ data: { name: 'Downtown Store' } })
         log('Locations done.')
 
         // 2. Organizations
         log('Creating Organizations...')
         const orgTown = await prisma.organization.create({
-            data: { name: 'Town of Carrboro', category: 'Community Partner', description: 'Local municipal government partner.', website: 'townofcarrboro.org' }
+            data: { name: 'City Government', category: 'Community Partner', description: 'Local municipal government partner.', website: 'citygov.example.org' }
         })
         const orgFarm = await prisma.organization.create({
-            data: { name: 'Eco-Farm Collective', category: 'Vendor', description: 'Local organic produce supplier.', website: 'eco-farm.org' }
+            data: { name: 'Eco-Farm Collective', category: 'Vendor', description: 'Local organic produce supplier.', website: 'eco-farm.example.org' }
         })
         const orgCoomer = await prisma.organization.create({
-            data: { name: 'Coomer Band', category: 'Performer', description: 'Local bluegrass band.', website: 'coomerband.com' }
+            data: { name: 'Bluegrass Band', category: 'Performer', description: 'Local bluegrass performers.', website: 'bluegrassband.example.com' }
         })
         const orgFoodBank = await prisma.organization.create({
-            data: { name: 'Orange County Food Bank', category: 'Non-Profit', description: 'Food distribution.', website: 'foodbank.org' }
+            data: { name: 'Community Food Bank', category: 'Non-Profit', description: 'Food distribution.', website: 'foodbank.example.org' }
         })
         log('Organizations done.')
 
         // 3. Contacts
         log('Creating Contacts...')
-        const contactBrenda = await prisma.contact.create({
-            data: { firstName: 'Brenda', lastName: 'Camp', company: 'Weaver Street Market', jobTitle: 'Community Outreach', email: 'brenda.c@weaverstreet.coop', notes: 'Key contact.', type: 'Internal' }
+        const contactOutreach = await prisma.contact.create({
+            data: { firstName: 'Jane', lastName: 'Doe', company: 'Community Co-op', jobTitle: 'Community Outreach', email: 'jane.doe@example.com', notes: 'Key contact.', type: 'Internal' }
         })
-        const contactRuffin = await prisma.contact.create({
-            data: { firstName: 'Ruffin', lastName: 'Slater', company: 'Weaver Street Market', jobTitle: 'General Manager', email: 'ruffin@weaverstreet.coop', type: 'Internal' }
+        const contactManager = await prisma.contact.create({
+            data: { firstName: 'John', lastName: 'Smith', company: 'Community Co-op', jobTitle: 'General Manager', email: 'john.smith@example.com', type: 'Internal' }
         })
         const contactMayor = await prisma.contact.create({
-            data: { firstName: 'Damon', lastName: 'Seils', company: 'Town of Carrboro', jobTitle: 'Mayor', email: 'mayor@carrboro.org', type: 'Partner', organizationId: orgTown.id }
+            data: { firstName: 'Alex', lastName: 'Johnson', company: 'City Government', jobTitle: 'Mayor', email: 'mayor@example.org', type: 'Partner', organizationId: orgTown.id }
         })
         log('Contacts done.')
 
@@ -88,7 +88,7 @@ async function main() {
                 description: 'Kickoff event.',
                 startTime: new Date('2026-10-01T17:00:00Z'),
                 endTime: new Date('2026-10-01T20:00:00Z'),
-                locationId: locCarrboro.id,
+                locationId: locMainLawn.id,
                 // primaryContactId skipped
             }
         })
@@ -98,17 +98,17 @@ async function main() {
             where: { id: eventFairLaunch.id },
             data: {
                 organizations: { connect: [{ id: orgFoodBank.id }, { id: orgFarm.id }] },
-                contacts: { connect: [{ id: contactBrenda.id }] }
+                contacts: { connect: [{ id: contactOutreach.id }] }
             }
         })
 
         const eventJazz1 = await prisma.event.create({
             data: {
-                title: 'Jazz on the Lawn: Coomer Band',
+                title: 'Jazz on the Lawn: Bluegrass Performance',
                 description: 'Live music on the lawn.',
                 startTime: new Date('2026-06-07T11:00:00Z'),
                 endTime: new Date('2026-06-07T13:00:00Z'),
-                locationId: locCarrboro.id,
+                locationId: locMainLawn.id,
             }
         })
         await prisma.event.update({
@@ -162,17 +162,73 @@ async function main() {
         })
         log('Tasks done.')
 
+        // Roles
+        log('Seeding Default Roles...')
+        const roles = [
+            { name: 'ADMIN', description: 'System Administrator with full access', isSystem: true },
+            { name: 'USER', description: 'Standard user with basic access', isSystem: true },
+            { name: 'EDITOR', description: 'Content editor with publishing access', isSystem: true }
+        ]
+        for (const role of roles) {
+            await prisma.role.upsert({
+                where: { name: role.name },
+                update: { description: role.description, isSystem: role.isSystem },
+                create: role
+            })
+        }
+        log('Roles done.')
+
+        // Permissions
+        log('Seeding Default Role Permissions...')
+        const systemPages = [
+            'admin', 'calendar', 'chat', 'contacts', 'email-planner',
+            'events', 'gallery', 'organizations', 'products', 'projects',
+            'promotions', 'social', 'tasks'
+        ]
+
+        // Seed ADMIN permissions (all true)
+        for (const page of systemPages) {
+            await prisma.rolePermission.upsert({
+                where: { role_page: { role: 'ADMIN', page } },
+                update: { isEnabled: true },
+                create: { role: 'ADMIN', page, isEnabled: true }
+            })
+        }
+
+        // Seed USER permissions (allow common pages, restrict admin page)
+        for (const page of systemPages) {
+            const isEnabled = page !== 'admin'
+            await prisma.rolePermission.upsert({
+                where: { role_page: { role: 'USER', page } },
+                update: { isEnabled },
+                create: { role: 'USER', page, isEnabled }
+            })
+        }
+
+        // Seed EDITOR permissions (all true by default, customizable)
+        for (const page of systemPages) {
+            await prisma.rolePermission.upsert({
+                where: { role_page: { role: 'EDITOR', page } },
+                update: { isEnabled: true },
+                create: { role: 'EDITOR', page, isEnabled: true }
+            })
+        }
+        log('Permissions done.')
+
         // User
         log('Upserting User...')
-        const passwordHash = await bcrypt.hash('admin', 10)
+        const passwordHash = await hashPassword('admin')
         await prisma.user.upsert({
             where: { email: 'admin@copromote.app' },
-            update: {},
+            update: {
+                role: 'ADMIN'
+            },
             create: {
                 email: 'admin@copromote.app',
                 username: 'admin',
                 name: 'Admin User',
                 password: passwordHash,
+                role: 'ADMIN',
                 mustChangePassword: true
             }
         })

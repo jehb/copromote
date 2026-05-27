@@ -45,7 +45,7 @@ This document outlines potential features and enhancements that could be added t
 - **Claim System:** Create a new self-service portal route (`/volunteer`) where authenticated owners can browse and "claim" these specific tasks. Upon completion, a webhook fires to the POS system to credit the owner's account with the corresponding discount percentage for the coming month.
 **UI/UX & User Flow:**
 - **Volunteer Portal:** A minimalist, mobile-first list view showing available shifts (e.g., "Assemble 500 Promo Bags" or "Guide Farm Tour"). Each card displays the required hours and the corresponding POS discount reward.
-- **Check-in/Check-out:** When a member arrives, they tap a "Start Shift" button on their phone. A geolocation check confirms they are at the Weaver Street store. When finished, they tap "End Shift," which triggers a confetti animation and logs the hours directly to their Owner profile.
+- **Check-in/Check-out:** When a member arrives, they tap a "Start Shift" button on their phone. A geolocation check confirms they are at the co-op store. When finished, they tap "End Shift," which triggers a confetti animation and logs the hours directly to their Owner profile.
 **Database Schema & API:**
 - **Schema Additions:** Expand `Task` with `isVolunteerShift: Boolean`, `rewardValue: Float`, and `volunteerContactId: String?`. Create `ShiftLog` model: `contactId`, `startTime`, `endTime`, `verifiedBy`.
 - **API Endpoints:** `POST /api/volunteer/shifts/claim` assigns the current session user to the `Task`. `POST /api/volunteer/shifts/checkout` validates location and creates the `ShiftLog`.
@@ -93,10 +93,10 @@ This document outlines potential features and enhancements that could be added t
 **Description:** A public-facing form for non-profits to submit requests to host events or tabling sessions at the co-op.
 **Benefits:** Integrates directly into the Co+promote Event pipeline pending marketer approval.
 **Deep Dive integration & Architecture:**
-- **External Form Generation:** Create a dynamic Next.js API route that serves an embedded iframe `<iframe>` or a standalone React component meant to be hosted on Weaver Street's main WordPress site.
+- **External Form Generation:** Create a dynamic Next.js API route that serves an embedded iframe `<iframe>` or a standalone React component meant to be hosted on the co-op's main WordPress site.
 - **Draft Pipeline:** Submissions populate the Co+promote database as an `Event` with the status `PENDING_PARTNER`. The pipeline utilizes React Flow (#38) to visually route approvals through the Store Manager before notifying the Marketing Editor.
 **UI/UX & User Flow:**
-- **External User Flow:** The non-profit visits `weaverstreetmarket.coop/host-an-event`. They fill out a multi-step React Hook Form (using Zod validation) detailing their mission, requested dates, and required table space.
+- **External User Flow:** The non-profit visits `coop.example.com/host-an-event`. They fill out a multi-step React Hook Form (using Zod validation) detailing their mission, requested dates, and required table space.
 - **Internal Approval Flow:** The Community Manager logs into Co+promote. The 'Pending Partner Events' widget shows the request. Clicking it opens a split view: the left side shows the partner's answers, the right side shows the Co-op's internal calendar to quickly check for date collisions before hitting 'Approve'.
 **Database Schema & API:**
 - **Schema Additions:** Expand `Event` with `partnerOrganizationId: String?`, `isRequested: Boolean @default(false)`, and `requestedDates: Json?`.
@@ -104,7 +104,7 @@ This document outlines potential features and enhancements that could be added t
 
 ### 8. Co-op Patronage Dividend Estimator
 **Description:** Help owners estimate their yearly dividend based on their purchase tracking.
-**Benefits:** Gamifies the co-op experience, encouraging members to shift more of their grocery budget to Weaver Street Market.
+**Benefits:** Gamifies the co-op experience, encouraging members to shift more of their grocery budget to the co-op.
 **Deep Dive integration & Architecture:**
 - **Data Synchronization:** Requires a secure, read-only sync from the POS system's transaction ledger down to the individual `Contact` UUID.
 - **Client-Side Calculation Widget:** A React component on the user dashboard that takes the Year-to-Date spend and multiplies it by the Board's projected dividend percentage, rendering a visually encouraging "Your estimated return: $45.12" graphic.
@@ -136,7 +136,7 @@ This document outlines potential features and enhancements that could be added t
 - **Dynamic Updates:** Push notifications can be sent directly to the Wallet pass when the member's annual equity payment is due, changing the pass color to red until resolved.
 **UI/UX & User Flow:**
 - **One-Tap Addition:** In the "Welcome" email or on the user's dashboard, prominently display standard "Add to Apple Wallet" and "Save to Google Pay" badge buttons.
-- **Scanning Context:** At the POS register, the user double-clicks their physical phone button to bring up Apple Wallet. The pass displays a high-contrast QR code or barcode (depending on Weaver Street's POS scanner hardware) for instantaneous scanning.
+- **Scanning Context:** At the POS register, the user double-clicks their physical phone button to bring up Apple Wallet. The pass displays a high-contrast QR code or barcode (depending on the co-op's POS scanner hardware) for instantaneous scanning.
 **Database Schema & API:**
 - **Schema Additions:** Expand `Contact` with `appleWalletPassId: String?` and `googlePayPassId: String?`. Add `walletPassLastUpdated: DateTime?`.
 - **API Endpoints:** `GET /api/wallet/apple/:contactId/pass.pkpass` strictly generates the binary blob payload utilizing the Contact's UUID and dynamic data. Apple APNs certs will be required as Env Vars.
@@ -160,13 +160,13 @@ This document outlines potential features and enhancements that could be added t
 - **API Endpoints:** `PUT /api/organizations/:id/pipeline` updates the stage. `GET /api/reports/dei-spend` aggregates POS purchase order data joined against `Organization.isDEI`.
 
 ### 12. Local Producer "Food Mile" Calculator
-**Description:** Calculate and display the literal distance between the producer and the specific Weaver Street store.
+**Description:** Calculate and display the literal distance between the producer and the specific co-op store.
 **Benefits:** Enables sorting products by "Food Miles" to easily highlight the absolute freshest local products in flyers.
 **Deep Dive integration & Architecture:**
 - **Geocoding API:** When a local `Organization` is created, hit the Google Maps Geocoding API to convert their address string into standard long/lat coordinates.
 - **Query Optimization:** In the Prisma schema, use raw PostgreSQL/MySQL geospatial extensions (if available) or the Haversine formula in the Next.js API route to calculate the distance between the Organization's coordinates and the target `Location` coordinates on the fly.
 **UI/UX & User Flow:**
-- **Product Table View:** In the list of `EventProducts`, a dedicated column displays a badge: "12 Miles to Carrboro" with a small green leaf icon. Clicking the headers sorts the entire product catalog by proximity to the currently selected store location.
+- **Product Table View:** In the list of `EventProducts`, a dedicated column displays a badge: "12 Miles to Local Store" with a small green leaf icon. Clicking the headers sorts the entire product catalog by proximity to the currently selected store location.
 - **Asset Generation:** When dragging a product onto a generic social media template, an automated text node pops up near the bottom of the image reading "Grown just [X] miles away!" utilizing the pre-calculated data.
 **Database Schema & API:**
 - **Schema Additions:** Expand `Location` and `Organization` with `latitude: Float?` and `longitude: Float?`. Add `calculatedMiles: Float?` as an optional cache layer to `EventProduct`.
@@ -241,7 +241,7 @@ This document outlines potential features and enhancements that could be added t
 **Description:** A button that pushes a local farm's profile to the Co-op's main WordPress website.
 **Benefits:** Eliminates double data entry (entering data in Co+promote, then again in the WordPress CMS).
 **Deep Dive integration & Architecture:**
-- **WordPress REST API:** Co+promote acts as the "source of truth". When a marketer clicks "Publish to Web", a Next.js Server Action compiles the `Organization.bio` and latest `EventProduct` imagery into a JSON payload and POSTs it to the `wp-json/wp/v2/posts` endpoint of the main Weaver Street site.
+- **WordPress REST API:** Co+promote acts as the "source of truth". When a marketer clicks "Publish to Web", a Next.js Server Action compiles the `Organization.bio` and latest `EventProduct` imagery into a JSON payload and POSTs it to the `wp-json/wp/v2/posts` endpoint of the main co-op site.
 - **Webhooks:** If the farmer updates their bio in the Self-Service Portal (#16), Co+promote automatically fires a `PUT` request to WordPress to keep the public site synced.
 **UI/UX & User Flow:**
 - **CMS Publishing Toggle:** On the internal view of a Vendor profile, there is a prominent "Web Status" toggle switch. It reads "Draft".
@@ -335,7 +335,7 @@ This document outlines potential features and enhancements that could be added t
 **Benefits:** Highly dynamic video assets generated instantly without Premiere Pro.
 **Deep Dive integration & Architecture:**
 - **Remotion Lambda Pipeline:** Create an AWS Lambda function running `remotion-lambda`. When a marketer clicks "Generate Brand Video," a Next.js Server Action sends an array of `EventProduct` data (images, prices, local farmer names) as input props to the Lambda.
-- **Dynamic Compositions:** The Remotion React composition iterates over the array, applying Weaver Street Market's specific font (e.g., Brandon Grotesque) and green brand colors over a 15-second fluid motion timeline, dropping the final MP4 back into the Immich instance.
+- **Dynamic Compositions:** The Remotion React composition iterates over the array, applying the co-op's specific font (e.g., Brandon Grotesque) and green brand colors over a 15-second fluid motion timeline, dropping the final MP4 back into the Immich instance.
 **UI/UX & User Flow:**
 - **Template Selection:** The marketer clicks "New Video." They are presented with 3 motion templates (e.g., "Weekend Sale Splash," "Farmer Spotlight," "New Item Drop"). 
 - **Data Hookup:** After selecting "Weekend Sale Splash," they are asked to select 4 products. They click "Render Video." A loading bar appears as the Lambda function processes the frames, and within 30 seconds, an `<video>` tag appears playing the final, rendered 1080x1920 MP4 ready for TikTok.
@@ -368,13 +368,13 @@ This document outlines potential features and enhancements that could be added t
 **Benefits:** Unifies the digital marketing strategy with the physical in-store shopper experience.
 **Deep Dive integration & Architecture:**
 - **Audio Asset Management:** Expand the `@immich/sdk` implementation (which natively handles video) to accept `.mp3` or `.wav` voiceover files uploaded by the marketing team.
-- **Store-Level Playback:** Expose a secure, long-poll API endpoint (`/api/locations/audio-queue`). Each physical Weaver Street location runs a lightweight Raspberry Pi or background browser connected to the PA system that constantly fetches and plays the active `PromotionPeriod` audio assets.
+- **Store-Level Playback:** Expose a secure, long-poll API endpoint (`/api/locations/audio-queue`). Each physical co-op location runs a lightweight Raspberry Pi or background browser connected to the PA system that constantly fetches and plays the active `PromotionPeriod` audio assets.
 **UI/UX & User Flow:**
 - **Audio Waveform Editor:** A simple UI (using `wavesurfer.js`) allows marketers to listen to the uploaded `.mp3` voiceover and visually trim dead air from the beginning or end of the track.
-- **Location Toggles:** A grid of checkboxes allows the marketer to select which specific locations (e.g., Carrboro, Southern Village) should play the audio asset between specific hours (e.g., 9 AM - 11 AM only).
+- **Location Toggles:** A grid of checkboxes allows the marketer to select which specific locations (e.g., Main, Westside) should play the audio asset between specific hours (e.g., 9 AM - 11 AM only).
 
 ### 29. Social Listening & Sentiment Analysis
-**Description:** Monitor local community Facebook groups and Nextdoor for mentions of Weaver Street Market.
+**Description:** Monitor local community Facebook groups and Nextdoor for mentions of Co-op Market.
 **Benefits:** Allows community managers to proactively respond to localized praise or complaints.
 **Deep Dive integration & Architecture:**
 - **Scraping Infrastructure:** This requires the Puppeteer/Playwright implementation (Feature #40) running on a scheduled cron job (via Inngest) to scrape specific, public Nextdoor neighborhood pages or public Facebook groups using a dedicated "listener" account.
@@ -387,11 +387,11 @@ This document outlines potential features and enhancements that could be added t
 **Description:** Automatically pull in Instagram posts where the co-op is tagged and request permission to use.
 **Benefits:** Authentically showcases the community engaging with co-op products.
 **Deep Dive integration & Architecture:**
-- **Instagram Graph API:** Register a Meta App to subscribe to the `mentions` webhook. When @weaverstreetmarket is tagged, the webhook delivers the post ID to Co+promote.
-- **Rights Management Workflow:** The `components/tasks/task-board.tsx` populates a "Pending UGC" column. A marketer clicks a button which auto-comments on the Instagram post: "We love this! Reply #YesWeaver to let us use this photo." A secondary webhook listens for that hashtag reply and automatically imports the high-res image to Immich.
+- **Instagram Graph API:** Register a Meta App to subscribe to the `mentions` webhook. When @coopmarket is tagged, the webhook delivers the post ID to Co+promote.
+- **Rights Management Workflow:** The `components/tasks/task-board.tsx` populates a "Pending UGC" column. A marketer clicks a button which auto-comments on the Instagram post: "We love this! Reply #YesCoop to let us use this photo." A secondary webhook listens for that hashtag reply and automatically imports the high-res image to Immich.
 **UI/UX & User Flow:**
 - **Masonry Gallery View:** The `Pending UGC` dashboard renders an attractive masonry layout of community photos. 
-- **One-Click Authorization:** Hovering over a photo reveals a central "Request Permission" button. Clicking it turns the button into a spinning loader while the API posts the comment. Once the user replies with `#YesWeaver`, the image animates with a green checkmark and flies into the Immich "Approved Assets" folder.
+- **One-Click Authorization:** Hovering over a photo reveals a central "Request Permission" button. Clicking it turns the button into a spinning loader while the API posts the comment. Once the user replies with `#YesCoop`, the image animates with a green checkmark and flies into the Immich "Approved Assets" folder.
 
 ### 31. Influencer/Ambassador Management Module
 **Description:** Track local food bloggers, their reach, and the ROI of comped products.
@@ -493,12 +493,12 @@ This document outlines potential features and enhancements that could be added t
 - **Serverless Browser Provisioning:** Deploy alongside a service like Browserless.io or use `@sparticuz/chromium` if deploying to Vercel/AWS Lambda to avoid binary size limits.
 - ** DOM Parsing:** Write targeted Puppeteer scripts that locate specific CSS selectors on competitor domains (e.g., `#price-tag`), returning the innerText value back to the `EventProduct` price tracking table in Prisma.
 **UI/UX & User Flow:**
-- **Competitor Matrix Table:** A dedicated dashboard view shows Weaver Street's price for organic milk next to automated, constantly updated columns scraping local competitors. 
+- **Competitor Matrix Table:** A dedicated dashboard view shows the co-op's price for organic milk next to automated, constantly updated columns scraping local competitors. 
 - **Price Alerting:** If a scraper detects a competitor dropped their price by more than 10%, that specific table cell turns red, and an automated task is assigned to the pricing coordinator to review the margin.
 
 ### 41. Prescriptive Analytics Engine
 **Description:** AI that doesn't just show data, but tells the marketer *what* to do next.
-**Benefits:** Example: "Produce sales dropping at Carrboro location. Recommend 15% discount on local apples."
+**Benefits:** Example: "Produce sales dropping at Main Store location. Recommend 15% discount on local apples."
 **Deep Dive integration & Architecture:**
 - **Anomaly Detection:** An Inngest cron job pulls daily sales aggregates from the POS and compares them against a 30-day moving average.
 - **LLM Synthesis:** If a standard deviation is breached, the data is sent to an LLM with the prompt: "Sales have dropped 20% in category X. Give 3 actionable marketing interventions." The resulting text is formatted as an 'Alert' on the main `/dashboard`.
@@ -510,10 +510,10 @@ This document outlines potential features and enhancements that could be added t
 **Description:** Integrate store foot traffic sensors into the analytics dashboard.
 **Benefits:** Correlate online promotion spikes directly with physical visits to the stores.
 **Deep Dive integration & Architecture:**
-- **Hardware API Intake:** Expose a secure Next.js webhook (e.g., `/api/webhooks/dor-sensor`) to receive hourly POST requests from physical door sensors (like Dor or RetailNext) at the Weaver Street locations.
+- **Hardware API Intake:** Expose a secure Next.js webhook (e.g., `/api/webhooks/dor-sensor`) to receive hourly POST requests from physical door sensors (like Dor or RetailNext) at the co-op locations.
 - **Overlay Charting:** Using a charting library like Recharts or Graphic Walker, overlay the physical foot traffic line graph onto the digital Email Open Rate line graph to visually track in-store conversion rates.
 **UI/UX & User Flow:**
-- **Correlation Charting:** In the main dashboard, the marketer views the "Weekend Promotion Performance" chart. A blue line graph tracks total email clicks over 48 hours. A grey bar chart overlaid underneath shows the physical door swings in the Carrboro store, making the attribution immediately blindingly obvious.
+- **Correlation Charting:** In the main dashboard, the marketer views the "Weekend Promotion Performance" chart. A blue line graph tracks total email clicks over 48 hours. A grey bar chart overlaid underneath shows the physical door swings in the Main Store, making the attribution immediately blindingly obvious.
 
 ### 43. Marketing Budget Allocation Tracker
 **Description:** Track marketing spend and MDF per department (e.g., Deli, Produce, Wellness).
@@ -569,7 +569,7 @@ This document outlines potential features and enhancements that could be added t
 **Description:** A module to handle organizational contracts, proposals, and NDAs.
 **Benefits:** Generate standard contracts pre-filled with Contact and Project data.
 **Deep Dive integration & Architecture:**
-- **React-PDF Generation:** Utilize `@react-pdf/renderer` to build exact replica templates of Weaver Street's legal NDAs within the React codebase. 
+- **React-PDF Generation:** Utilize `@react-pdf/renderer` to build exact replica templates of the co-op's legal NDAs within the React codebase. 
 - **Variable Hydration:** When a contract is initiated, the system passes the `Organization` data into the React-PDF component props, exporting a locked, finalized PDF to the e-signature API (Feature #9).
 **UI/UX & User Flow:**
 - **Template Library:** A slick, grid-based `/templates` view shows thumbnails of available legal docs. Hovering over a document shows a "Quick Fill" button.
