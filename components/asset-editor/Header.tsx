@@ -33,6 +33,7 @@ export default function Header({
                         disabled={!canUndo}
                         className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
                         title="Undo"
+                        aria-label="Undo"
                     >
                         <Undo2 size={18} />
                     </button>
@@ -41,6 +42,7 @@ export default function Header({
                         disabled={!canRedo}
                         className="p-1.5 rounded-md text-neutral-600 hover:bg-neutral-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
                         title="Redo"
+                        aria-label="Redo"
                     >
                         <Redo2 size={18} />
                     </button>
