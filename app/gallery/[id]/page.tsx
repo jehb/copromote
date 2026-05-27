@@ -18,9 +18,14 @@ interface GalleryItemPageProps {
 
 export default async function GalleryItemPage({ params }: GalleryItemPageProps) {
     const { id } = await params
-    const photo = await getPhoto(id)
-    const allTags = await getPhotoTags()
-    const allAlbums = await getAlbums()
+
+    // Performance optimization: Execute independent data fetches concurrently
+    // to avoid sequential waterfall delays and reduce total page load latency.
+    const [photo, allTags, allAlbums] = await Promise.all([
+        getPhoto(id),
+        getPhotoTags(),
+        getAlbums()
+    ])
 
     if (!photo) {
         notFound()
