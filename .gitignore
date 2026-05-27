@@ -46,3 +46,12 @@ next-env.d.ts
 *.log
 *_output.txt
 temp_*.txt
+
+# databases, backups and dumps
+*.db
+*.db-journal
+*.db.backup
+*.sql
+*.bak
+*.backup
+*.tmp
