@@ -9,11 +9,12 @@ export async function logActivity(
     entityType: string,
     entityId?: string,
     details?: string,
-    metadata?: any
+    metadata?: any,
+    userId?: string
 ) {
     try {
-        const session = await getSession()
-        const userId = session?.id
+        const session = !userId ? await getSession() : null
+        const finalUserId = userId || session?.id
 
         await prisma.activityLog.create({
             data: {
@@ -22,7 +23,7 @@ export async function logActivity(
                 entityId,
                 details,
                 metadata: metadata ? JSON.stringify(metadata) : undefined,
-                userId
+                userId: finalUserId
             }
         })
     } catch (error) {
