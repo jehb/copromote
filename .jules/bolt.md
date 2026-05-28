@@ -32,3 +32,6 @@
 ## 2024-05-24 - [Performance: N+1 API operations in Gallery Details]
 **Learning:** Sequential data fetching (`await getPhoto()`, `await getPhotoTags()`, `await getAlbums()`) in Next.js Server Components for the gallery details page (`app/gallery/[id]/page.tsx`) blocks subsequent requests until the previous one completes, creating an unnecessary request waterfall and increasing overall latency.
 **Action:** Replaced the sequential `await` calls with a concurrent `await Promise.all([getPhoto(), getPhotoTags(), getAlbums()])` execution to fetch independent data concurrently, reducing the total load time to the duration of the longest request. Added explanatory comments to ensure the optimization's intent is clear.
+## 2024-05-28 - [Performance: Immich SDK Bulk Untag Workaround]
+**Learning:** The Immich SDK `untagAssets` function only supports removing a single tag at a time, unlike `bulkTagAssets` which supports multiple tags. When a user removes multiple tags, using a sequential `for...of` loop causes an N+1 performance bottleneck due to cumulative API round-trips.
+**Action:** Replaced the sequential `for...of` loop in `updateTagsOnImmichAsset` with `await Promise.all(tagsToRemove.map(...))` to batch these removal requests concurrently on the server side, minimizing network overhead.

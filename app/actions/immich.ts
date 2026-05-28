@@ -182,11 +182,15 @@ export async function updateTagsOnImmichAsset(assetId: string, tagsToAdd: string
             })
         }
 
-        for (const tagId of tagsToRemove) {
-            await immich.untagAssets({
-                id: tagId,
-                bulkIdsDto: { ids: [assetId] }
-            })
+        if (tagsToRemove.length > 0) {
+            await Promise.all(
+                tagsToRemove.map(tagId =>
+                    immich.untagAssets({
+                        id: tagId,
+                        bulkIdsDto: { ids: [assetId] }
+                    })
+                )
+            )
         }
     } catch (e: any) {
         console.error('Failed to update tags on Immich asset:', e?.response?.data || e.message)
