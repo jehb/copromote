@@ -104,10 +104,10 @@ export function ThemeList({ initialThemes }: { initialThemes: any[] }) {
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
-                                        <Button variant="ghost" size="sm" type="button" onClick={() => openEdit(theme)}>
+                                        <Button variant="ghost" size="sm" type="button" onClick={() => openEdit(theme)} aria-label="Edit theme">
                                             <Edit className="h-4 w-4 text-slate-500" />
                                         </Button>
-                                        <Button variant="ghost" size="sm" type="button" onClick={() => handleDelete(theme.id)}>
+                                        <Button variant="ghost" size="sm" type="button" onClick={() => handleDelete(theme.id)} aria-label="Delete theme">
                                             <Trash2 className="h-4 w-4 text-red-500" />
                                         </Button>
                                     </div>
