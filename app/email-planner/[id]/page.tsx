@@ -30,35 +30,35 @@ export default async function EmailPlanDetailPage({ params }: { params: { id: st
     // So we should fetch prisma.event.findMany() directly here or create a new action.
     // Using prisma directly in server component is fine.
 
-    const events = await prisma.event.findMany({
-        select: {
-            id: true,
-            title: true,
-            startTime: true,
-        },
-        orderBy: {
-            startTime: 'asc',
-        },
-    })
-
     const planItems = (plan as any).items || []
     const allUPCs: string[] = planItems.flatMap((item: any) => item.products?.map((p: any) => p.upc) || [])
     const uniqueUPCs = Array.from(new Set(allUPCs))
-    const availableProducts = uniqueUPCs.length > 0 ? await getExternalProductsByUPCs(uniqueUPCs) : []
 
-    const savedAssets = await prisma.savedAsset.findMany({
-        select: {
-            id: true,
-            name: true,
-            previewImage: true,
-        },
-        orderBy: {
-            createdAt: 'desc',
-        },
-    })
-
-    // Fetch Immich Photos
-    const photos = await getPhotos()
+    // Bolt: Parallelize independent DB queries to eliminate waterfall latency
+    const [events, availableProducts, savedAssets, photos] = await Promise.all([
+        prisma.event.findMany({
+            select: {
+                id: true,
+                title: true,
+                startTime: true,
+            },
+            orderBy: {
+                startTime: 'asc',
+            },
+        }),
+        uniqueUPCs.length > 0 ? getExternalProductsByUPCs(uniqueUPCs) : Promise.resolve([]),
+        prisma.savedAsset.findMany({
+            select: {
+                id: true,
+                name: true,
+                previewImage: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        }),
+        getPhotos()
+    ])
 
     return (
         <div className="container mx-auto py-8 space-y-8">
