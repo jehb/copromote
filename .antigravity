@@ -1,0 +1,7 @@
+# Reminders
+
+- ALWAYS write command output to a temporary file when running commands. NEVER FORGET THIS.
+- Examples: `git branch > temp_branch.txt`, `npm test > temp_test.txt`
+- Always clean up (delete) any temporary files after the task is completed or the information is no longer needed.
+- IMPORTANT: Always read files directly using `view_file`. NEVER use tools like `cat`, `head`, `tail`, `more`, `less` inside commands to read files.
+- If using tools like `grep` locally through terminal commands, ALWAYS send their output to a temporary file, and then read that file directly using `view_file`.

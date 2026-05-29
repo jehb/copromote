@@ -1,0 +1,193 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { getMyRole } from '@/app/actions/user-role'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+    DialogTrigger
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { format } from 'date-fns'
+import { createTask, updateTask } from '@/app/actions/tasks'
+import { Plus } from 'lucide-react'
+import { AuditInfo } from '@/components/common/audit-info'
+
+interface TaskDialogProps {
+    users: any[]
+    task?: any
+    trigger?: React.ReactNode
+    children?: React.ReactNode
+    onSave?: () => void
+    defaultProjectId?: string
+    projectId?: string
+    defaultStatus?: string
+    projects?: any[]
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
+}
+
+export function TaskDialog({
+    users,
+    children,
+    task,
+    trigger,
+    onSave,
+    defaultProjectId,
+    projectId,
+    defaultStatus = 'todo',
+    projects = [],
+    open: controlledOpen,
+    onOpenChange: setControlledOpen
+}: TaskDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false)
+    const isControlled = controlledOpen !== undefined
+    const isOpen = isControlled ? controlledOpen : internalOpen
+
+    const setIsOpen = (newOpen: boolean) => {
+        if (isControlled) {
+            setControlledOpen?.(newOpen)
+        } else {
+            setInternalOpen(newOpen)
+        }
+    }
+
+    const [isAdmin, setIsAdmin] = useState(false)
+    const isEditing = !!task
+
+    useEffect(() => {
+        if (isOpen) {
+            getMyRole().then(role => setIsAdmin(role === 'ADMIN'))
+        }
+    }, [isOpen])
+
+    const handleSubmit = async (formData: FormData) => {
+        if (isEditing) {
+            await updateTask(task.id, formData)
+        } else {
+            await createTask(formData)
+        }
+        setIsOpen(false)
+        onSave?.()
+    }
+
+    const formatForInput = (date: Date) => {
+        return date ? format(new Date(date), "yyyy-MM-dd'T'HH:mm") : ''
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            {!isControlled && (
+                <div onClick={() => setIsOpen(true)} className="inline-block cursor-pointer">
+                    {trigger || (
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" /> Add Task
+                        </Button>
+                    )}
+                </div>
+            )}
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>{isEditing ? 'Edit Task' : 'Create Task'}</DialogTitle>
+                    <DialogDescription>
+                        {isEditing ? 'Make changes to your task here. Click save when you\'re done.' : 'Add a new task to your project. Click save when you\'re done.'}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <form action={handleSubmit} className="grid gap-4 py-4">
+                    <input type="hidden" name="projectId" value={projectId || task?.projectId || ''} />
+                    <div className="grid gap-2">
+                        <Label htmlFor="title">Title</Label>
+                        <Input id="title" name="title" defaultValue={task?.title} required />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea id="description" name="description" defaultValue={task?.description} />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select name="status" defaultValue={task?.status || defaultStatus}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="todo">Todo</SelectItem>
+                                    <SelectItem value="in-progress">In Progress</SelectItem>
+                                    <SelectItem value="done">Done</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="dueDate">Due Date</Label>
+                            <Input
+                                id="dueDate"
+                                name="dueDate"
+                                type="datetime-local"
+                                defaultValue={task?.dueDate ? formatForInput(task.dueDate) : ''}
+                            />
+                        </div>
+                    </div>
+
+                    {isEditing && (
+                        <div className="grid gap-2">
+                            <Label htmlFor="assignee">Assignee</Label>
+                            <Select name="assigneeId" defaultValue={task?.assigneeId || 'none'}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Unassigned" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">Unassigned</SelectItem>
+                                    {users.map((user: any) => (
+                                        <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+
+                    {!projectId && projects.length > 0 && (
+                        <div className="grid gap-2">
+                            <Label htmlFor="projectId">Project</Label>
+                            <Select name="projectId" defaultValue={task?.projectId || 'none'}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="No Project" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">No Project</SelectItem>
+                                    {projects.map((project: any) => (
+                                        <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+                        <Button type="submit">Save</Button>
+                    </DialogFooter>
+                </form>
+                {isEditing && isAdmin && (
+                    <AuditInfo
+                        createdAt={task.createdAt}
+                        updatedAt={task.updatedAt}
+                        createdBy={task.createdBy}
+                        updatedBy={task.updatedBy}
+                    />
+                )}
+            </DialogContent>
+        </Dialog>
+    )
+}

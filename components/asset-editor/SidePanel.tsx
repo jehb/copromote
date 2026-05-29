@@ -1,0 +1,420 @@
+import React, { useRef } from 'react';
+import { SidebarTab, EditorElement } from './types';
+import TemplatesTab from './TemplatesTab';
+import SavedAssetsTab from './SavedAssetsTab';
+
+interface SidePanelProps {
+    activeTab: SidebarTab | null;
+    onAddText: (text: string, fontSize: number, fontFamily: string) => void;
+    onAddRect: () => void;
+    onAddCircle: () => void;
+    onAddStar: () => void;
+    onAddPolygon: (sides: number) => void;
+    onAddRing: () => void;
+    onAddLine: () => void;
+    onAddArrow: () => void;
+    onAddPath: (path: string, viewBox?: string) => void;
+    onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    canvasBg: string;
+    setCanvasBg: (bg: string) => void;
+    canvasSize: { width: number, height: number };
+    setCanvasSize: (size: { width: number, height: number }) => void;
+    onAddIcon: (iconPath: string) => void;
+    elements: EditorElement[];
+    setElements: (elements: EditorElement[]) => void;
+    selectedIds: string[];
+    setSelectedIds: (ids: string[] | ((prev: string[]) => string[])) => void;
+    photos?: any[];
+    palettes?: any[];
+}
+
+export default function SidePanel({
+    activeTab,
+    onAddText,
+    onAddRect,
+    onAddCircle,
+    onAddStar,
+    onAddPolygon,
+    onAddRing,
+    onAddLine,
+    onAddArrow,
+    onAddPath,
+    onImageUpload,
+    canvasBg,
+    setCanvasBg,
+    canvasSize,
+    setCanvasSize,
+    onAddIcon,
+    elements,
+    setElements,
+    selectedIds,
+    setSelectedIds,
+    photos = [],
+    palettes = []
+}: SidePanelProps) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    if (!activeTab) return null;
+
+    return (
+        <div className="w-72 bg-white border-r h-full flex flex-col z-10 shadow-sm flex-shrink-0 animate-in slide-in-from-left-8 duration-200">
+            <div className="p-4 border-b">
+                <h2 className="text-lg font-semibold text-neutral-800 capitalize">{activeTab}</h2>
+            </div>
+
+            <div className="p-4 flex-1 overflow-y-auto">
+                {activeTab === 'text' && (
+                    <div className="flex flex-col gap-3">
+                        <button
+                            onClick={() => onAddText('Add a heading', 48, 'sans-serif')}
+                            className="p-3 bg-neutral-100 hover:bg-neutral-200 rounded-lg text-left transition-colors"
+                        >
+                            <span className="text-3xl font-bold text-neutral-800">Add a heading</span>
+                        </button>
+                        <button
+                            onClick={() => onAddText('Add a subheading', 32, 'sans-serif')}
+                            className="p-3 bg-neutral-100 hover:bg-neutral-200 rounded-lg text-left transition-colors"
+                        >
+                            <span className="text-xl font-semibold text-neutral-700">Add a subheading</span>
+                        </button>
+                        <button
+                            onClick={() => onAddText('Add a little bit of body text', 18, 'sans-serif')}
+                            className="p-3 bg-neutral-100 hover:bg-neutral-200 rounded-lg text-left transition-colors"
+                        >
+                            <span className="text-sm text-neutral-600">Add a little bit of body text</span>
+                        </button>
+                    </div>
+                )}
+
+                {activeTab === 'shapes' && (
+                    <div className="flex flex-col gap-6">
+                        <div>
+                            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Geometric</h3>
+                            <div className="grid grid-cols-3 gap-3">
+                                <button onClick={onAddRect} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Rectangle">
+                                    <div className="w-8 h-8 bg-neutral-400"></div>
+                                </button>
+                                <button onClick={onAddCircle} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Circle">
+                                    <div className="w-8 h-8 bg-neutral-400 rounded-full"></div>
+                                </button>
+                                <button onClick={() => onAddPolygon(3)} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Triangle">
+                                    <div className="w-0 h-0 border-l-[16px] border-l-transparent border-r-[16px] border-r-transparent border-b-[28px] border-b-neutral-400"></div>
+                                </button>
+                                <button onClick={() => onAddPolygon(6)} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Hexagon">
+                                    <div className="w-8 h-8 bg-neutral-400" style={{ clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)' }}></div>
+                                </button>
+                                <button onClick={onAddRing} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Ring">
+                                    <div className="w-8 h-8 border-4 border-neutral-400 rounded-full"></div>
+                                </button>
+                                <button onClick={onAddStar} className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Star">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-400"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Lines & Arrows</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button onClick={onAddLine} className="aspect-[2/1] bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200" title="Line">
+                                    <div className="w-12 h-0.5 bg-neutral-400"></div>
+                                </button>
+                                <button onClick={onAddArrow} className="aspect-[2/1] bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200 relative" title="Arrow">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor" className="text-neutral-400"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4v3z" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'icons' && (
+                    <div className="grid grid-cols-3 gap-3">
+                        <button
+                            onClick={() => onAddIcon("M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z")}
+                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
+                            title="Heart"
+                        >
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-600"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+                        </button>
+                        <button
+                            onClick={() => onAddIcon("M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z")}
+                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
+                            title="Star"
+                        >
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-600"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                        </button>
+                        <button
+                            onClick={() => onAddIcon("M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z")}
+                            className="aspect-square bg-neutral-100 hover:bg-neutral-200 rounded-lg flex items-center justify-center transition-colors border border-neutral-200"
+                            title="Cloud"
+                        >
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" className="text-neutral-600"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" /></svg>
+                        </button>
+                    </div>
+                )}
+
+                {activeTab === 'uploads' && (
+                    <div className="flex flex-col gap-4">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            ref={fileInputRef}
+                            className="hidden"
+                            onChange={(e) => {
+                                onImageUpload(e);
+                                if (fileInputRef.current) fileInputRef.current.value = ''; // reset
+                            }}
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                        >
+                            Upload Media
+                        </button>
+
+                        <div className="w-full bg-neutral-200 h-px my-2" />
+                        <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Immich Gallery</h3>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            {photos.length === 0 ? (
+                                <div className="col-span-2 text-center text-sm text-neutral-500 py-4">
+                                    No photos found in library.
+                                </div>
+                            ) : (
+                                photos.map((photo) => (
+                                    <button
+                                        key={photo.id}
+                                        onClick={() => {
+                                            const img = new Image();
+                                            const fullResUrl = `/api/immich/asset/${photo.id}/download?inline=true`;
+                                            img.src = fullResUrl;
+
+                                            img.onload = () => {
+                                                const originalWidth = img.naturalWidth;
+                                                const originalHeight = img.naturalHeight;
+
+                                                // Calculate scaled dimensions, capping at 400px
+                                                let targetWidth = originalWidth;
+                                                let targetHeight = originalHeight;
+                                                const maxDim = 400;
+
+                                                if (originalWidth > maxDim || originalHeight > maxDim) {
+                                                    const ratio = Math.min(maxDim / originalWidth, maxDim / originalHeight);
+                                                    targetWidth = originalWidth * ratio;
+                                                    targetHeight = originalHeight * ratio;
+                                                }
+
+                                                const newElement = {
+                                                    id: `image-${Date.now()}-${photo.id}`,
+                                                    type: 'image' as const,
+                                                    x: 50,
+                                                    y: 50,
+                                                    width: targetWidth,
+                                                    height: targetHeight,
+                                                    src: fullResUrl,
+                                                };
+                                                setElements([...elements, newElement]);
+                                            };
+                                        }}
+                                        className="relative aspect-square rounded overflow-hidden group border border-neutral-200 hover:border-blue-500 transition-colors bg-neutral-100"
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={`${photo.url}?w=200&h=200&fit=crop`}
+                                            alt={photo.name}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                        />
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'background' && (
+                    <div className="flex flex-col gap-4">
+                        {palettes.length > 0 && palettes.map(palette => {
+                            const colors = typeof palette.colors === 'string' ? JSON.parse(palette.colors) : palette.colors;
+                            return (
+                                <div key={palette.id} className="flex flex-col gap-2">
+                                    <label className="text-sm text-neutral-600 font-medium">{palette.name}</label>
+                                    <div className="flex gap-2 flex-wrap">
+                                        {colors.map((color: string, i: number) => (
+                                            <button
+                                                key={`${palette.id}-${i}`}
+                                                onClick={() => setCanvasBg(color)}
+                                                className={`w-8 h-8 rounded-full border hover:scale-110 transition-transform shadow-sm ${canvasBg === color ? 'ring-2 ring-blue-500 ring-offset-1 border-transparent' : 'border-neutral-200'}`}
+                                                style={{ backgroundColor: color }}
+                                                title={color}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {palettes.length === 0 && (
+                            <div className="flex flex-col gap-2">
+                                <label className="text-sm text-neutral-600 font-medium whitespace-nowrap">Default Colors</label>
+                                <div className="flex gap-2 flex-wrap">
+                                    {['#ffffff', '#000000', '#f87171', '#fb923c', '#fbbf24', '#a3e635', '#4ade80', '#34d399', '#2dd4bf', '#38bdf8', '#60a5fa', '#818cf8', '#a78bfa', '#e879f9', '#f472b6'].map(color => (
+                                        <button
+                                            key={color}
+                                            onClick={() => setCanvasBg(color)}
+                                            className={`w-8 h-8 rounded-full border hover:scale-110 transition-transform shadow-sm ${canvasBg === color ? 'ring-2 ring-blue-500 ring-offset-1 border-transparent' : 'border-neutral-200'}`}
+                                            style={{ backgroundColor: color }}
+                                            title={color}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mt-2 flex flex-col gap-2">
+                            <label className="text-sm text-neutral-600 font-medium">Custom Color</label>
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="color"
+                                    value={canvasBg}
+                                    onChange={(e) => setCanvasBg(e.target.value)}
+                                    className="w-10 h-10 rounded cursor-pointer border-0 p-0"
+                                />
+                                <span className="text-sm text-neutral-700 uppercase font-mono">{canvasBg}</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'templates' && (
+                    <TemplatesTab
+                        setElements={setElements}
+                        setCanvasBg={setCanvasBg}
+                        setCanvasSize={setCanvasSize}
+                    />
+                )}
+
+                {activeTab === 'saved-assets' && (
+                    <SavedAssetsTab
+                        setElements={setElements}
+                        setCanvasBg={setCanvasBg}
+                        setCanvasSize={setCanvasSize}
+                    />
+                )}
+
+                {activeTab === 'layers' && (
+                    <div className="flex flex-col gap-2">
+                        {elements.length === 0 ? (
+                            <p className="text-sm text-neutral-500 italic">No elements on canvas.</p>
+                        ) : (
+                            [...elements].reverse().map((el, index) => {
+                                // Calculate actual index in original array
+                                const realIndex = elements.length - 1 - index;
+                                const isSelected = selectedIds.includes(el.id);
+
+                                const handleSelect = (e: React.MouseEvent) => {
+                                    const metaPressed = e.shiftKey || e.ctrlKey || e.metaKey;
+                                    if (metaPressed) {
+                                        if (isSelected) {
+                                            setSelectedIds(selectedIds.filter(id => id !== el.id));
+                                        } else {
+                                            setSelectedIds([...selectedIds, el.id]);
+                                        }
+                                    } else {
+                                        setSelectedIds([el.id]);
+                                    }
+                                };
+
+                                return (
+                                    <div
+                                        key={el.id}
+                                        onClick={handleSelect}
+                                        className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-neutral-200 bg-white hover:bg-neutral-50'}`}
+                                    >
+                                        <div className="flex items-center gap-3 overflow-hidden">
+                                            <div className="w-6 h-6 rounded bg-neutral-100 flex items-center justify-center shrink-0 border border-neutral-200">
+                                                {el.type === 'rect' && <div className="w-3 h-3 bg-neutral-400" />}
+                                                {el.type === 'circle' && <div className="w-3 h-3 bg-neutral-400 rounded-full" />}
+                                                {el.type === 'image' && <span className="text-[10px] text-neutral-500 font-bold">IMG</span>}
+                                                {el.type === 'text' && <span className="text-[10px] text-neutral-500 font-bold">T</span>}
+                                            </div>
+                                            <span className="text-xs font-medium text-neutral-700 truncate capitalize">
+                                                {el.type} {el.text ? `"${el.text}"` : ''}
+                                            </span>
+                                        </div>
+
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setElements(elements.filter(e => e.id !== el.id));
+                                                if (isSelected) setSelectedIds(selectedIds.filter(id => id !== el.id));
+                                            }}
+                                            className="p-1 text-neutral-400 hover:text-red-600 transition-colors"
+                                            title="Delete Layer"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
+                                        </button>
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'resize' && (
+                    <div className="flex flex-col gap-6">
+                        <div className="space-y-3">
+                            <label className="text-sm text-neutral-600 font-medium">Custom Size (px)</label>
+                            <div className="flex items-center gap-2">
+                                <div className="flex flex-col gap-1 flex-1">
+                                    <span className="text-xs text-neutral-400">Width</span>
+                                    <input
+                                        type="number"
+                                        value={canvasSize.width}
+                                        onChange={(e) => setCanvasSize({ ...canvasSize, width: Number(e.target.value) || 100 })}
+                                        className="w-full h-9 px-2 text-sm border rounded focus:outline-none focus:border-blue-500"
+                                        min={100}
+                                    />
+                                </div>
+                                <span className="text-neutral-400 pt-4">×</span>
+                                <div className="flex flex-col gap-1 flex-1">
+                                    <span className="text-xs text-neutral-400">Height</span>
+                                    <input
+                                        type="number"
+                                        value={canvasSize.height}
+                                        onChange={(e) => setCanvasSize({ ...canvasSize, height: Number(e.target.value) || 100 })}
+                                        className="w-full h-9 px-2 text-sm border rounded focus:outline-none focus:border-blue-500"
+                                        min={100}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            <label className="text-sm text-neutral-600 font-medium">Presets</label>
+                            <button
+                                onClick={() => setCanvasSize({ width: 1080, height: 1080 })}
+                                className="w-full p-2 text-left text-sm bg-neutral-50 hover:bg-neutral-100 rounded border border-neutral-200 transition-colors flex justify-between items-center"
+                            >
+                                <span>Instagram Post</span>
+                                <span className="text-xs text-neutral-400">1080 × 1080</span>
+                            </button>
+                            <button
+                                onClick={() => setCanvasSize({ width: 1920, height: 1080 })}
+                                className="w-full p-2 text-left text-sm bg-neutral-50 hover:bg-neutral-100 rounded border border-neutral-200 transition-colors flex justify-between items-center"
+                            >
+                                <span>YouTube Thumbnail</span>
+                                <span className="text-xs text-neutral-400">1920 × 1080</span>
+                            </button>
+                            <button
+                                onClick={() => setCanvasSize({ width: 1080, height: 1920 })}
+                                className="w-full p-2 text-left text-sm bg-neutral-50 hover:bg-neutral-100 rounded border border-neutral-200 transition-colors flex justify-between items-center"
+                            >
+                                <span>Story / Reel</span>
+                                <span className="text-xs text-neutral-400">1080 × 1920</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
