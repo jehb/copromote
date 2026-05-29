@@ -8,7 +8,7 @@ import { ProtectedRoute } from '@/components/layout/protected-route'
 export default async function SocialPage({
     searchParams
 }: {
-    searchParams: {
+    searchParams: Promise<{
         platform?: string,
         view?: 'table' | 'grid',
         status?: string,
@@ -16,7 +16,7 @@ export default async function SocialPage({
         endDate?: string,
         promotionPeriodId?: string,
         eventId?: string
-    }
+    }>
 }) {
     const params = await searchParams
     const {

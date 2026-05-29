@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-export default async function EditOrganizationPage({ params }: { params: { id: string } }) {
+export default async function EditOrganizationPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const [organization, contacts, externalBrands] = await Promise.all([
         getOrganization(id),

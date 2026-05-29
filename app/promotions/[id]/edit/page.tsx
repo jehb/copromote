@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 
-export default async function EditPromotionPage({ params }: { params: { id: string } }) {
+export default async function EditPromotionPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const promotion = await getPromotion(id)
 

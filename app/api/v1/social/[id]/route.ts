@@ -68,7 +68,7 @@ import { prisma } from "@/lib/db";
 import { validateApiKey } from "@/lib/api-auth";
 import { logActivity } from "@/app/actions/activity-logs";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { user, error } = await validateApiKey(req);
   if (error || !user) {
@@ -117,7 +117,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { user, error } = await validateApiKey(req);
   if (error || !user) {

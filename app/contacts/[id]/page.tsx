@@ -11,7 +11,7 @@ import { AuditInfo } from '@/components/common/audit-info'
 import { notFound } from 'next/navigation'
 import { format } from 'date-fns'
 
-export default async function ContactDetailPage({ params }: { params: { id: string } }) {
+export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
     const [contact, organizations, currentUser] = await Promise.all([
