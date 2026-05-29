@@ -10,7 +10,7 @@ import Link from 'next/link'
 export default async function NewOrganizationPage({
     searchParams
 }: {
-    searchParams: { primaryContactId?: string }
+    searchParams: Promise<{ primaryContactId?: string }>
 }) {
     const { primaryContactId } = await searchParams
     const [contacts, externalBrands] = await Promise.all([

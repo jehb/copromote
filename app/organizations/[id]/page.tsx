@@ -20,7 +20,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-export default async function OrganizationDetailPage({ params }: { params: { id: string } }) {
+export default async function OrganizationDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
     const [organization, allContacts, currentUser] = await Promise.all([

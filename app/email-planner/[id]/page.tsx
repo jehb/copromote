@@ -12,7 +12,7 @@ import { prisma } from '@/lib/prisma'
 import { getExternalProductsByUPCs } from '@/app/actions/external-db'
 import { getPhotos } from '@/app/actions/photos'
 
-export default async function EmailPlanDetailPage({ params }: { params: { id: string } }) {
+export default async function EmailPlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const { data: plan, success } = await getEmailPlan(id)
 

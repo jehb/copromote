@@ -25,7 +25,7 @@ import { TaskDialog } from '@/components/tasks/task-dialog'
 import { AuditInfo } from '@/components/common/audit-info'
 import { ProjectDeleteDialog } from '@/components/projects/project-delete-dialog'
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const [project, users, currentUser] = await Promise.all([
         getProject(id),

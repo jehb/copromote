@@ -8,7 +8,7 @@ import { ProtectedRoute } from '@/components/layout/protected-route'
 export default async function CalendarPage({
     searchParams,
 }: {
-    searchParams: { date?: string }
+    searchParams: Promise<{ date?: string }>
 }) {
     const dateStr = (await searchParams).date
     const events = await getCalendarEvents()

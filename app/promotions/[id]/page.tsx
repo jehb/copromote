@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Trash2, Link as LinkIcon, FileText, Image as ImageIcon, Video, ArrowLeft, Plus, Instagram, Facebook, Linkedin, Twitter, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 
-export default async function PromotionDetailPage({ params }: { params: { id: string } }) {
+export default async function PromotionDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const promotion = await getPromotion(id)
 
