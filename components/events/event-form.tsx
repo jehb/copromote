@@ -444,6 +444,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                             type="button"
                                             onClick={() => toggleContact(contact.id)}
                                             className="opacity-50 group-hover:opacity-100"
+                                            aria-label={`Remove contact ${contact.firstName} ${contact.lastName}`}
                                         >
                                             <X className="h-3 w-3" />
                                         </button>
@@ -535,6 +536,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                             type="button"
                                             onClick={() => toggleOrg(org.id)}
                                             className="opacity-50 group-hover:opacity-100"
+                                            aria-label={`Remove organization ${org.name}`}
                                         >
                                             <X className="h-3 w-3" />
                                         </button>
@@ -576,6 +578,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                                     type="button"
                                                     onClick={() => removeProduct(upc)}
                                                     className="opacity-50 hover:text-red-600 hover:opacity-100 transition-colors"
+                                                    aria-label={`Remove product ${fullProduct ? fullProduct.name : upc}`}
                                                 >
                                                     <X className="h-3 w-3" />
                                                 </button>

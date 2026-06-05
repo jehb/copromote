@@ -147,9 +147,7 @@ describe('EventForm', () => {
         expect(screen.getByText(/Jane Smith/)).toBeInTheDocument()
 
         // Remove Jane
-        const removeBtns = screen.getAllByRole('button', { hidden: true })
-        const removeJane = removeBtns.find(b => b.innerHTML.includes('lucide-x') && b.closest('.bg-white')?.textContent?.includes('Jane Smith'))
-        if (removeJane) await user.click(removeJane)
+        await user.click(screen.getByRole('button', { name: /Remove contact Jane Smith/i }))
         
         expect(screen.queryByText(/Jane Smith/)).not.toBeInTheDocument()
     })
@@ -173,11 +171,7 @@ describe('EventForm', () => {
         expect(screen.getByText(/Org 2/)).toBeInTheDocument()
 
         // Remove Org
-        const orgText = screen.getByText(/Org 2/)
-        if (orgText && orgText.parentElement) {
-            const removeOrg = orgText.parentElement.querySelector('button')
-            if (removeOrg) fireEvent.click(removeOrg)
-        }
+        await user.click(screen.getByRole('button', { name: /Remove organization Org 2/i }))
         
         expect(screen.queryByText(/Org 2/)).not.toBeInTheDocument()
     })
@@ -196,11 +190,7 @@ describe('EventForm', () => {
         await user.click(screen.getByTestId('mock-product-selector'))
 
         // Remove product
-        const productText = screen.getByText(/Product 1/)
-        if (productText && productText.parentElement) {
-            const removeProduct = productText.parentElement.querySelector('button')
-            if (removeProduct) fireEvent.click(removeProduct)
-        }
+        await user.click(screen.getByRole('button', { name: /Remove product Product 1/i }))
         
         expect(screen.queryByText(/Product 1/)).not.toBeInTheDocument()
     })
