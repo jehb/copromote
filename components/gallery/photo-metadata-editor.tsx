@@ -129,6 +129,7 @@ export function PhotoMetadataEditor({
                                 <button
                                     className="ml-1 hover:text-red-500 focus:outline-none"
                                     onClick={() => setTags(tags.filter(t => t.id !== tag.id))}
+                                    aria-label={`Remove ${tag.name} tag`}
                                 >
                                     <X className="h-3 w-3" />
                                 </button>
