@@ -16,12 +16,13 @@ export async function getExportData(entities: string[]) {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
     const data: Record<string, any[]> = {}
+    const promises: Promise<void>[] = []
 
     if (entities.includes('contacts')) {
-        const contacts = await prisma.contact.findMany({
+        promises.push(prisma.contact.findMany({
             include: { organization: true }
-        })
-        data.contacts = contacts.map(c => ({
+        }).then(contacts => {
+            data.contacts = contacts.map(c => ({
             ID: c.id,
             'First Name': c.firstName,
             'Last Name': c.lastName,
@@ -34,13 +35,14 @@ export async function getExportData(entities: string[]) {
             Organization: c.organization?.name || '',
             'Created At': formatDate(c.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('organizations')) {
-        const orgs = await prisma.organization.findMany({
+        promises.push(prisma.organization.findMany({
             include: { primaryContact: true }
-        })
-        data.organizations = orgs.map(o => ({
+        }).then(orgs => {
+            data.organizations = orgs.map(o => ({
             ID: o.id,
             Name: o.name,
             Category: o.category,
@@ -49,13 +51,14 @@ export async function getExportData(entities: string[]) {
             'Primary Contact': o.primaryContact ? `${o.primaryContact.firstName} ${o.primaryContact.lastName}` : '',
             'Created At': formatDate(o.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('events')) {
-        const events = await prisma.event.findMany({
+        promises.push(prisma.event.findMany({
             include: { location: true, primaryContact: true }
-        })
-        data.events = events.map(e => ({
+        }).then(events => {
+            data.events = events.map(e => ({
             ID: e.id,
             Title: e.title,
             Description: e.description || '',
@@ -65,13 +68,14 @@ export async function getExportData(entities: string[]) {
             'Primary Contact': e.primaryContact ? e.primaryContact.name : '',
             'Created At': formatDate(e.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('tasks')) {
-        const tasks = await prisma.task.findMany({
+        promises.push(prisma.task.findMany({
             include: { assignee: true, project: true }
-        })
-        data.tasks = tasks.map(t => ({
+        }).then(tasks => {
+            data.tasks = tasks.map(t => ({
             ID: t.id,
             Title: t.title,
             Description: t.description || '',
@@ -81,11 +85,12 @@ export async function getExportData(entities: string[]) {
             Project: t.project?.name || '',
             'Created At': formatDate(t.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('projects')) {
-        const projects = await prisma.project.findMany()
-        data.projects = projects.map(p => ({
+        promises.push(prisma.project.findMany().then(projects => {
+            data.projects = projects.map(p => ({
             ID: p.id,
             Name: p.name,
             Description: p.description || '',
@@ -94,11 +99,12 @@ export async function getExportData(entities: string[]) {
             'End Date': formatDate(p.endDate),
             'Created At': formatDate(p.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('hyperlinks')) {
-        const hyperlinks = await prisma.hyperlink.findMany()
-        data.hyperlinks = hyperlinks.map(h => ({
+        promises.push(prisma.hyperlink.findMany().then(hyperlinks => {
+            data.hyperlinks = hyperlinks.map(h => ({
             ID: h.id,
             Title: h.title,
             URL: h.url,
@@ -106,11 +112,12 @@ export async function getExportData(entities: string[]) {
             Icon: h.icon || '',
             'Created At': formatDate(h.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('social-posts')) {
-        const socialPosts = await prisma.socialPost.findMany()
-        data['social-posts'] = socialPosts.map(p => ({
+        promises.push(prisma.socialPost.findMany().then(socialPosts => {
+            data['social-posts'] = socialPosts.map(p => ({
             ID: p.id,
             Content: p.content,
             Platform: p.platform,
@@ -118,11 +125,12 @@ export async function getExportData(entities: string[]) {
             'Scheduled Date': formatDate(p.scheduledDate),
             'Created At': formatDate(p.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('promotions')) {
-        const promotions = await prisma.promotionPeriod.findMany()
-        data.promotions = promotions.map(p => ({
+        promises.push(prisma.promotionPeriod.findMany().then(promotions => {
+            data.promotions = promotions.map(p => ({
             ID: p.id,
             Name: p.name,
             'Start Date': formatDate(p.startDate),
@@ -132,24 +140,26 @@ export async function getExportData(entities: string[]) {
             'Ad Publishing Deadline': formatDate(p.adPublishingDeadline),
             'Created At': formatDate(p.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('email-plans')) {
-        const plans = await prisma.emailPlan.findMany()
-        data['email-plans'] = plans.map(p => ({
+        promises.push(prisma.emailPlan.findMany().then(plans => {
+            data['email-plans'] = plans.map(p => ({
             ID: p.id,
             Subject: p.subject,
             'Send Date': formatDate(p.sendDate),
             Notes: p.notes || '',
             'Created At': formatDate(p.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('email-items')) {
-        const items = await prisma.emailItem.findMany({
+        promises.push(prisma.emailItem.findMany({
             include: { plan: true }
-        })
-        data['email-items'] = items.map(i => ({
+        }).then(items => {
+            data['email-items'] = items.map(i => ({
             ID: i.id,
             Title: i.title,
             Description: i.description || '',
@@ -157,11 +167,12 @@ export async function getExportData(entities: string[]) {
             Order: i.order,
             'Created At': formatDate(i.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('users')) {
-        const users = await prisma.user.findMany()
-        data.users = users.map(u => ({
+        promises.push(prisma.user.findMany().then(users => {
+            data.users = users.map(u => ({
             ID: u.id,
             Name: u.name,
             Email: u.email,
@@ -170,11 +181,12 @@ export async function getExportData(entities: string[]) {
             'Must Change Password': u.mustChangePassword ? 'Yes' : 'No',
             'Created At': formatDate(u.createdAt)
         }))
+        }))
     }
 
     if (entities.includes('color-palettes')) {
-        const palettes = await prisma.colorPalette.findMany()
-        data['color-palettes'] = palettes.map(p => {
+        promises.push(prisma.colorPalette.findMany().then(palettes => {
+            data['color-palettes'] = palettes.map(p => {
             let parsedColors = p.colors;
             if (typeof p.colors === 'string') {
                 try {
@@ -192,7 +204,10 @@ export async function getExportData(entities: string[]) {
                 'Created At': formatDate(p.createdAt)
             }
         })
+        }))
     }
+
+    await Promise.all(promises)
 
     return data
 }
