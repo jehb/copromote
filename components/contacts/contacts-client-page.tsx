@@ -196,7 +196,7 @@ export function ContactsClientPage({ initialContacts }: ContactsClientPageProps)
                                         <TableCell className="text-right pr-6">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900 hover:bg-slate-200/50 transition-all rounded-full">
+                                                    <Button variant="ghost" size="icon" aria-label="Contact options" className="h-8 w-8 text-slate-400 hover:text-slate-900 hover:bg-slate-200/50 transition-all rounded-full">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
