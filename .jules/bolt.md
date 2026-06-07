@@ -11,3 +11,7 @@ Improvement: ~50% faster with simulated latency.
 ## 2026-05-18 - Concurrent API Calls for External Services (Immich untagAssets)
 **Learning:** The Immich SDK `untagAssets` method only supports removing a single tag at a time, leading to sequential O(N) network requests when an asset has multiple tags removed in `updateTagsOnImmichAsset`. A `for...of` loop awaiting each API call creates a significant network bottleneck.
 **Action:** When a service or SDK lacks a native bulk-removal method, map the independent network operations to Promises and use batched/chunked `Promise.all` to execute them concurrently, drastically reducing the overall latency from `O(N * network_latency)` to approximately `O(1 * network_latency)` when executing within connection pool limits.
+
+## 2026-05-18 - Concurrent API Calls for Page Loads (Social Post Creation)
+**Learning:** Sequential `await` statements in Next.js Server Components create a waterfall network effect, where independent data fetching logic is unnecessarily blocked by the prior call. In this instance, fetching `getPromotions`, `getUsers`, `getEvents`, and `getAvailablePlatforms` individually caused additive page load latencies.
+**Action:** When a Next.js Server Component or Action requires data from multiple independent sources, consolidate the asynchronous calls within `await Promise.all([...])` to resolve them concurrently, bound only by the slowest query rather than the sum of all queries.
