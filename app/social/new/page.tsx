@@ -9,10 +9,14 @@ import { ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function NewPostPage() {
-    const promotions = await getPromotions()
-    const users = await getUsers()
-    const events = await getEvents()
-    const platforms = await getAvailablePlatforms()
+    // Performance optimization: Execute independent data fetches concurrently
+    // to avoid sequential waterfall delays and reduce total page load latency.
+    const [promotions, users, events, platforms] = await Promise.all([
+        getPromotions(),
+        getUsers(),
+        getEvents(),
+        getAvailablePlatforms()
+    ])
 
     return (
         <div className="p-8 max-w-2xl mx-auto space-y-8">
