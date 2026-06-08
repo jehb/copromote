@@ -15,3 +15,7 @@ Improvement: ~50% faster with simulated latency.
 ## 2026-05-18 - Concurrent API Calls for Page Loads (Social Post Creation)
 **Learning:** Sequential `await` statements in Next.js Server Components create a waterfall network effect, where independent data fetching logic is unnecessarily blocked by the prior call. In this instance, fetching `getPromotions`, `getUsers`, `getEvents`, and `getAvailablePlatforms` individually caused additive page load latencies.
 **Action:** When a Next.js Server Component or Action requires data from multiple independent sources, consolidate the asynchronous calls within `await Promise.all([...])` to resolve them concurrently, bound only by the slowest query rather than the sum of all queries.
+
+## 2026-05-18 - Concurrent Context Lookups in Regex Loops
+**Learning:** Performing `await prisma.[model].findUnique` queries directly inside a `while (regex.exec(text))` loop (e.g., in `getChatContext` for chat mentions) leads to an N+1 performance bottleneck. Each query must complete sequentially before the next iteration can process the subsequent mention, causing unnecessary accumulated network latency.
+**Action:** When extracting multiple entities via regex loops, avoid blocking `await` statements inside the loop. Instead, collect the asynchronous query operations as Promises into an array (`fetchPromises.push((async () => { ... })())`) and resolve them concurrently after the loop using `await Promise.all(fetchPromises)`, reducing O(N) sequential latency to O(1) concurrent latency.

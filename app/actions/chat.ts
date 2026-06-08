@@ -23,6 +23,7 @@ async function getChatContext(text: string) {
     let match
 
     const processedIds = new Set<string>()
+    const fetchPromises: Promise<void>[] = []
 
     while ((match = mentionRegex.exec(text)) !== null) {
         const type = match[1].toLowerCase()
@@ -31,35 +32,41 @@ async function getChatContext(text: string) {
         if (processedIds.has(id)) continue
         processedIds.add(id)
 
-        try {
-            if (type === 'event') {
-                const event = await prisma.event.findUnique({
-                    where: { id },
-                    include: { location: true }
-                })
-                if (event) {
-                    contextLines.push(`EVENT CONTEXT: Title: ${event.title}, Start: ${event.startTime}, End: ${event.endTime}, Location: ${event.location.name}, Description: ${event.description || 'N/A'}`)
+        const fetchPromise = (async () => {
+            try {
+                if (type === 'event') {
+                    const event = await prisma.event.findUnique({
+                        where: { id },
+                        include: { location: true }
+                    })
+                    if (event) {
+                        contextLines.push(`EVENT CONTEXT: Title: ${event.title}, Start: ${event.startTime}, End: ${event.endTime}, Location: ${event.location.name}, Description: ${event.description || 'N/A'}`)
+                    }
+                } else if (type === 'task') {
+                    const task = await prisma.task.findUnique({
+                        where: { id },
+                        include: { assignee: true }
+                    })
+                    if (task) {
+                        contextLines.push(`TASK CONTEXT: Title: ${task.title}, Status: ${task.status}, Due: ${task.dueDate || 'N/A'}, Assignee: ${task.assignee?.name || 'Unassigned'}, Description: ${task.description || 'N/A'}`)
+                    }
+                } else if (type === 'promotion') {
+                    const promo = await prisma.promotionPeriod.findUnique({
+                        where: { id }
+                    })
+                    if (promo) {
+                        contextLines.push(`PROMOTION CONTEXT: Name: ${promo.name}, Start: ${promo.startDate}, End: ${promo.endDate}, Ad Live: ${promo.adLiveDate || 'N/A'}`)
+                    }
                 }
-            } else if (type === 'task') {
-                const task = await prisma.task.findUnique({
-                    where: { id },
-                    include: { assignee: true }
-                })
-                if (task) {
-                    contextLines.push(`TASK CONTEXT: Title: ${task.title}, Status: ${task.status}, Due: ${task.dueDate || 'N/A'}, Assignee: ${task.assignee?.name || 'Unassigned'}, Description: ${task.description || 'N/A'}`)
-                }
-            } else if (type === 'promotion') {
-                const promo = await prisma.promotionPeriod.findUnique({
-                    where: { id }
-                })
-                if (promo) {
-                    contextLines.push(`PROMOTION CONTEXT: Name: ${promo.name}, Start: ${promo.startDate}, End: ${promo.endDate}, Ad Live: ${promo.adLiveDate || 'N/A'}`)
-                }
+            } catch (err) {
+                console.error(`Error fetching context for ${type}:${id}`, err)
             }
-        } catch (err) {
-            console.error(`Error fetching context for ${type}:${id}`, err)
-        }
+        })()
+
+        fetchPromises.push(fetchPromise)
     }
+
+    await Promise.all(fetchPromises)
 
     return contextLines.join('\n')
 }
