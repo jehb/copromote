@@ -38,7 +38,7 @@ describe('ProjectDeleteDialog', () => {
     it('renders icon variant by default', () => {
         render(<ProjectDeleteDialog projectId="p-1" projectName="Test Project" />)
         // Since variant="icon" is default, the button has ghost variant. The SVG child is present.
-        const button = screen.getByRole('button')
+        const button = screen.getByRole('button', { name: /delete project/i })
         expect(button).toHaveClass('h-8', 'w-8') // typical icon size classes in variant
     })
 
@@ -51,7 +51,7 @@ describe('ProjectDeleteDialog', () => {
         const user = userEvent.setup()
         render(<ProjectDeleteDialog projectId="p-1" projectName="Test Project" />)
         
-        await user.click(screen.getByRole('button'))
+        await user.click(screen.getByRole('button', { name: /delete project/i }))
         
         expect(screen.getByRole('alertdialog')).toBeInTheDocument()
         expect(screen.getByText(/Are you absolutely sure/i)).toBeInTheDocument()
@@ -63,7 +63,7 @@ describe('ProjectDeleteDialog', () => {
         ;(deleteProject as jest.Mock).mockResolvedValue(undefined)
         
         render(<ProjectDeleteDialog projectId="p-1" projectName="Test Project" />)
-        await user.click(screen.getByRole('button'))
+        await user.click(screen.getByRole('button', { name: /delete project/i }))
         
         const confirmBtn = screen.getByRole('button', { name: /delete project/i })
         
@@ -82,7 +82,7 @@ describe('ProjectDeleteDialog', () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         
         render(<ProjectDeleteDialog projectId="p-1" projectName="Test Project" />)
-        await user.click(screen.getByRole('button'))
+        await user.click(screen.getByRole('button', { name: /delete project/i }))
         
         const confirmBtn = screen.getByRole('button', { name: /delete project/i })
         
