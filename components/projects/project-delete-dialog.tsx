@@ -45,7 +45,7 @@ export function ProjectDeleteDialog({ projectId, projectName, variant = 'icon', 
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 {variant === 'icon' ? (
-                    <Button variant="ghost" size="icon" className={className || "h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"}>
+                    <Button variant="ghost" size="icon" aria-label="Delete Project" title="Delete Project" className={className || "h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"}>
                         <Trash2 className="h-4 w-4" />
                     </Button>
                 ) : (
