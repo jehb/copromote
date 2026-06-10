@@ -14,9 +14,8 @@ import { EditUserDialog } from './edit-user-dialog'
 export const dynamic = 'force-dynamic'
 
 export default async function UsersPage() {
-    const users = await getUsers()
-    const contacts = await getContacts()
-    const roles = await getRoles()
+    // ⚡ Bolt: Execute independent data fetching concurrently to improve TTFB
+    const [users, contacts, roles] = await Promise.all([getUsers(), getContacts(), getRoles()])
 
     return (
         <div className="p-8 space-y-8">
