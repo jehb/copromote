@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import {
@@ -27,6 +27,16 @@ interface EventCalendarViewProps {
 
 export function EventCalendarView({ events }: EventCalendarViewProps) {
     const [currentDate, setCurrentDate] = useState(new Date())
+
+    // ⚡ Bolt: Pre-compute event lookups by day to eliminate O(N*D) filtering overhead during calendar render
+    const eventsByDate = useMemo(() => {
+        return events.reduce((acc, event) => {
+            const dateStr = format(new Date(event.startTime), 'yyyy-MM-dd')
+            if (!acc[dateStr]) acc[dateStr] = []
+            acc[dateStr].push(event)
+            return acc
+        }, {} as Record<string, any[]>)
+    }, [events])
 
     const monthStart = startOfMonth(currentDate)
     const monthEnd = endOfMonth(currentDate)
@@ -85,7 +95,7 @@ export function EventCalendarView({ events }: EventCalendarViewProps) {
             <div className="flex-1 grid grid-cols-7 grid-rows-6 auto-rows-fr">
                 {calendarDays.map((day, idx) => {
                     const isCurrentMonth = format(day, 'M') === format(currentDate, 'M')
-                    const dayEvents = events.filter(e => isSameDay(new Date(e.startTime), day))
+                    const dayEvents = eventsByDate[format(day, 'yyyy-MM-dd')] || []
 
                     return (
                         <div

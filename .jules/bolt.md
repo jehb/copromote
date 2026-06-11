@@ -19,3 +19,7 @@ Improvement: ~50% faster with simulated latency.
 ## 2026-05-18 - Concurrent Context Lookups in Regex Loops
 **Learning:** Performing `await prisma.[model].findUnique` queries directly inside a `while (regex.exec(text))` loop (e.g., in `getChatContext` for chat mentions) leads to an N+1 performance bottleneck. Each query must complete sequentially before the next iteration can process the subsequent mention, causing unnecessary accumulated network latency.
 **Action:** When extracting multiple entities via regex loops, avoid blocking `await` statements inside the loop. Instead, collect the asynchronous query operations as Promises into an array (`fetchPromises.push((async () => { ... })())`) and resolve them concurrently after the loop using `await Promise.all(fetchPromises)`, reducing O(N) sequential latency to O(1) concurrent latency.
+
+## 2026-05-18 - Avoid O(N*D) Filtering in UI Render Loops
+**Learning:** Running an O(N) array filter inside a UI rendering loop (e.g., iterating over 42 days in a calendar view and filtering the events array for each day) creates an O(N * D) rendering bottleneck. As the number of events grows, this causes significant UI lag when components re-render or parameters change.
+**Action:** When mapping over items that require correlated data, pre-compute an O(1) lookup map or grouped dictionary outside the loop using `useMemo`. This reduces the overall rendering complexity from O(N * D) to O(N + D), preventing CPU blockages on the main thread.
