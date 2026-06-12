@@ -57,6 +57,20 @@ export function CalendarView({
         })
     }, [initialEvents, filters])
 
+    // ⚡ Bolt: Pre-compute O(1) lookup map to avoid O(N*D) filtering in render loop
+    const eventsByDate = useMemo(() => {
+        const map = new Map<string, EventItem[]>()
+        filteredEvents.forEach(event => {
+            if (!event.date) return
+            const d = typeof event.date === 'string' ? new Date(event.date) : event.date
+            const key = `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`
+            const existing = map.get(key) || []
+            existing.push(event)
+            map.set(key, existing)
+        })
+        return map
+    }, [filteredEvents])
+
     return (
         <div className="h-full flex gap-6">
             {/* Sidebar Filters */}
@@ -164,7 +178,8 @@ export function CalendarView({
                     ))}
 
                     {days.map(day => {
-                        const dayEvents = filteredEvents.filter(e => isSameDayUTC(e.date, day))
+                        const dayKey = `${day.getUTCFullYear()}-${day.getUTCMonth()}-${day.getUTCDate()}`
+                        const dayEvents = eventsByDate.get(dayKey) || []
                         return (
                             <div
                                 key={day.toISOString()}
