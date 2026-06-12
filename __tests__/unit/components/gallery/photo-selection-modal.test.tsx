@@ -13,13 +13,15 @@ describe('PhotoSelectionModal', () => {
     const mockPhotos = [
         { id: 'p1', name: 'Photo One', url: 'https://test.com/1.jpg', tags: [{ id: 't1', name: 'Nature' }] },
         { id: 'p2', name: 'Photo Two', url: 'https://test.com/2.jpg', tags: [{ id: 't2', name: 'City' }] },
-        { id: 'p3', name: 'Another Pic', url: 'https://test.com/3.jpg', tags: [{ id: 't1', name: 'Nature' }, { id: 't3', name: 'People' }] }
+        { id: 'p3', name: 'Another Pic', url: 'https://test.com/3.jpg', tags: [{ id: 't1', name: 'Nature' }, { id: 't3', name: 'People' }] },
+        { id: 'p4', name: '', url: 'https://test.com/4.jpg', tags: [{ id: 't4', name: 'Colorless' }] }
     ]
 
     const mockTags = [
         { id: 't1', name: 'Nature', color: '#00ff00' },
         { id: 't2', name: 'City', color: '#ff0000' },
-        { id: 't3', name: 'People', color: '#0000ff' }
+        { id: 't3', name: 'People', color: '#0000ff' },
+        { id: 't4', name: 'Colorless', color: '' }
     ]
 
     const mockOnSelect = jest.fn()
@@ -125,6 +127,53 @@ describe('PhotoSelectionModal', () => {
         await userEvent.click(screen.getByRole('button', { name: 'Confirm Selection' }))
 
         expect(mockOnSelect).toHaveBeenCalledWith(['p2'])
+    })
+
+
+
+    it('filters photos by tag search', async () => {
+        render(<PhotoSelectionModal selectedPhotoIds={[]} onSelect={mockOnSelect} />)
+        await userEvent.click(screen.getByRole('button', { name: /Add from Gallery/i }))
+        await waitFor(() => {
+            expect(screen.getByText('Photo One')).toBeInTheDocument()
+        })
+
+        const searchInput = screen.getByPlaceholderText('Tag or name...')
+        await userEvent.type(searchInput, 'City')
+
+        expect(screen.queryByText('Photo One')).not.toBeInTheDocument()
+        expect(screen.getByText('Photo Two')).toBeInTheDocument()
+        expect(screen.queryByText('Another Pic')).not.toBeInTheDocument()
+    })
+
+    it('cancels selection and closes modal', async () => {
+        render(<PhotoSelectionModal selectedPhotoIds={['p1']} onSelect={mockOnSelect} />)
+        await userEvent.click(screen.getByRole('button', { name: /Add from Gallery/i }))
+        await waitFor(() => {
+            expect(screen.getByText('Photo One')).toBeInTheDocument()
+        })
+
+        const photoTwoCard = screen.getByText('Photo Two').closest('div.border-2')
+        await userEvent.click(photoTwoCard!)
+        expect(screen.getByText('2 photos selected')).toBeInTheDocument()
+
+        await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+        expect(mockOnSelect).not.toHaveBeenCalled()
+
+        await userEvent.click(screen.getByRole('button', { name: /Add from Gallery/i }))
+        await waitFor(() => {
+            expect(screen.getByText('1 photo selected')).toBeInTheDocument()
+        })
+    })
+
+    it('handles photos without a name and tags without a color', async () => {
+        render(<PhotoSelectionModal selectedPhotoIds={[]} onSelect={mockOnSelect} />)
+        await userEvent.click(screen.getByRole('button', { name: /Add from Gallery/i }))
+        await waitFor(() => {
+            expect(screen.getByText('Untitled')).toBeInTheDocument()
+            expect(screen.getByAltText('Photo')).toBeInTheDocument()
+            expect(screen.getByRole('button', { name: 'Colorless' })).toBeInTheDocument()
+        })
     })
 
     it('handles api failure gracefully', async () => {
