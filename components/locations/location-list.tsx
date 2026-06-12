@@ -9,11 +9,16 @@ import { toast } from 'sonner'
 
 export function LocationList({ locations }: { locations: any[] }) {
     async function handleDelete(id: string) {
-        const result = await deleteLocation(id)
-        if (result.success) {
-            toast.success('Location deleted')
-        } else {
-            toast.error(result.message || 'Failed to delete location')
+        try {
+            const result = await deleteLocation(id)
+            if (result.success) {
+                toast.success('Location deleted')
+            } else {
+                toast.error(result.message || 'Failed to delete location')
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('An unexpected error occurred.')
         }
     }
 
