@@ -78,6 +78,26 @@ describe('ContactForm', () => {
         expect(formData.get('lastName')).toBe('Smith')
     })
 
+    it('sets saving state on submission', async () => {
+        const actionMock = jest.fn()
+        // We'll mock the action to not resolve immediately so we can see the saving state
+        render(<ContactForm organizations={mockOrganizations} action={actionMock} />)
+
+        const submitBtn = screen.getByRole('button', { name: /create contact/i })
+
+        // Required fields
+        await userEvent.type(screen.getByLabelText('First Name'), 'Jane')
+        await userEvent.type(screen.getByLabelText('Last Name'), 'Smith')
+
+        // Use userEvent or fireEvent to trigger form submission.
+        // A click on a submit button will bubble up as a submit event to the form.
+        await userEvent.click(submitBtn)
+
+        // After submit, the button should show "Saving..."
+        expect(screen.getByRole('button', { name: /saving/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /saving/i })).toBeDisabled()
+    })
+
     it('calls history.back on cancel', async () => {
         const actionMock = jest.fn()
         render(<ContactForm organizations={mockOrganizations} action={actionMock} />)
