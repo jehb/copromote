@@ -35,6 +35,15 @@ const mockPhotos = [
         updatedAt: '2023-10-11T10:00:00.000Z',
         description: 'City skyline',
         tags: [mockTags[1]]
+    },
+    {
+        id: 'photo3',
+        url: 'http://example.com/photo3.jpg',
+        name: '', // Empty name to test fallback
+        createdAt: '2023-10-12T10:00:00.000Z',
+        updatedAt: '2023-10-12T10:00:00.000Z',
+        description: 'Unknown location',
+        tags: [{ id: 'tag3', name: 'Unknown', color: '#ff0000' }]
     }
 ]
 
@@ -51,25 +60,18 @@ describe('GalleryClient', () => {
         
         expect(screen.getByText('Forest')).toBeInTheDocument()
         expect(screen.getByText('Skyline')).toBeInTheDocument()
+        expect(screen.getByText('Untitled Photo')).toBeInTheDocument()
         
         // Grid view specific element, card titles are rendered
         const images = screen.getAllByRole('img')
-        expect(images.length).toBe(2)
+        expect(images.length).toBe(3)
     })
 
     it('can toggle to table view', async () => {
         render(<GalleryClient initialPhotos={mockPhotos} tags={mockTags} />)
         
-        // Click table view button (it's the second button in the toggle group, so we can find it by its icon)
-        // Let's find the button with the List icon
-        const tableViewButton = screen.getAllByRole('button').find(b => b.innerHTML.includes('lucide-list'))
-        if (tableViewButton) {
-            await userEvent.click(tableViewButton)
-        } else {
-            // Fallback for RTL
-            const buttons = screen.getAllByRole('button')
-            await userEvent.click(buttons[2]) // Assuming 0: Upload, 1: Grid, 2: Table
-        }
+        const tableViewButton = screen.getByRole('button', { name: /Table view/i })
+        await userEvent.click(tableViewButton)
 
         expect(screen.getByRole('table')).toBeInTheDocument()
         expect(screen.getByText('A beautiful forest')).toBeInTheDocument()
@@ -97,13 +99,28 @@ describe('GalleryClient', () => {
         expect(screen.getByText('Skyline')).toBeInTheDocument()
         // Should hide Forest photo
         expect(screen.queryByText('Forest')).not.toBeInTheDocument()
+        // Should hide empty name photo
+        expect(screen.queryByText('Untitled Photo')).not.toBeInTheDocument()
+    })
+
+    it('filters photos by search query matching tag when photo name is null/empty', async () => {
+        render(<GalleryClient initialPhotos={mockPhotos} tags={mockTags} />)
+
+        const searchInput = screen.getByPlaceholderText(/find by tag or name/i)
+        await userEvent.type(searchInput, 'Unknown')
+
+        // Should show empty name photo (it has "Untitled Photo" as fallback title)
+        expect(screen.getByText('Untitled Photo')).toBeInTheDocument()
+        // Should hide other photos
+        expect(screen.queryByText('Forest')).not.toBeInTheDocument()
+        expect(screen.queryByText('Skyline')).not.toBeInTheDocument()
     })
 
     it('handles photo deletion', async () => {
         render(<GalleryClient initialPhotos={mockPhotos} tags={mockTags} />)
         
         // Delete button is rendered over the image in grid view
-        const deleteButtons = screen.getAllByRole('button').filter(b => b.innerHTML.includes('lucide-trash'))
+        const deleteButtons = screen.getAllByRole('button', { name: /Delete photo/i })
         await userEvent.click(deleteButtons[0])
         
         expect(window.confirm).toHaveBeenCalled()
@@ -114,7 +131,7 @@ describe('GalleryClient', () => {
         window.confirm = jest.fn(() => false)
         render(<GalleryClient initialPhotos={mockPhotos} tags={mockTags} />)
         
-        const deleteButtons = screen.getAllByRole('button').filter(b => b.innerHTML.includes('lucide-trash'))
+        const deleteButtons = screen.getAllByRole('button', { name: /Delete photo/i })
         await userEvent.click(deleteButtons[0])
         
         expect(window.confirm).toHaveBeenCalled()
@@ -128,5 +145,26 @@ describe('GalleryClient', () => {
         await userEvent.type(searchInput, 'NonExistent')
         
         expect(screen.getByText('No photos found')).toBeInTheDocument()
+    })
+
+    it('handles deletion error', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {})
+
+        const testError = new Error('Delete failed');
+        (deletePhoto as jest.Mock).mockRejectedValueOnce(testError)
+
+        render(<GalleryClient initialPhotos={mockPhotos} tags={mockTags} />)
+
+        const deleteButtons = screen.getAllByRole('button', { name: /Delete photo/i })
+        await userEvent.click(deleteButtons[0])
+
+        await waitFor(() => {
+            expect(consoleSpy).toHaveBeenCalledWith(testError)
+        })
+        expect(alertSpy).toHaveBeenCalledWith('Failed to delete photo')
+
+        consoleSpy.mockRestore()
+        alertSpy.mockRestore()
     })
 })
