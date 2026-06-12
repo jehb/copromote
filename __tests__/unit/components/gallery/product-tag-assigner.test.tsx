@@ -75,6 +75,19 @@ describe('ProductTagAssigner', () => {
         })
     })
 
+    it('handles assignment error without message', async () => {
+        ;(assignProductTagToPhoto as jest.Mock).mockRejectedValue({})
+
+        render(<ProductTagAssigner photoId="photo-1" existingUpcs={[]} />)
+
+        const selector = screen.getByTestId('mock-product-selector')
+        await userEvent.click(selector)
+
+        await waitFor(() => {
+            expect(toast.error).toHaveBeenCalledWith('There was a problem tagging this photo.')
+        })
+    })
+
     it('shows loading state while assigning', async () => {
         // Delay resolution to check loading state
         let resolvePromise: (value: any) => void
