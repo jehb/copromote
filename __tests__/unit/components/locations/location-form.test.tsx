@@ -20,12 +20,15 @@ jest.mock('sonner', () => ({
 // Mock react-dom functions used in SubmitButton
 jest.mock('react-dom', () => ({
     ...jest.requireActual('react-dom'),
-    useFormStatus: () => ({ pending: false })
+    useFormStatus: jest.fn(() => ({ pending: false }))
 }))
+
+import { useFormStatus } from 'react-dom'
 
 describe('LocationForm', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        ;(useFormStatus as jest.Mock).mockReturnValue({ pending: false })
     })
 
     it('renders Add Location button initially', () => {
@@ -113,6 +116,32 @@ describe('LocationForm', () => {
         await waitFor(() => {
             expect(screen.getByText('Invalid name')).toBeInTheDocument()
         })
+    })
+
+    it('displays default error message on failed submission without specific message', async () => {
+        (createLocation as jest.Mock).mockResolvedValue({ success: false })
+        render(<LocationForm />)
+
+        await userEvent.click(screen.getByRole('button', { name: /Add Location/i }))
+        await userEvent.type(screen.getByLabelText(/Name/), 'Room')
+
+        const form = screen.getByRole('button', { name: 'Save Location' }).closest('form')
+        fireEvent.submit(form!)
+
+        await waitFor(() => {
+            expect(screen.getByText('Failed to save location.')).toBeInTheDocument()
+        })
+    })
+
+    it('displays Saving... and disables button when form is pending', async () => {
+        ;(useFormStatus as jest.Mock).mockReturnValue({ pending: true })
+        render(<LocationForm />)
+
+        await userEvent.click(screen.getByRole('button', { name: /Add Location/i }))
+
+        const submitButton = screen.getByRole('button', { name: 'Saving...' })
+        expect(submitButton).toBeInTheDocument()
+        expect(submitButton).toBeDisabled()
     })
 
     it('displays unexpected error message on thrown exception', async () => {
