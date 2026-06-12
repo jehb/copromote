@@ -36,7 +36,7 @@ export function DeleteRoleDialog({ roleName }: { roleName: string }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-red-500 rounded-full" title="Delete role">
+                <Button variant="ghost" size="icon" aria-label="Delete role" className="h-6 w-6 text-muted-foreground hover:text-red-500 rounded-full" title="Delete role">
                     <Trash2 className="h-3 w-3" />
                 </Button>
             </DialogTrigger>
