@@ -9,13 +9,13 @@ jest.mock('lucide-react', () => {
         ...actual,
         icons: {
             ...actual.icons,
-            Twitter: () => <div data-testid="icon-twitter" />,
-            Github: () => <div data-testid="icon-github" />,
+            Twitter: (props: any) => <div data-testid="icon-twitter" {...props} />,
+            Github: (props: any) => <div data-testid="icon-github" {...props} />,
         },
-        Twitter: () => <div data-testid="icon-twitter" />,
-        Github: () => <div data-testid="icon-github" />,
-        ExternalLink: () => <div data-testid="icon-external" />,
-        Link2: () => <div data-testid="icon-link2" />,
+        Twitter: (props: any) => <div data-testid="icon-twitter" {...props} />,
+        Github: (props: any) => <div data-testid="icon-github" {...props} />,
+        ExternalLink: (props: any) => <div data-testid="icon-external" {...props} />,
+        Link2: (props: any) => <div data-testid="icon-link2" {...props} />,
     }
 })
 
@@ -89,13 +89,34 @@ describe('QuickLinks', () => {
         // Verify URLs
         expect(links[0]).toHaveAttribute('href', 'https://twitter.com')
         expect(links[1]).toHaveAttribute('href', 'https://github.com')
+
+        // Verify security attributes for external links
+        expect(links[0]).toHaveAttribute('target', '_blank')
+        expect(links[0]).toHaveAttribute('rel', 'noopener noreferrer')
+        expect(links[1]).toHaveAttribute('target', '_blank')
+        expect(links[1]).toHaveAttribute('rel', 'noopener noreferrer')
     })
 
-    it('dynamically renders valid icons', () => {
+    it('dynamically renders valid icons with appropriate styling classes', () => {
         render(<QuickLinks hyperlinks={mockHyperlinks} />)
 
-        expect(screen.getByTestId('icon-twitter')).toBeInTheDocument()
-        expect(screen.getByTestId('icon-github')).toBeInTheDocument()
+        const twitterIcon = screen.getByTestId('icon-twitter')
+        const githubIcon = screen.getByTestId('icon-github')
+
+        expect(twitterIcon).toBeInTheDocument()
+        expect(githubIcon).toBeInTheDocument()
+
+        // Verify style propagation to DynamicIcon
+        expect(twitterIcon).toHaveClass('h-5 w-5 text-slate-600')
+        expect(githubIcon).toHaveClass('h-5 w-5 text-slate-600')
+    })
+
+    it('propagates styling to the header icon', () => {
+        render(<QuickLinks hyperlinks={mockHyperlinks} />)
+
+        const link2Icon = screen.getByTestId('icon-link2')
+        expect(link2Icon).toBeInTheDocument()
+        expect(link2Icon).toHaveClass('h-5 w-5 text-blue-600')
     })
 
     it('falls back to default icon when icon is null or invalid', () => {
