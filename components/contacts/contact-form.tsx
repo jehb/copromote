@@ -26,13 +26,12 @@ export function ContactForm({ contact, organizations, action }: ContactFormProps
     const [isSaving, setIsSaving] = useState(false)
     const [phone, setPhone] = useState<Value>(contact?.phone || '')
 
-    /* istanbul ignore next */
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setIsSaving(true)
     }
 
     return (
-        <form action={action} onSubmit={() => setIsSaving(true)} className="space-y-8">
+        <form action={action} onSubmit={handleSubmit} className="space-y-8">
             {contact?.id && <input type="hidden" name="id" value={contact.id} />}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
