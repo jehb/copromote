@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { AddOrganizationChoice } from '@/components/contacts/add-organization-choice'
 import { linkContactToOrganization } from '@/app/actions/contacts'
 import userEvent from '@testing-library/user-event'
@@ -122,5 +122,61 @@ describe('AddOrganizationChoice', () => {
         
         expect(screen.getByText('Register New Organization')).toBeInTheDocument()
         expect(screen.queryByPlaceholderText('Search organizations...')).not.toBeInTheDocument()
+    })
+
+    it('handles errors when linkContactToOrganization rejects', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        ;(linkContactToOrganization as jest.Mock).mockRejectedValue(new Error('Network error'))
+
+        render(<AddOrganizationChoice contactId="contact-1" contactName="John Doe" availableOrganizations={mockOrgs} />)
+
+        await userEvent.click(screen.getByRole('button', { name: /Link to Organization/i }))
+        await userEvent.click(screen.getByText('Select Existing Organization'))
+
+        const orgBtn = screen.getByText('Acme Corp').closest('button')!
+        await userEvent.click(orgBtn)
+
+        expect(linkContactToOrganization).toHaveBeenCalledWith('contact-1', 'org-1')
+
+        await waitFor(() => {
+            expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to link organization:', expect.any(Error))
+        })
+
+        // Ensure linking state is reset by verifying button is no longer disabled
+        expect(orgBtn).not.toBeDisabled()
+
+        consoleErrorSpy.mockRestore()
+    })
+
+    it('resets view to choice after closing dialog', async () => {
+        jest.useFakeTimers()
+        // Setup userEvent with advanceTimers so it works with fake timers
+        const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime })
+
+        render(<AddOrganizationChoice contactId="1" contactName="John Doe" availableOrganizations={mockOrgs} />)
+
+        // Open dialog
+        await user.click(screen.getByRole('button', { name: /Link to Organization/i }))
+
+        // Change view to 'existing'
+        await user.click(screen.getByText('Select Existing Organization'))
+        expect(screen.getByPlaceholderText('Search organizations...')).toBeInTheDocument()
+
+        // Close dialog by pressing Escape
+        await user.keyboard('{Escape}')
+
+        // Fast-forward timers to run the setTimeout, wrap in act since it triggers a state change
+        act(() => {
+            jest.advanceTimersByTime(300)
+        })
+
+        // Open dialog again
+        await user.click(screen.getByRole('button', { name: /Link to Organization/i }))
+
+        // Verify view is reset to 'choice'
+        expect(screen.getByText('Register New Organization')).toBeInTheDocument()
+        expect(screen.getByText('Select Existing Organization')).toBeInTheDocument()
+
+        jest.useRealTimers()
     })
 })
