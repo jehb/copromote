@@ -112,4 +112,99 @@ describe('PhotoAlbumEditor', () => {
             expect(screen.queryByText('Winter Holidays')).not.toBeInTheDocument()
         })
     })
+
+    describe('Error Handling', () => {
+        beforeEach(() => {
+            jest.spyOn(console, 'error').mockImplementation(() => {})
+        })
+
+        afterEach(() => {
+            ;(console.error as jest.Mock).mockRestore()
+        })
+
+        it('logs error on createAlbum failure', async () => {
+            const error = new Error('Create Error')
+            ;(createAlbum as jest.Mock).mockRejectedValue(error)
+
+            render(<PhotoAlbumEditor photoId="p1" initialAlbums={mockInitialAlbums} allAlbums={mockAllAlbums} />)
+
+            await userEvent.click(screen.getByRole('button', { name: /Add to Album/i }))
+            const searchInput = screen.getByPlaceholderText('Search albums...')
+            await userEvent.type(searchInput, 'Failed Album')
+
+            const createOption = await screen.findByText('Create "Failed Album"')
+            await userEvent.click(createOption)
+
+            await waitFor(() => {
+                expect(console.error).toHaveBeenCalledWith("Failed to create album", error)
+            })
+        })
+
+        it('logs error on addPhotoToAlbum failure', async () => {
+            const error = new Error('Add Error')
+            ;(addPhotoToAlbum as jest.Mock).mockRejectedValue(error)
+
+            render(<PhotoAlbumEditor photoId="p1" initialAlbums={mockInitialAlbums} allAlbums={mockAllAlbums} />)
+
+            await userEvent.click(screen.getByRole('button', { name: /Add to Album/i }))
+            await userEvent.click(screen.getByText('Winter Holidays'))
+
+            await waitFor(() => {
+                expect(console.error).toHaveBeenCalledWith("Failed to add photo to album", error)
+            })
+        })
+
+        it('logs error on removePhotoFromAlbum failure', async () => {
+            const error = new Error('Remove Error')
+            ;(removePhotoFromAlbum as jest.Mock).mockRejectedValue(error)
+
+            render(<PhotoAlbumEditor photoId="p1" initialAlbums={mockInitialAlbums} allAlbums={mockAllAlbums} />)
+
+            const removeButton = screen.getByRole('button', { name: /Remove photo from album/i })
+            await userEvent.click(removeButton)
+
+            await waitFor(() => {
+                expect(console.error).toHaveBeenCalledWith("Failed to remove photo from album", error)
+            })
+        })
+
+        it('logs error on deleteAlbum failure', async () => {
+            const error = new Error('Delete Error')
+            ;(window.confirm as jest.Mock).mockReturnValue(true)
+            ;(deleteAlbum as jest.Mock).mockRejectedValue(error)
+
+            render(<PhotoAlbumEditor photoId="p1" initialAlbums={mockInitialAlbums} allAlbums={mockAllAlbums} />)
+
+            await userEvent.click(screen.getByRole('button', { name: /Add to Album/i }))
+
+            const deleteButton = screen.getByRole('button', { name: /Delete album permanently/i })
+            await userEvent.click(deleteButton)
+
+            await waitFor(() => {
+                expect(console.error).toHaveBeenCalledWith("Failed to delete album", error)
+            })
+        })
+    })
+
+    describe('Edge Cases', () => {
+        it('clears search query when popover closes', async () => {
+            render(<PhotoAlbumEditor photoId="p1" initialAlbums={mockInitialAlbums} allAlbums={mockAllAlbums} />)
+
+            // Open popover
+            await userEvent.click(screen.getByRole('button', { name: /Add to Album/i }))
+
+            // Type query
+            const searchInput = screen.getByPlaceholderText('Search albums...')
+            await userEvent.type(searchInput, 'test query')
+            expect(searchInput).toHaveValue('test query')
+
+            // Close popover by clicking outside or pressing Escape
+            await userEvent.keyboard('{Escape}')
+
+            // Open popover again and check if query is cleared
+            await userEvent.click(screen.getByRole('button', { name: /Add to Album/i }))
+            const searchInputAgain = screen.getByPlaceholderText('Search albums...')
+            expect(searchInputAgain).toHaveValue('')
+        })
+    })
 })
