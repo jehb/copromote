@@ -20,11 +20,11 @@ export async function proxy(request: NextRequest) {
 
     const currentUser = request.cookies.get('session')?.value
     const payload = currentUser ? await decrypt(currentUser) : null
-    const isLoginPage = request.nextUrl.pathname.startsWith('/login')
+    const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/verify-magic-link')
 
     // If no session or invalid session, enforce login page
     if (!payload) {
-        if (!isLoginPage) {
+        if (!isAuthPage) {
             const response = NextResponse.redirect(getRedirectUrl('/login'))
             if (currentUser) {
                 // If there was a cookie but it was invalid, clear it
@@ -32,7 +32,7 @@ export async function proxy(request: NextRequest) {
             }
             return response
         }
-        // If they are already on login, let them proceed. Just clear invalid cookie if present.
+        // If they are already on auth page, let them proceed. Just clear invalid cookie if present.
         if (currentUser) {
             const response = NextResponse.next()
             response.cookies.delete('session')
@@ -42,15 +42,32 @@ export async function proxy(request: NextRequest) {
     }
 
     // From this point, payload is guaranteed to be valid
+    const pathname = request.nextUrl.pathname
+
+    // 1. Check if session requires 2FA
+    if (payload.pending2fa) {
+        if (pathname !== '/verify-2fa' && pathname !== '/logout') {
+            return NextResponse.redirect(getRedirectUrl('/verify-2fa'))
+        }
+        return NextResponse.next()
+    }
+
+    // 2. Prevent accessing /verify-2fa if session is fully authenticated
+    if (pathname === '/verify-2fa') {
+        return NextResponse.redirect(getRedirectUrl('/'))
+    }
+
+    // 3. Check password change requirement
     if (payload.mustChangePassword) {
         if (
-            !request.nextUrl.pathname.startsWith('/change-password') &&
-            !request.nextUrl.pathname.startsWith('/logout')
+            !pathname.startsWith('/change-password') &&
+            !pathname.startsWith('/logout')
         ) {
             return NextResponse.redirect(getRedirectUrl('/change-password'))
         }
     } else {
-        if (isLoginPage) {
+        // If they don't need to change password, prevent accessing login/auth pages
+        if (isAuthPage) {
             return NextResponse.redirect(getRedirectUrl('/'))
         }
     }

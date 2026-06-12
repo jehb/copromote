@@ -240,3 +240,49 @@ export async function searchEventsForAutocomplete(query: string) {
         startTime: e.startTime.toISOString() // Ensure serializability
     }))
 }
+
+export async function bulkUpdateEvents(updates: {
+    id: string;
+    title?: string;
+    startTime?: string;
+    endTime?: string;
+    status?: EventStatus;
+    locationId?: string;
+    primaryContactId?: string | null;
+    seriesId?: string | null;
+    description?: string | null;
+    internalNotes?: string | null;
+}[]) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    const userId = await getCurrentUserId();
+
+    await prisma.$transaction(
+        updates.map(update => {
+            const { id, startTime, endTime, ...data } = update;
+            return prisma.event.update({
+                where: { id },
+                data: {
+                    ...data,
+                    ...(startTime ? { startTime: fromZonedTime(startTime, TIMEZONE) } : {}),
+                    ...(endTime ? { endTime: fromZonedTime(endTime, TIMEZONE) } : {}),
+                    updatedById: userId
+                }
+            });
+        })
+    );
+
+    for (const update of updates) {
+        const event = await prisma.event.findUnique({
+            where: { id: update.id },
+            select: { title: true }
+        });
+        const fields = Object.keys(update).filter(k => k !== 'id').join(', ');
+        await logActivity('UPDATE', 'Event', update.id, `Bulk updated fields (${fields}) on event: ${event?.title || update.id}`);
+    }
+
+    revalidatePath('/events');
+    revalidatePath('/calendar');
+}
+

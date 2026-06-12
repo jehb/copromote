@@ -1,5 +1,5 @@
 
-import { encrypt, decrypt, getSession, updateSession, logout } from '@/lib/session'
+import { encrypt, decrypt, getSession, getPending2faSession, updateSession, logout } from '@/lib/session'
 import { cookies } from 'next/headers'
 import { SignJWT, jwtVerify } from 'jose'
 import { NextResponse } from 'next/server'
@@ -63,6 +63,49 @@ describe('Session Utility', () => {
             })
 
             const session = await getSession()
+            expect(session).toBeNull()
+        })
+
+        it('should return null if session is pending 2FA', async () => {
+            // Decrypt mock returns pending2fa payload
+            mockJwtVerify.mockResolvedValueOnce({
+                payload: { id: 'mock_user_id', username: 'mock_user', pending2fa: true }
+            })
+
+            const session = await getSession()
+            expect(session).toBeNull()
+        })
+    })
+
+    describe('getPending2faSession', () => {
+        it('should return session if pending 2FA', async () => {
+            mockJwtVerify.mockResolvedValueOnce({
+                payload: { id: 'mock_user_id', username: 'mock_user', pending2fa: true }
+            })
+
+            const session = await getPending2faSession()
+            expect(session).toEqual({
+                id: 'mock_user_id',
+                username: 'mock_user',
+                pending2fa: true
+            })
+        })
+
+        it('should return null if session is NOT pending 2FA', async () => {
+            mockJwtVerify.mockResolvedValueOnce({
+                payload: { id: 'mock_user_id', username: 'mock_user' }
+            })
+
+            const session = await getPending2faSession()
+            expect(session).toBeNull()
+        })
+
+        it('should return null if no session cookie exists', async () => {
+            mockCookies.mockResolvedValueOnce({
+                get: jest.fn().mockReturnValue(undefined)
+            })
+
+            const session = await getPending2faSession()
             expect(session).toBeNull()
         })
     })

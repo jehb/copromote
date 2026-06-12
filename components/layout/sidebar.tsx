@@ -89,7 +89,7 @@ export function Sidebar({ disabledPages = [] }: { disabledPages?: string[] }) {
 
     // Hide sidebar on auth pages
     /* istanbul ignore if */
-    if (pathname === '/login' || pathname === '/change-password') {
+    if (pathname === '/login' || pathname === '/change-password' || pathname === '/verify-2fa') {
         return null
     }
 

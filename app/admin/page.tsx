@@ -102,6 +102,20 @@ export default function AdminPage() {
                         </Card>
                     </Link>
 
+                    <Link href="/admin/security">
+                        <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full border-blue-100 hover:border-blue-200">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Shield className="h-5 w-5 text-blue-600 animate-pulse" style={{ animationDuration: '3s' }} />
+                                    Security Center
+                                </CardTitle>
+                                <CardDescription>
+                                    Manage IP whitelisting and two-factor authentication (2FA) rules.
+                                </CardDescription>
+                            </CardHeader>
+                        </Card>
+                    </Link>
+
                     <Link href="/admin/logs">
                         <Card className="hover:bg-slate-50 transition-colors cursor-pointer h-full">
                             <CardHeader>

@@ -8,7 +8,7 @@ import { getEventSeries } from '@/app/actions/event-series'
 import { Button } from '@/components/ui/button'
 import { EventCard } from '@/components/events/event-card'
 import Link from 'next/link'
-import { Plus, MapPin, Loader2, Calendar, LayoutGrid, List, Calendar as CalendarIcon, Filter } from 'lucide-react'
+import { Plus, MapPin, Loader2, Calendar, LayoutGrid, List, Calendar as CalendarIcon, Filter, Edit } from 'lucide-react'
 import { PageHeader } from '@/components/ui/page-header'
 import {
     DropdownMenu,
@@ -20,9 +20,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { EventListView } from '@/components/events/event-list-view'
 import { EventCalendarView } from '@/components/events/event-calendar-view'
+import { EventBulkEditView } from '@/components/events/event-bulk-edit-view'
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { EventCommonProps } from '@/types/events'
+
 
 interface EventsClientPageProps {
     initialData: EventCommonProps & {
@@ -69,7 +71,7 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
         initialData: initialData.eventSeries,
     })
 
-    const [view, setView] = useState<'list' | 'calendar' | 'cards'>('list')
+    const [view, setView] = useState<'list' | 'calendar' | 'cards' | 'bulk'>('list')
     const [statusFilter, setStatusFilter] = useState<string[]>(['SCHEDULED', 'TENTATIVE'])
 
     const isLoadingAny = isLoadingEvents
@@ -114,8 +116,19 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
                 <LayoutGrid className="h-3.5 w-3.5" />
                 Cards
             </button>
+            <button
+                onClick={() => setView('bulk')}
+                className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
+                    view === 'bulk' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                )}
+            >
+                <Edit className="h-3.5 w-3.5" />
+                Bulk Edit
+            </button>
         </div>
     )
+
 
     return (
         <div className="p-4 md:p-8 space-y-4 md:space-y-8 h-full flex flex-col w-full">
@@ -137,54 +150,66 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
                 }
             />
 
-            <div className="flex justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
-                <div className="flex items-center gap-4">
-                    <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Display View</h3>
-                    {viewSwitcher}
-                    <div className="h-6 w-px bg-slate-200 hidden md:block" />
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 border-dashed">
-                                <Filter className="h-3.5 w-3.5 mr-2" />
-                                Status
-                                {statusFilter.length > 0 && (
-                                    <>
-                                        <div className="mx-2 h-4 w-px bg-slate-200" />
-                                        <span className="rounded-sm bg-slate-100 px-1 font-normal text-slate-500 text-xs">
-                                            {statusFilter.length}
-                                        </span>
-                                    </>
-                                )}
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[200px]">
-                            <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            {['TENTATIVE', 'SCHEDULED', 'PAST', 'CANCELED'].map((status) => (
-                                <DropdownMenuCheckboxItem
-                                    key={status}
-                                    checked={statusFilter.includes(status)}
-                                    onCheckedChange={(checked) => {
-                                        setStatusFilter((prev) =>
-                                            checked
-                                                ? [...prev, status]
-                                                : prev.filter((s) => s !== status)
-                                        )
-                                    }}
-                                >
-                                    {status.charAt(0) + status.slice(1).toLowerCase()}
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+            {view !== 'bulk' && (
+                <div className="flex justify-between items-center bg-white p-4 rounded-xl border shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Display View</h3>
+                        {viewSwitcher}
+                        <div className="h-6 w-px bg-slate-200 hidden md:block" />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8 border-dashed">
+                                    <Filter className="h-3.5 w-3.5 mr-2" />
+                                    Status
+                                    {statusFilter.length > 0 && (
+                                        <>
+                                            <div className="mx-2 h-4 w-px bg-slate-200" />
+                                            <span className="rounded-sm bg-slate-100 px-1 font-normal text-slate-500 text-xs">
+                                                {statusFilter.length}
+                                            </span>
+                                        </>
+                                    )}
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-[200px]">
+                                <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {['TENTATIVE', 'SCHEDULED', 'PAST', 'CANCELED'].map((status) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={status}
+                                        checked={statusFilter.includes(status)}
+                                        onCheckedChange={(checked) => {
+                                            setStatusFilter((prev) =>
+                                                checked
+                                                    ? [...prev, status]
+                                                    : prev.filter((s) => s !== status)
+                                            )
+                                        }}
+                                    >
+                                        {status.charAt(0) + status.slice(1).toLowerCase()}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                    <div className="text-sm text-slate-500 font-medium">
+                        Showing {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+                    </div>
                 </div>
-                <div className="text-sm text-slate-500 font-medium">
-                    Showing {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
-                </div>
-            </div>
+            )}
+
 
             <div className="flex-1">
-                {isLoadingAny && events.length === 0 ? (
+                {view === 'bulk' ? (
+                    <EventBulkEditView
+                        events={filteredEvents}
+                        locations={locations}
+                        users={users}
+                        eventSeries={eventSeries}
+                        onCancel={() => setView('list')}
+                        onSaveSuccess={() => setView('list')}
+                    />
+                ) : isLoadingAny && events.length === 0 ? (
                     <div className="flex justify-center py-20">
                         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
                     </div>

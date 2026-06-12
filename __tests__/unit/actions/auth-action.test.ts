@@ -14,6 +14,13 @@ jest.mock('@/lib/prisma', () => ({
             findUnique: jest.fn(),
             update: jest.fn(),
         },
+        whitelistedIp: {
+            count: jest.fn().mockResolvedValue(1),
+            findUnique: jest.fn().mockResolvedValue({ ipAddress: '127.0.0.1' }),
+        },
+        twoFactorChallenge: {
+            upsert: jest.fn(),
+        },
     },
 }))
 

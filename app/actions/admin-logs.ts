@@ -30,7 +30,8 @@ export async function logSecurityEvent(
     userAgent?: string
 ) {
     const session = await getSession();
-    if (!session) throw new Error("Unauthorized");
+    const isAuthAction = ['LOGIN', 'FAILED_LOGIN', '2FA_REQUIRED', 'LOGOUT'].includes(action);
+    if (!session && !isAuthAction) throw new Error("Unauthorized");
     try {
         const headerStore = await headers()
 
