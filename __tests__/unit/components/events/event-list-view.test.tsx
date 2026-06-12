@@ -30,6 +30,24 @@ describe('EventListView', () => {
             location: null,
             primaryContact: null,
             socialPosts: []
+        },
+        {
+            id: 'e3',
+            title: 'Test Event 3',
+            startTime: new Date('2026-12-01T14:30:00Z').toISOString(),
+            status: 'TENTATIVE',
+            location: null,
+            primaryContact: null,
+            socialPosts: [{ platform: 'Facebook' }, { platform: 'Twitter' }, { platform: 'Unknown' }]
+        },
+        {
+            id: 'e4',
+            title: 'Test Event 4',
+            startTime: new Date('2022-01-01T14:30:00Z').toISOString(),
+            status: 'PAST',
+            location: null,
+            primaryContact: null,
+            socialPosts: []
         }
     ]
 
@@ -55,9 +73,18 @@ describe('EventListView', () => {
         // Row 2
         expect(screen.getByText('Test Event 2')).toBeInTheDocument()
         expect(screen.getByText('CANCELED')).toBeInTheDocument()
-        expect(screen.getByText('No Location')).toBeInTheDocument()
-        expect(screen.getByText('No contact')).toBeInTheDocument()
-        expect(screen.getByText('0')).toBeInTheDocument() // 0 social posts
+        expect(screen.getAllByText('No Location')[0]).toBeInTheDocument()
+        expect(screen.getAllByText('No contact')[0]).toBeInTheDocument()
+        expect(screen.getAllByText('0')[0]).toBeInTheDocument() // 0 social posts
+
+        // Row 3
+        expect(screen.getByText('Test Event 3')).toBeInTheDocument()
+        expect(screen.getByText('TENTATIVE')).toBeInTheDocument()
+        expect(screen.getByText('3')).toBeInTheDocument() // 3 social posts
+
+        // Row 4
+        expect(screen.getByText('Test Event 4')).toBeInTheDocument()
+        expect(screen.getByText('PAST')).toBeInTheDocument()
     })
 
     it('navigates to event details on row click', async () => {
