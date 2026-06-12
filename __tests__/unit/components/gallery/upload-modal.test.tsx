@@ -12,7 +12,8 @@ jest.mock('@/app/actions/photos', () => ({
 describe('UploadModal', () => {
     const mockTags = [
         { id: 't1', name: 'Tag 1', color: '#ff0000' },
-        { id: 't2', name: 'Tag 2', color: '#00ff00' }
+        { id: 't2', name: 'Tag 2', color: '#00ff00' },
+        { id: 't3', name: 'Tag 3' }
     ]
 
     beforeEach(() => {
@@ -74,6 +75,28 @@ describe('UploadModal', () => {
         consoleSpy.mockRestore()
     })
 
+    it('handles photo upload failure with fallback message', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        // Reject with an error that doesn't have a specific message, or a non-Error object
+        ;(uploadPhoto as jest.Mock).mockRejectedValue({})
+        render(<UploadModal tags={mockTags} />)
+
+        await userEvent.click(screen.getByRole('button', { name: /Upload Photo/i }))
+
+        const file = new File(['hello'], 'hello.png', { type: 'image/png' })
+        const input = screen.getByLabelText(/Select Photo/i)
+        await userEvent.upload(input, file)
+
+        const form = screen.getByRole('button', { name: 'Upload Photo' }).closest('form')
+        fireEvent.submit(form!)
+
+        await waitFor(() => {
+            expect(window.alert).toHaveBeenCalledWith('Failed to upload photo')
+        })
+
+        consoleSpy.mockRestore()
+    })
+
     it('toggles new tag input and creates a tag', async () => {
         (createPhotoTag as jest.Mock).mockResolvedValue(undefined)
         render(<UploadModal tags={mockTags} />)
@@ -96,6 +119,19 @@ describe('UploadModal', () => {
         
         // Input should disappear after creation
         expect(screen.queryByPlaceholderText('Enter tag name')).not.toBeInTheDocument()
+    })
+
+    it('does not create an empty tag', async () => {
+        render(<UploadModal tags={mockTags} />)
+
+        await userEvent.click(screen.getByRole('button', { name: /Upload Photo/i }))
+        await userEvent.click(screen.getByRole('button', { name: 'New Tag' }))
+
+        const tagInput = screen.getByPlaceholderText('Enter tag name')
+        await userEvent.type(tagInput, '   ')
+        await userEvent.click(screen.getByRole('button', { name: 'Add' }))
+
+        expect(createPhotoTag).not.toHaveBeenCalled()
     })
 
     it('handles tag creation failure', async () => {
