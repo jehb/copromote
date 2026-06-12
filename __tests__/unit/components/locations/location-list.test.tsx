@@ -103,4 +103,22 @@ describe('LocationList', () => {
             expect(toast.error).toHaveBeenCalledWith('Failed to delete location')
         })
     })
+
+    it('displays unexpected error message on thrown exception', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        ;(deleteLocation as jest.Mock).mockRejectedValue(new Error('Unexpected network error'))
+
+        render(<LocationList locations={mockLocations} />)
+
+        const deleteButtons = screen.getAllByRole('button', { name: 'Delete Location' })
+        await userEvent.click(deleteButtons[0])
+
+        await waitFor(() => {
+            expect(deleteLocation).toHaveBeenCalledWith('1')
+            expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error))
+            expect(toast.error).toHaveBeenCalledWith('An unexpected error occurred.')
+        })
+
+        consoleSpy.mockRestore()
+    })
 })
