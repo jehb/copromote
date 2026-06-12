@@ -168,4 +168,91 @@ describe('PhotoMetadataEditor', () => {
         expect(screen.queryByPlaceholderText('Add a description...')).not.toBeInTheDocument()
         expect(screen.getByText('Original desc')).toBeInTheDocument()
     })
+
+    it('handles errors when saving changes', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        ;(updatePhotoDescription as jest.Mock).mockRejectedValue(new Error('Save failed'))
+
+        render(
+            <PhotoMetadataEditor
+                photoId="p1"
+                initialTags={mockInitialTags}
+                initialDescription="Original desc"
+                allTags={mockAllTags}
+            />
+        )
+
+        await userEvent.click(screen.getByRole('button'))
+
+        const textarea = screen.getByPlaceholderText('Add a description...')
+        await userEvent.clear(textarea)
+        await userEvent.type(textarea, 'Changed desc')
+
+        const saveButton = screen.getByRole('button', { name: /Save Changes/i })
+        await userEvent.click(saveButton)
+
+        await waitFor(() => {
+            expect(consoleSpy).toHaveBeenCalledWith('Failed to save changes', expect.any(Error))
+        })
+
+        consoleSpy.mockRestore()
+    })
+
+    it('handles errors when creating a tag', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        ;(createPhotoTag as jest.Mock).mockRejectedValue(new Error('Create tag failed'))
+
+        render(
+            <PhotoMetadataEditor
+                photoId="p1"
+                initialTags={mockInitialTags}
+                initialDescription=""
+                allTags={mockAllTags}
+            />
+        )
+
+        await userEvent.click(screen.getByRole('button'))
+        await userEvent.click(screen.getByRole('button', { name: /Add Tag/i }))
+
+        const searchInput = screen.getByPlaceholderText('Search tags...')
+        await userEvent.type(searchInput, 'Failing Tag')
+
+        const createOption = await screen.findByText('Create "Failing Tag"')
+        await userEvent.click(createOption)
+
+        await waitFor(() => {
+            expect(consoleSpy).toHaveBeenCalledWith('Failed to create tag', expect.any(Error))
+        })
+
+        consoleSpy.mockRestore()
+    })
+
+    it('resets search query when popover closes', async () => {
+        render(
+            <PhotoMetadataEditor
+                photoId="p1"
+                initialTags={mockInitialTags}
+                initialDescription=""
+                allTags={mockAllTags}
+            />
+        )
+
+        await userEvent.click(screen.getByRole('button'))
+        const addTagBtn = screen.getByRole('button', { name: /Add Tag/i })
+
+        // Open popover
+        await userEvent.click(addTagBtn)
+
+        const searchInput = screen.getByPlaceholderText('Search tags...')
+        await userEvent.type(searchInput, 'Some query')
+        expect(searchInput).toHaveValue('Some query')
+
+        // Close popover by clicking outside or pressing Escape
+        await userEvent.keyboard('{Escape}')
+
+        // Open again to check if it was reset
+        await userEvent.click(addTagBtn)
+        const newSearchInput = screen.getByPlaceholderText('Search tags...')
+        expect(newSearchInput).toHaveValue('')
+    })
 })
