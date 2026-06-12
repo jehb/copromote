@@ -25,7 +25,7 @@ jest.mock('@/components/ui/rich-text-editor', () => ({
 
 // Mock Server Actions
 jest.mock('@/app/actions/event-series', () => ({
-    createEventSeries: jest.fn().mockResolvedValue({ success: true, series: { id: 's2', title: 'New Series' } })
+    createEventSeries: jest.fn()
 }))
 
 jest.mock('@/app/actions/wordpress', () => ({
@@ -196,6 +196,9 @@ describe('EventForm', () => {
     })
 
     it('handles event series creation', async () => {
+        const { createEventSeries } = require('@/app/actions/event-series')
+        createEventSeries.mockResolvedValueOnce({ success: true, series: { id: 's2', title: 'New Series' } })
+
         const user = userEvent.setup()
         render(
             <EventForm locations={mockLocations} users={mockUsers} contacts={mockContacts} organizations={mockOrganizations} action={jest.fn()} />
@@ -207,6 +210,72 @@ describe('EventForm', () => {
 
         await waitFor(() => {
             expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        })
+    })
+
+    it('handles event series creation with missing series payload gracefully', async () => {
+        const { createEventSeries } = require('@/app/actions/event-series')
+        createEventSeries.mockResolvedValueOnce({ success: false, message: 'Bad request' })
+
+        const user = userEvent.setup()
+        render(
+            <EventForm locations={mockLocations} users={mockUsers} contacts={mockContacts} organizations={mockOrganizations} action={jest.fn()} />
+        )
+
+        await user.click(screen.getByRole('button', { name: /create new series/i }))
+        await user.type(screen.getByLabelText(/series title/i), 'Fail Series 2')
+        await user.click(screen.getByRole('button', { name: /^create series/i }))
+
+        await waitFor(() => {
+            expect(screen.getByRole('dialog')).toBeInTheDocument()
+        })
+    })
+
+    it('handles event series creation failure gracefully', async () => {
+        const { createEventSeries } = require('@/app/actions/event-series')
+        createEventSeries.mockRejectedValueOnce(new Error('Creation failed'))
+
+        const user = userEvent.setup()
+        render(
+            <EventForm locations={mockLocations} users={mockUsers} contacts={mockContacts} organizations={mockOrganizations} action={jest.fn()} />
+        )
+
+        await user.click(screen.getByRole('button', { name: /create new series/i }))
+        await user.type(screen.getByLabelText(/series title/i), 'Fail Series')
+        await user.click(screen.getByRole('button', { name: /^create series/i }))
+
+        await waitFor(() => {
+            expect(screen.getByRole('dialog')).toBeInTheDocument()
+        })
+    })
+
+    it('ignores empty event series creation', async () => {
+        const user = userEvent.setup()
+        render(
+            <EventForm locations={mockLocations} users={mockUsers} contacts={mockContacts} organizations={mockOrganizations} action={jest.fn()} />
+        )
+
+        await user.click(screen.getByRole('button', { name: /create new series/i }))
+        await user.click(screen.getByRole('button', { name: /^create series/i }))
+
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    it('handles WP search and selection error gracefully', async () => {
+        const { searchWordPressEvents } = require('@/app/actions/wordpress')
+        searchWordPressEvents.mockRejectedValueOnce(new Error('Search failed'))
+
+        const user = userEvent.setup()
+        render(
+            <EventForm locations={mockLocations} users={mockUsers} contacts={mockContacts} organizations={mockOrganizations} action={jest.fn()} />
+        )
+
+        // Type search
+        const searchInput = screen.getByPlaceholderText(/search events by title/i)
+        await user.type(searchInput, 'WP Error Event{Enter}')
+
+        await waitFor(() => {
+            expect(screen.queryByText('WP Error Event')).not.toBeInTheDocument()
         })
     })
 
