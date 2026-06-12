@@ -153,4 +153,27 @@ describe('EventsClientPage', () => {
             expect(screen.getByText('Showing 2 events')).toBeInTheDocument()
         })
     })
+
+    it('calls the appropriate server actions in query functions', async () => {
+        render(<EventsClientPage initialData={mockInitialData} />)
+
+        const useQueryCalls = (useQuery as jest.Mock).mock.calls;
+        for (const call of useQueryCalls) {
+            if (call[0]?.queryFn) {
+                await call[0].queryFn();
+            }
+        }
+
+        const { getEvents, getLocations, getUsers } = require('@/app/actions/events');
+        const { getContacts } = require('@/app/actions/contacts');
+        const { getOrganizations } = require('@/app/actions/organizations');
+        const { getEventSeries } = require('@/app/actions/event-series');
+
+        expect(getEvents).toHaveBeenCalled();
+        expect(getLocations).toHaveBeenCalled();
+        expect(getUsers).toHaveBeenCalled();
+        expect(getContacts).toHaveBeenCalled();
+        expect(getOrganizations).toHaveBeenCalled();
+        expect(getEventSeries).toHaveBeenCalled();
+    })
 })
