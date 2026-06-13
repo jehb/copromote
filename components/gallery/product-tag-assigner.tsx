@@ -34,6 +34,7 @@ export function ProductTagAssigner({ photoId, existingUpcs }: ProductTagAssigner
 
             <div className="relative">
                 <ProductSelector
+                    selectedUpcs={existingUpcs}
                     onSelect={handleSelect}
                     disabled={isAssigning}
                 />

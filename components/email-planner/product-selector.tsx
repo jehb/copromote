@@ -31,9 +31,10 @@ interface ProductSelectorProps {
     onSelect: (upc: string) => void
     disabled?: boolean
     availableProducts?: Product[] // Products already attached, to filter out
+    selectedUpcs?: string[] // Direct UPC strings already attached, to filter out
 }
 
-export function ProductSelector({ onSelect, disabled, availableProducts = [] }: ProductSelectorProps) {
+export function ProductSelector({ onSelect, disabled, availableProducts = [], selectedUpcs = [] }: ProductSelectorProps) {
     const [open, setOpen] = React.useState(false)
     const [search, setSearch] = React.useState('')
     const [products, setProducts] = React.useState<Product[]>([])
@@ -65,7 +66,14 @@ export function ProductSelector({ onSelect, disabled, availableProducts = [] }: 
         }
     }, [open])
 
-    const unselectedProducts = products.filter(p => !availableProducts.some(ap => ap.upc === p.upc))
+    // ⚡ Bolt: Optimize exclusion filtering with O(1) Set lookup to prevent O(N*M) nested array iterations
+    const exclusionSet = React.useMemo(() => {
+        const set = new Set(selectedUpcs)
+        availableProducts.forEach(ap => set.add(ap.upc))
+        return set
+    }, [availableProducts, selectedUpcs])
+
+    const unselectedProducts = products.filter(p => !exclusionSet.has(p.upc))
 
     return (
         <Popover open={open} onOpenChange={(val) => {
