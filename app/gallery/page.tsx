@@ -7,8 +7,8 @@ import { Images } from 'lucide-react'
 import { ProtectedRoute } from '@/components/layout/protected-route'
 
 export default async function GalleryPage() {
-    const photos = await getPhotos()
-    const tags = await getPhotoTags()
+    // ⚡ Bolt: Execute independent data queries concurrently to avoid waterfall fetching
+    const [photos, tags] = await Promise.all([getPhotos(), getPhotoTags()])
 
     return (
         <ProtectedRoute pageName="gallery">
