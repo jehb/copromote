@@ -49,7 +49,7 @@ export function ColorPaletteForm({ palette }: { palette?: ColorPalette }) {
 
     if (!isMounted) {
         return isEditing ? (
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600" aria-label="Edit Color Palette">
                 <Pencil className="h-4 w-4" />
                 <span className="sr-only">Edit</span>
             </Button>
@@ -116,7 +116,7 @@ export function ColorPaletteForm({ palette }: { palette?: ColorPalette }) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {isEditing ? (
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-blue-600" aria-label="Edit Color Palette">
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                     </Button>
@@ -186,6 +186,7 @@ export function ColorPaletteForm({ palette }: { palette?: ColorPalette }) {
                                             className="h-9 w-9 text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0"
                                             onClick={() => handleRemoveColor(idx)}
                                             disabled={colors.length === 1}
+                                            aria-label="Remove Color"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
