@@ -27,3 +27,7 @@ Improvement: ~50% faster with simulated latency.
 ## 2026-05-18 - Avoid O(N*D) Filtering in UI Render Loops
 **Learning:** Running an O(N) array filter inside a UI rendering loop (e.g., iterating over 42 days in a calendar view and filtering the events array for each day) creates an O(N * D) rendering bottleneck. As the number of events grows, this causes significant UI lag when components re-render or parameters change.
 **Action:** When mapping over items that require correlated data, pre-compute an O(1) lookup map or grouped dictionary outside the loop using `useMemo`. This reduces the overall rendering complexity from O(N * D) to O(N + D), preventing CPU blockages on the main thread.
+
+## 2024-06-15 - Batched Independent Data Fetching
+**Learning:** Next.js Server Components with independent data queries (e.g. `getPhotos()` and `getPhotoTags()`) can suffer from a waterfall fetching problem if they are `await`ed sequentially.
+**Action:** Always verify if sequential `await` expressions inside server components or server actions depend on each other. If they are independent, wrap them in `Promise.all([ ... ])` to execute them concurrently and optimize page latency.
