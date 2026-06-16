@@ -89,14 +89,7 @@ describe('ThemeList', () => {
     it('opens dialog to edit theme', async () => {
         render(<ThemeList initialThemes={mockThemes} />)
         
-        // Find edit buttons (two themes, two edit buttons + 1 new theme button)
-        // Edit button has lucide-edit icon, but we can query by clicking the first ghost button
-        const buttons = screen.getAllByRole('button')
-        // buttons[0] = New Theme
-        // buttons[1] = Edit Theme 1
-        // buttons[2] = Delete Theme 1
-        
-        await userEvent.click(buttons[1])
+        await userEvent.click(screen.getAllByRole('button', { name: 'Edit Theme' })[0])
         
         expect(screen.getByRole('heading', { name: 'Edit Theme' })).toBeInTheDocument()
     })
@@ -106,9 +99,7 @@ describe('ThemeList', () => {
 
         render(<ThemeList initialThemes={mockThemes} />)
         
-        const buttons = screen.getAllByRole('button')
-        // buttons[2] = Delete Theme 1
-        await userEvent.click(buttons[2])
+        await userEvent.click(screen.getAllByRole('button', { name: 'Delete Theme' })[0])
 
         await waitFor(() => {
             expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this theme?')
@@ -123,8 +114,7 @@ describe('ThemeList', () => {
 
         render(<ThemeList initialThemes={mockThemes} />)
         
-        const buttons = screen.getAllByRole('button')
-        await userEvent.click(buttons[2])
+        await userEvent.click(screen.getAllByRole('button', { name: 'Delete Theme' })[0])
 
         await waitFor(() => {
             expect(deleteTheme).toHaveBeenCalledWith('1')
@@ -138,8 +128,7 @@ describe('ThemeList', () => {
 
         render(<ThemeList initialThemes={mockThemes} />)
         
-        const buttons = screen.getAllByRole('button')
-        await userEvent.click(buttons[2])
+        await userEvent.click(screen.getAllByRole('button', { name: 'Delete Theme' })[0])
 
         expect(deleteTheme).not.toHaveBeenCalled()
     })
