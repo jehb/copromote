@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "start /B wsl sleep infinity && wsl -u root snap start docker && wsl /snap/bin/docker start promoty-db",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
