@@ -591,7 +591,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
 
                             <div className="mt-2 w-full">
                                 <ProductSelector
-                                    availableProducts={selectedProducts.map(upc => availableProducts.find(ap => ap.upc === upc)).filter(Boolean) as Product[]}
+                                    selectedUpcs={selectedProducts}
                                     onSelect={handleAddProduct}
                                 />
                             </div>

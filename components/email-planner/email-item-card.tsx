@@ -270,7 +270,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                 {isEditing && (
                                     <div className="w-full">
                                         <ProductSelector
-                                            availableProducts={item.products?.map(p => availableProducts.find(ap => ap.upc === p.upc)).filter(Boolean) as Product[]}
+                                            selectedUpcs={item.products?.map(p => p.upc) || []}
                                             onSelect={handleAddProduct}
                                         />
                                     </div>
