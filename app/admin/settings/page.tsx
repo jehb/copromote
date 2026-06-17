@@ -20,12 +20,12 @@ import {
 
 // NCG Brand Colors
 const THEMES = [
-    { name: 'NCG Dark Green (Default)', primary: '#007934', secondary: '#7AB800' },
-    { name: 'NCG Light Green', primary: '#7AB800', secondary: '#007934' },
-    { name: 'NCG Orange', primary: '#FF5800', secondary: '#FFA100' },
-    { name: 'NCG Dark Purple', primary: '#622567', secondary: '#B382C7' },
-    { name: 'NCG Dark Blue', primary: '#005293', secondary: '#00B0CA' },
-    { name: 'NCG Red', primary: '#D50032', secondary: '#1e1e1e' },
+    { name: 'NCG Dark Green (Default)', primary: '#007934', secondary: '#7AB800', accent: '#FF5800' },
+    { name: 'NCG Light Green', primary: '#7AB800', secondary: '#007934', accent: '#FF5800' },
+    { name: 'NCG Orange', primary: '#FF5800', secondary: '#FFA100', accent: '#622567' },
+    { name: 'NCG Dark Purple', primary: '#622567', secondary: '#B382C7', accent: '#FF5800' },
+    { name: 'NCG Dark Blue', primary: '#005293', secondary: '#00B0CA', accent: '#FF5800' },
+    { name: 'NCG Red', primary: '#D50032', secondary: '#1e1e1e', accent: '#FF5800' },
 ]
 
 export default function SettingsPage() {
@@ -40,13 +40,15 @@ export default function SettingsPage() {
         }
     }, [])
 
-    const handleThemeChange = (color: string) => {
-        setPrimaryColor(color)
-        localStorage.setItem('theme-primary', color)
-        document.documentElement.style.setProperty('--primary', color)
-        document.documentElement.style.setProperty('--ring', color)
-        document.documentElement.style.setProperty('--sidebar-primary', color)
-        document.documentElement.style.setProperty('--sidebar-ring', color)
+    const handleThemeChange = (theme: typeof THEMES[0]) => {
+        setPrimaryColor(theme.primary)
+        localStorage.setItem('theme-primary', theme.primary)
+        document.documentElement.style.setProperty('--primary', theme.primary)
+        document.documentElement.style.setProperty('--ring', theme.primary)
+        document.documentElement.style.setProperty('--sidebar-primary', theme.primary)
+        document.documentElement.style.setProperty('--sidebar-ring', theme.primary)
+        document.documentElement.style.setProperty('--secondary', theme.secondary)
+        document.documentElement.style.setProperty('--accent', theme.accent)
     }
 
     if (!mounted) return null
@@ -70,16 +72,17 @@ export default function SettingsPage() {
                                 {THEMES.map((theme) => (
                                     <button
                                         key={theme.primary}
-                                        onClick={() => handleThemeChange(theme.primary)}
+                                        onClick={() => handleThemeChange(theme)}
                                         className={`
                                             relative flex flex-col items-center gap-2 p-2 rounded-lg border-2 transition-all hover:bg-slate-50
                                             ${primaryColor === theme.primary ? 'border-primary bg-slate-50' : 'border-transparent'}
                                         `}
                                     >
-                                        <div
-                                            className="h-10 w-full rounded-md shadow-sm border"
-                                            style={{ backgroundColor: theme.primary }}
-                                        />
+                                        <div className="h-10 w-full rounded-md shadow-sm border overflow-hidden flex">
+                                            <div className="flex-1" style={{ backgroundColor: theme.primary }} title={`Primary: ${theme.primary}`} />
+                                            <div className="w-1/3" style={{ backgroundColor: theme.secondary }} title={`Secondary: ${theme.secondary}`} />
+                                            <div className="w-1/4" style={{ backgroundColor: theme.accent }} title={`Accent: ${theme.accent}`} />
+                                        </div>
                                         <span className="text-xs font-medium text-slate-600 text-center">{theme.name}</span>
                                         {primaryColor === theme.primary && (
                                             <div className="absolute top-1 right-1 bg-white rounded-full p-0.5 shadow-sm">
@@ -93,9 +96,10 @@ export default function SettingsPage() {
 
                         <div className="p-4 rounded-lg bg-slate-50 border space-y-4">
                             <div className="text-sm font-medium text-slate-500 uppercase tracking-wider">Preview</div>
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 flex-wrap">
                                 <Button>Primary Button</Button>
                                 <Button variant="secondary">Secondary Button</Button>
+                                <Button className="bg-accent text-accent-foreground hover:bg-accent/90">Accent Button</Button>
                                 <Button variant="outline">Outline Button</Button>
                             </div>
                         </div>

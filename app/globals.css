@@ -44,6 +44,13 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  
+  /* NCG Palette utility colors */
+  --color-ncg-green-dark: var(--ncg-green-dark);
+  --color-ncg-green-light: var(--ncg-green-light);
+  --color-ncg-white: var(--ncg-white);
+  --color-ncg-orange: var(--ncg-orange);
+  --color-ncg-purple: var(--ncg-purple);
 }
 
 :root {
@@ -54,18 +61,27 @@
   --card-foreground: #1e1e1e;
   --popover: #FFFFFF;
   --popover-foreground: #1e1e1e;
-  --primary: #007934;
-  --primary-foreground: #FFFFFF;
-  --secondary: #7AB800;
-  --secondary-foreground: #FFFFFF;
+
+  /* NCG Palette definition */
+  --ncg-green-dark: #007934;
+  --ncg-green-light: #7AB800;
+  --ncg-white: #FFFFFF;
+  --ncg-orange: #FF5800;
+  --ncg-purple: #622567;
+
+  /* standard bindings mapped to NCG Palette */
+  --primary: var(--ncg-green-dark);
+  --primary-foreground: var(--ncg-white);
+  --secondary: var(--ncg-green-light);
+  --secondary-foreground: var(--ncg-white);
   --muted: #B5B6B3;
   --muted-foreground: #565A5C;
-  --accent: #FF5800;
-  --accent-foreground: #FFFFFF;
+  --accent: var(--ncg-orange);
+  --accent-foreground: var(--ncg-white);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: var(--ncg-green-dark);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -73,12 +89,12 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: #f8f9fa;
   --sidebar-foreground: #1e1e1e;
-  --sidebar-primary: #007934;
-  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-primary: var(--ncg-green-dark);
+  --sidebar-primary-foreground: var(--ncg-white);
   --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #007934;
+  --sidebar-accent-foreground: var(--ncg-green-dark);
   --sidebar-border: #e2e8f0;
-  --sidebar-ring: #007934;
+  --sidebar-ring: var(--ncg-green-dark);
 }
 
 .dark {
@@ -88,6 +104,14 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
+
+  /* NCG Palette for dark mode (adjusted for contrast) */
+  --ncg-green-dark: #3fb06a;
+  --ncg-green-light: #9ad429;
+  --ncg-white: oklch(0.145 0 0);
+  --ncg-orange: #ff7d3b;
+  --ncg-purple: #c58ec9;
+
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);

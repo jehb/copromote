@@ -57,6 +57,20 @@ export default async function RootLayout({
                     document.documentElement.style.setProperty('--ring', savedPrimary);
                     document.documentElement.style.setProperty('--sidebar-primary', savedPrimary);
                     document.documentElement.style.setProperty('--sidebar-ring', savedPrimary);
+                    
+                    var themeMap = {
+                      '#007934': { secondary: '#7AB800', accent: '#FF5800' },
+                      '#7AB800': { secondary: '#007934', accent: '#FF5800' },
+                      '#FF5800': { secondary: '#FFA100', accent: '#622567' },
+                      '#622567': { secondary: '#B382C7', accent: '#FF5800' },
+                      '#005293': { secondary: '#00B0CA', accent: '#FF5800' },
+                      '#D50032': { secondary: '#1e1e1e', accent: '#FF5800' }
+                    };
+                    var mapping = themeMap[savedPrimary];
+                    if (mapping) {
+                      document.documentElement.style.setProperty('--secondary', mapping.secondary);
+                      document.documentElement.style.setProperty('--accent', mapping.accent);
+                    }
                   }
                 } catch (e) {}
               })();
