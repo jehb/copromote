@@ -31,3 +31,7 @@ Improvement: ~50% faster with simulated latency.
 ## 2024-06-15 - Batched Independent Data Fetching
 **Learning:** Next.js Server Components with independent data queries (e.g. `getPhotos()` and `getPhotoTags()`) can suffer from a waterfall fetching problem if they are `await`ed sequentially.
 **Action:** Always verify if sequential `await` expressions inside server components or server actions depend on each other. If they are independent, wrap them in `Promise.all([ ... ])` to execute them concurrently and optimize page latency.
+
+## 2026-05-18 - Batched Lookups for Async Logging
+**Learning:** Executing `await prisma.findUnique` inside a `for...of` loop to gather data for secondary asynchronous tasks (like activity logging for a bulk update) introduces O(N) database queries and network latencies.
+**Action:** Extract the queries outside of the loop by pre-fetching the necessary related data in a single O(1) batched query (e.g., using `findMany` with `in`), and then execute the subsequent independent asynchronous tasks concurrently using `Promise.all`.

@@ -273,14 +273,24 @@ export async function bulkUpdateEvents(updates: {
         })
     );
 
-    for (const update of updates) {
-        const event = await prisma.event.findUnique({
-            where: { id: update.id },
-            select: { title: true }
-        });
-        const fields = Object.keys(update).filter(k => k !== 'id').join(', ');
-        await logActivity('UPDATE', 'Event', update.id, `Bulk updated fields (${fields}) on event: ${event?.title || update.id}`);
-    }
+    // ⚡ Bolt: Performance optimization
+    // Pre-fetch titles for all updated events to avoid O(N) sequential database queries in loop
+    const eventTitles = await prisma.event.findMany({
+        where: { id: { in: updates.map(u => u.id) } },
+        select: { id: true, title: true }
+    });
+
+    // Create an O(1) lookup map
+    const titleMap = new Map(eventTitles.map(e => [e.id, e.title]));
+
+    // ⚡ Bolt: Use Promise.all to log all activities concurrently instead of awaiting each sequentially
+    await Promise.all(
+        updates.map(update => {
+            const title = titleMap.get(update.id);
+            const fields = Object.keys(update).filter(k => k !== 'id').join(', ');
+            return logActivity('UPDATE', 'Event', update.id, `Bulk updated fields (${fields}) on event: ${title || update.id}`);
+        })
+    );
 
     revalidatePath('/events');
     revalidatePath('/calendar');
