@@ -133,7 +133,10 @@ export async function deleteWhitelistedIp(id: string) {
 }
 
 // 4. Verify 2FA code (Pending session)
-export async function verifyTwoFactorCode(prevState: any, formData: FormData) {
+export async function verifyTwoFactorCode(
+    prevState: any,
+    formData: FormData
+): Promise<{ message: string; errors?: Record<string, string[]> }> {
     const pendingSession = await getPending2faSession()
     if (!pendingSession) {
         return { message: 'Session expired or invalid. Please log in again.' }
@@ -291,4 +294,12 @@ export async function resendTwoFactorCode() {
         console.error('Failed to resend 2FA code:', error)
         return { success: false, message: 'Failed to resend verification code. Please try again.' }
     }
+}
+
+export async function addWhitelistedIpForm(formData: FormData): Promise<void> {
+    await addWhitelistedIp(null, formData)
+}
+
+export async function deleteWhitelistedIpForm(id: string): Promise<void> {
+    await deleteWhitelistedIp(id)
 }

@@ -30,7 +30,7 @@ export function EventCalendarView({ events }: EventCalendarViewProps) {
 
     // ⚡ Bolt: Pre-compute event lookups by day to eliminate O(N*D) filtering overhead during calendar render
     const eventsByDate = useMemo(() => {
-        return events.reduce((acc, event) => {
+        return events.reduce((acc, event: any) => {
             const dateStr = format(new Date(event.startTime), 'yyyy-MM-dd')
             if (!acc[dateStr]) acc[dateStr] = []
             acc[dateStr].push(event)
@@ -118,7 +118,7 @@ export function EventCalendarView({ events }: EventCalendarViewProps) {
                             </div>
 
                             <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar">
-                                {dayEvents.map(event => (
+                                {dayEvents.map((event: any) => (
                                     <Link
                                         key={event.id}
                                         href={`/events/${event.id}`}

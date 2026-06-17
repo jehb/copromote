@@ -1,4 +1,4 @@
-import { getWhitelistedIps, addWhitelistedIp, deleteWhitelistedIp, getCurrentUserIp } from '@/app/actions/security-center'
+import { getWhitelistedIps, addWhitelistedIpForm, deleteWhitelistedIpForm, getCurrentUserIp } from '@/app/actions/security-center'
 import { getSecurityLogs } from '@/app/actions/admin-logs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -62,7 +62,7 @@ export default async function SecurityCenterPage() {
                                     {detectedIp}
                                 </div>
                                 {!isCurrentIpWhitelisted ? (
-                                    <form action={addWhitelistedIp}>
+                                    <form action={addWhitelistedIpForm}>
                                         <input type="hidden" name="ipAddress" value={detectedIp} />
                                         <input type="hidden" name="description" value="Admin current connection (Quick Whitelist)" />
                                         <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 shadow-sm text-xs py-2">
@@ -88,7 +88,7 @@ export default async function SecurityCenterPage() {
                                 <CardDescription className="text-xs">Allow password-only logins from this IP.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form action={addWhitelistedIp} className="space-y-4">
+                                <form action={addWhitelistedIpForm} className="space-y-4">
                                     <div className="space-y-1.5">
                                         <Label htmlFor="ipAddress" className="text-xs font-medium text-slate-600">IP Address</Label>
                                         <Input
@@ -138,7 +138,7 @@ export default async function SecurityCenterPage() {
                                         </TableHeader>
                                         <TableBody>
                                             {whitelistedIps.map((ip) => {
-                                                const deleteAction = deleteWhitelistedIp.bind(null, ip.id)
+                                                const deleteAction = deleteWhitelistedIpForm.bind(null, ip.id)
                                                 return (
                                                     <TableRow key={ip.id} className="hover:bg-slate-50/50">
                                                         <TableCell className="font-mono text-sm text-slate-800 font-medium">
