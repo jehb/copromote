@@ -69,20 +69,20 @@ export async function getExternalProducts(
 
         // Base query - adapting to legacy schema (positems)
         // F01: upc, F155: brand, F22: size, F238: department, F29: name
-        let query = 'SELECT F01 as upc, F155 as brand, F22 as size, F238 as department, F29 as name FROM positems'
-        let countQuery = 'SELECT COUNT(*) as count FROM positems'
+        const query = `
+            SELECT F01 as upc, F155 as brand, F22 as size, F238 as department, F29 as name
+            FROM positems
+            WHERE (@search = '%%' OR F29 LIKE @search OR F155 LIKE @search OR F01 LIKE @search OR F238 LIKE @search)
+            ORDER BY F29 ASC OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY
+        `
+        const countQuery = `
+            SELECT COUNT(*) as count
+            FROM positems
+            WHERE (@search = '%%' OR F29 LIKE @search OR F155 LIKE @search OR F01 LIKE @search OR F238 LIKE @search)
+        `
 
-        // Add filtering if search is provided
-        if (search) {
-            request.input('search', sql.NVarChar, `%${search}%`)
-            const whereClause = ' WHERE F29 LIKE @search OR F155 LIKE @search OR F01 LIKE @search OR F238 LIKE @search'
-            query += whereClause
-            countQuery += whereClause
-        }
-
-        // Add pagination
-        // MSSQL requires ORDER BY for OFFSET/FETCH
-        query += ' ORDER BY F29 ASC OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY'
+        const safeSearch = search ? `%${search}%` : '%%'
+        request.input('search', sql.NVarChar, safeSearch)
 
         const offset = (page - 1) * pageSize
         request.input('offset', sql.Int, offset)
@@ -91,7 +91,7 @@ export async function getExternalProducts(
         // Execute queries
         const [productsResult, countResult] = await Promise.all([
             request.query(query),
-            pool.request().input('search', sql.NVarChar, `%${search}%`).query(countQuery) // Re-bind input for separate request
+            pool.request().input('search', sql.NVarChar, safeSearch).query(countQuery) // Re-bind input for separate request
         ])
 
         await pool.close()
