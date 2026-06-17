@@ -13,19 +13,20 @@ interface SendEmailOptions {
 
 /**
  * Sends an email using the configured email provider.
- * Supports 'mock' (logs to console/files) and 'twilio' (native Twilio Email REST API).
+ * Supports 'mock' (logs to console/files), 'twilio' (native Twilio Email REST API), and 'smtp2go' (SMTP2GO REST API).
  * 
  * Configure via environment variables:
- * - EMAIL_PROVIDER: 'mock' (default) or 'twilio'
+ * - EMAIL_PROVIDER: 'mock' (default), 'twilio', or 'smtp2go'
  * - TWILIO_ACCOUNT_SID: Twilio Account SID
  * - TWILIO_AUTH_TOKEN: Twilio Auth Token
  * - TWILIO_EMAIL_FROM_ADDRESS: Default sender email (e.g. no-reply@copromote.app)
  * - TWILIO_EMAIL_FROM_NAME: Default sender name (e.g. Co+promote)
+ * - SMTP2GO_API_KEY: SMTP2GO API Key
  */
 export async function sendEmail(options: SendEmailOptions): Promise<{ success: boolean; messageId?: string; error?: string }> {
     const provider = process.env.EMAIL_PROVIDER || 'mock'
-    const fromAddress = options.from?.address || process.env.TWILIO_EMAIL_FROM_ADDRESS || 'no-reply@copromote.app'
-    const fromName = options.from?.name || process.env.TWILIO_EMAIL_FROM_NAME || 'Co+promote'
+    const fromAddress = options.from?.address || process.env.SMTP2GO_EMAIL_FROM_ADDRESS || process.env.TWILIO_EMAIL_FROM_ADDRESS || 'no-reply@copromote.app'
+    const fromName = options.from?.name || process.env.SMTP2GO_EMAIL_FROM_NAME || process.env.TWILIO_EMAIL_FROM_NAME || 'Co+promote'
 
     // Normalize recipients
     let recipients: EmailRecipient[] = []
@@ -92,6 +93,51 @@ export async function sendEmail(options: SendEmailOptions): Promise<{ success: b
             return { success: true, messageId: responseData.sid || responseData.id }
         } catch (error: any) {
             console.error('Failed to send email via Twilio:', error)
+            return { success: false, error: error.message || 'Network error' }
+        }
+    }
+
+    if (provider === 'smtp2go') {
+        const apiKey = process.env.SMTP2GO_API_KEY
+
+        if (!apiKey) {
+            console.error('SMTP2GO API Key not configured in environment variables.')
+            return { success: false, error: 'SMTP2GO API Key not configured' }
+        }
+
+        try {
+            const senderString = fromName ? `"${fromName}" <${fromAddress}>` : fromAddress
+            const toStrings = recipients.map(r => r.name ? `"${r.name}" <${r.address}>` : r.address)
+
+            const response = await fetch('https://api.smtp2go.com/v3/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Smtp2go-Api-Key': apiKey,
+                },
+                body: JSON.stringify({
+                    sender: senderString,
+                    to: toStrings,
+                    subject: options.subject,
+                    text_body: options.text,
+                    html_body: options.html || `<p>${options.text}</p>`,
+                })
+            })
+
+            const responseData = await response.json()
+            if (!response.ok) {
+                console.error('SMTP2GO Email API Error:', responseData)
+                return { success: false, error: responseData.data?.error || 'SMTP2GO API error' }
+            }
+
+            if (responseData.data?.failed > 0) {
+                console.error('SMTP2GO failed sending to some recipients:', responseData.data)
+                return { success: false, error: 'Failed to send to some recipients' }
+            }
+
+            return { success: true, messageId: responseData.data?.succeeded ? `smtp2go-${Date.now()}` : undefined }
+        } catch (error: any) {
+            console.error('Failed to send email via SMTP2GO:', error)
             return { success: false, error: error.message || 'Network error' }
         }
     }
