@@ -35,3 +35,7 @@ Improvement: ~50% faster with simulated latency.
 ## 2024-06-25 - Avoid Nested Array Filtering for Component Exclusions
 **Learning:** In React components that iterate over lists to exclude already selected items (e.g. `ProductSelector`), using `.some()` or `.find()` inside a `.filter()` creates an O(N*M) bottleneck. Parent components were previously mapping and filtering the entire product catalog just to construct an `availableProducts` array for exclusions, creating significant overhead during renders.
 **Action:** Replace nested array lookups with a `useMemo` that constructs an O(1) Javascript `Set`. Introduce a direct identifier prop (e.g. `selectedUpcs: string[]`) instead of requiring the parent to rebuild complex object arrays, pushing the lightweight string mapping up and keeping the core exclusion logic O(N) internally.
+
+## 2026-05-18 - Avoid O(N*M) Filtering and Lookups in Render Loops
+**Learning:** Using an O(N) lookup like `.find()` inside an O(M) iteration like `.filter()` or `.map()` (e.g., `availablePhotos.filter(p => !item.photos?.find(...))` or mapping items and searching for full entities) creates a significant O(N*M) rendering bottleneck. In components that render lists, this causes serious lag as data volume grows.
+**Action:** Replace nested array lookups in rendering loops with pre-computed O(1) JavaScript `Set`s and `Map`s constructed using `useMemo` at the top of the component. This reduces the rendering complexity to O(N+M), keeping the main thread responsive.

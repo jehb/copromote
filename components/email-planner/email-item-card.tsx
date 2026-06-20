@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,6 +51,22 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
         title: item.title,
         description: item.description || '',
     })
+
+    // ⚡ Bolt: Pre-compute O(1) Sets and Maps to avoid O(N*M) lookups inside render loops
+    const eventIdsSet = useMemo(() => new Set(item.events.map(e => e.id)), [item.events])
+    const photoIdsSet = useMemo(() => new Set(item.photos?.map(p => p.photoId) || []), [item.photos])
+
+    const productMap = useMemo(() => {
+        const map = new Map()
+        availableProducts.forEach(p => map.set(p.upc, p))
+        return map
+    }, [availableProducts])
+
+    const photoMap = useMemo(() => {
+        const map = new Map()
+        availablePhotos.forEach(p => map.set(p.id, p))
+        return map
+    }, [availablePhotos])
 
     const {
         attributes,
@@ -233,7 +249,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                 {isEditing && (
                                     <div className="w-full">
                                         <EventSelector
-                                            events={selectorEvents.filter(e => !item.events.find(ie => ie.id === e.id))}
+                                            events={selectorEvents.filter(e => !eventIdsSet.has(e.id))}
                                             onSelect={handleAddEvent}
                                         />
                                     </div>
@@ -246,7 +262,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                 <h4 className="text-sm font-semibold">Attached Products</h4>
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {item.products?.map(prod => {
-                                        const fullProduct = availableProducts.find(ap => ap.upc === prod.upc)
+                                        const fullProduct = productMap.get(prod.upc)
                                         return (
                                             <Badge key={prod.id} variant="outline" className="flex items-center gap-1 bg-blue-50/50">
                                                 <Link href={`/product/${prod.upc}`} className="hover:underline truncate max-w-[200px]" title={fullProduct?.name || prod.upc}>
@@ -283,7 +299,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                 <h4 className="text-sm font-semibold">Attached Gallery Photos</h4>
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     {item.photos?.map(itemPhoto => {
-                                        const fullPhoto = availablePhotos.find(ap => ap.id === itemPhoto.photoId)
+                                        const fullPhoto = photoMap.get(itemPhoto.photoId)
                                         if (!fullPhoto) return null
 
                                         return (
@@ -312,7 +328,7 @@ export function EmailItemCard({ item, availableEvents, availableProducts, availa
                                 {isEditing && (
                                     <div className="w-full">
                                         <PhotoSelector
-                                            availablePhotos={availablePhotos.filter(p => !item.photos?.find(ip => ip.photoId === p.id))}
+                                            availablePhotos={availablePhotos.filter(p => !photoIdsSet.has(p.id))}
                                             onSelect={handleAddPhoto}
                                         />
                                     </div>
