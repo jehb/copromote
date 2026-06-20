@@ -94,7 +94,7 @@ export function PromotionListView({ promotions }: PromotionListViewProps) {
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </form>
-                                        <Button asChild size="sm" variant="ghost" className="h-8 w-8 p-0">
+                                        <Button asChild size="sm" variant="ghost" className="h-8 w-8 p-0" aria-label="View Promotion">
                                             <Link href={`/promotions/${promo.id}`}>
                                                 <ArrowRight className="h-4 w-4" />
                                             </Link>
