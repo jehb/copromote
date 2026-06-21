@@ -43,7 +43,7 @@ export function ContactForm({ contact, organizations, action }: ContactFormProps
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="firstName">First Name</Label>
+                            <Label htmlFor="firstName">First Name <span className="text-red-500">*</span></Label>
                             <Input
                                 id="firstName"
                                 name="firstName"
@@ -54,7 +54,7 @@ export function ContactForm({ contact, organizations, action }: ContactFormProps
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="lastName">Last Name</Label>
+                            <Label htmlFor="lastName">Last Name <span className="text-red-500">*</span></Label>
                             <Input
                                 id="lastName"
                                 name="lastName"

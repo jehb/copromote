@@ -44,7 +44,7 @@ describe('ContactForm', () => {
         expect(screen.getByRole('button', { name: /create contact/i })).toBeInTheDocument()
 
         // Inputs should be empty
-        expect(screen.getByLabelText('First Name')).toHaveValue('')
+        expect(screen.getByLabelText(/First Name/i)).toHaveValue('')
     })
 
     it('renders populated form for editing', () => {
@@ -53,8 +53,8 @@ describe('ContactForm', () => {
 
         expect(screen.getByRole('button', { name: /update contact/i })).toBeInTheDocument()
 
-        expect(screen.getByLabelText('First Name')).toHaveValue('John')
-        expect(screen.getByLabelText('Last Name')).toHaveValue('Doe')
+        expect(screen.getByLabelText(/First Name/i)).toHaveValue('John')
+        expect(screen.getByLabelText(/Last Name/i)).toHaveValue('Doe')
         expect(screen.getByLabelText('Primary Email')).toHaveValue('john@example.com')
         // Radix Select renders a hidden select with options for form submission. 
         // getByText finds both visible span and hidden option.
@@ -66,8 +66,8 @@ describe('ContactForm', () => {
         const actionMock = jest.fn()
         render(<ContactForm organizations={mockOrganizations} action={actionMock} />)
 
-        await userEvent.type(screen.getByLabelText('First Name'), 'Jane')
-        await userEvent.type(screen.getByLabelText('Last Name'), 'Smith')
+        await userEvent.type(screen.getByLabelText(/First Name/i), 'Jane')
+        await userEvent.type(screen.getByLabelText(/Last Name/i), 'Smith')
 
         await userEvent.click(screen.getByRole('button', { name: /create contact/i }))
 
@@ -86,8 +86,8 @@ describe('ContactForm', () => {
         const submitBtn = screen.getByRole('button', { name: /create contact/i })
 
         // Required fields
-        await userEvent.type(screen.getByLabelText('First Name'), 'Jane')
-        await userEvent.type(screen.getByLabelText('Last Name'), 'Smith')
+        await userEvent.type(screen.getByLabelText(/First Name/i), 'Jane')
+        await userEvent.type(screen.getByLabelText(/Last Name/i), 'Smith')
 
         // Use userEvent or fireEvent to trigger form submission.
         // A click on a submit button will bubble up as a submit event to the form.
