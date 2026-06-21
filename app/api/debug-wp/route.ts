@@ -13,9 +13,17 @@ export async function GET(request: Request) {
         const query = searchParams.get('q')
         const testNoAuth = searchParams.get('noauth') === 'true'
 
-        const urlConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_URL' } })
-        const usernameConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_USERNAME' } })
-        const passwordConfig = await prisma.config.findUnique({ where: { key: 'WORDPRESS_APP_PASSWORD' } })
+        // ⚡ Bolt: Batch database queries to prevent waterfall network requests
+        const configs = await prisma.config.findMany({
+            where: {
+                key: {
+                    in: ['WORDPRESS_URL', 'WORDPRESS_USERNAME', 'WORDPRESS_APP_PASSWORD']
+                }
+            }
+        })
+        const urlConfig = configs.find(c => c.key === 'WORDPRESS_URL')
+        const usernameConfig = configs.find(c => c.key === 'WORDPRESS_USERNAME')
+        const passwordConfig = configs.find(c => c.key === 'WORDPRESS_APP_PASSWORD')
 
         if (!urlConfig?.value) {
             return NextResponse.json({ error: 'Missing WordPress URL' }, { status: 400 })

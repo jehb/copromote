@@ -6,6 +6,7 @@ jest.mock('@/lib/prisma', () => ({
     prisma: {
         config: {
             findUnique: jest.fn(),
+            findMany: jest.fn(),
         },
     },
 }))
@@ -50,12 +51,11 @@ describe('GET /api/debug-wp', () => {
 
     it('does not leak config in response', async () => {
         ;(getCurrentUser as jest.Mock).mockResolvedValue({ id: '1', role: 'ADMIN' })
-        ;(prisma.config.findUnique as jest.Mock).mockImplementation(({ where: { key } }) => {
-            if (key === 'WORDPRESS_URL') return Promise.resolve({ value: 'https://example.com' })
-            if (key === 'WORDPRESS_USERNAME') return Promise.resolve({ value: 'admin' })
-            if (key === 'WORDPRESS_APP_PASSWORD') return Promise.resolve({ value: 'password' })
-            return Promise.resolve(null)
-        })
+        ;(prisma.config.findMany as jest.Mock).mockResolvedValue([
+            { key: 'WORDPRESS_URL', value: 'https://example.com' },
+            { key: 'WORDPRESS_USERNAME', value: 'admin' },
+            { key: 'WORDPRESS_APP_PASSWORD', value: 'password' }
+        ])
 
         const req = {
             url: 'http://localhost/api/debug-wp',
