@@ -46,6 +46,7 @@ export function DeleteUserDialog({ userId, username }: DeleteUserDialogProps) {
                     size="icon"
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     title="Delete user"
+                    aria-label="Delete user"
                 >
                     <Trash2 className="h-4 w-4" />
                 </Button>

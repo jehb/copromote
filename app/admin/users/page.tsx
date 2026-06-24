@@ -90,6 +90,7 @@ export default async function UsersPage() {
                                                     className="text-muted-foreground opacity-50 cursor-not-allowed"
                                                     disabled
                                                     title="Cannot delete admin user"
+                                                    aria-label="Cannot delete admin user"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>

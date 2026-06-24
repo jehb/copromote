@@ -158,6 +158,7 @@ export default async function SecurityCenterPage() {
                                                                     size="icon"
                                                                     className="h-8 w-8 text-rose-500 hover:text-rose-700 hover:bg-rose-50"
                                                                     title="Remove from whitelist"
+                                                                    aria-label="Remove from whitelist"
                                                                 >
                                                                     <Trash2 className="h-4 w-4" />
                                                                 </Button>
