@@ -92,7 +92,7 @@ export function LocationForm({ location }: { location?: Location }) {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">Name <span className="text-red-500">*</span></Label>
                             <Input
                                 id="name"
                                 name="name"
