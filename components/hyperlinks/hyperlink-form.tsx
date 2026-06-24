@@ -89,7 +89,7 @@ export function HyperlinkForm({ hyperlink }: { hyperlink?: Hyperlink }) {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="title">Title</Label>
+                            <Label htmlFor="title">Title <span className="text-red-500">*</span></Label>
                             <Input
                                 id="title"
                                 name="title"
@@ -99,7 +99,7 @@ export function HyperlinkForm({ hyperlink }: { hyperlink?: Hyperlink }) {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="url">URL</Label>
+                            <Label htmlFor="url">URL <span className="text-red-500">*</span></Label>
                             <Input
                                 id="url"
                                 name="url"

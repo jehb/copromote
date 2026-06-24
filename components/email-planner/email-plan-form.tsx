@@ -69,7 +69,7 @@ export function EmailPlanForm({ initialData }: EmailPlanFormProps) {
             <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="subject">Subject Line</Label>
+                        <Label htmlFor="subject">Subject Line <span className="text-red-500">*</span></Label>
                         <Input
                             id="subject"
                             required
@@ -80,7 +80,7 @@ export function EmailPlanForm({ initialData }: EmailPlanFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="sendDate">Planned Send Date</Label>
+                        <Label htmlFor="sendDate">Planned Send Date <span className="text-red-500">*</span></Label>
                         <Input
                             id="sendDate"
                             type="date"
