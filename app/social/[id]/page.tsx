@@ -234,7 +234,7 @@ export default async function SocialPostDetailPage({
                                             <div className="p-3 flex justify-between items-center text-xs">
                                                 <div className="font-medium truncate flex-1 pr-2">{asset.name}</div>
                                                 <form action={deleteSocialPostAsset.bind(null, asset.id, post.id)}>
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-red-600 hover:bg-red-50">
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-red-600 hover:bg-red-50" aria-label="Delete asset" title="Delete asset">
                                                         <Trash2 className="h-3.5 w-3.5" />
                                                     </Button>
                                                 </form>
