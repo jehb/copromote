@@ -67,6 +67,7 @@ export function EventCalendarView({ events }: EventCalendarViewProps) {
                         </button>
                         <button
                             onClick={goToday}
+                            aria-label="Today"
                             className="px-3 py-1 text-sm font-medium hover:bg-slate-50 transition-colors border-r"
                         >
                             Today

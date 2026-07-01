@@ -88,6 +88,7 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
         <div className="flex items-center bg-slate-100 p-1 rounded-lg border shadow-sm">
             <button
                 onClick={() => setView('list')}
+                aria-label="List view"
                 className={cn(
                     "flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
                     view === 'list' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
@@ -98,6 +99,7 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
             </button>
             <button
                 onClick={() => setView('calendar')}
+                aria-label="Calendar view"
                 className={cn(
                     "flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
                     view === 'calendar' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
@@ -108,6 +110,7 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
             </button>
             <button
                 onClick={() => setView('cards')}
+                aria-label="Cards view"
                 className={cn(
                     "flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
                     view === 'cards' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
@@ -118,6 +121,7 @@ export function EventsClientPage({ initialData }: EventsClientPageProps) {
             </button>
             <button
                 onClick={() => setView('bulk')}
+                aria-label="Bulk edit view"
                 className={cn(
                     "flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-all",
                     view === 'bulk' ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"

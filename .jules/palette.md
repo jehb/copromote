@@ -1,3 +1,7 @@
 ## 2024-05-18 - Required Field Indicators in Forms
 **Learning:** This app frequently relies on the `required` HTML attribute for form validation (e.g., in `ContactForm`), but occasionally lacks clear visual indicators (like an asterisk) on the corresponding `<Label>`. Testing revealed that the tests query elements via `getByLabelText('Field Name')`, which breaks if the visual indicator changes the exact text content (e.g., `'First Name'` vs `'First Name *'`).
 **Action:** Always use a regular expression (e.g., `getByLabelText(/First Name/i)`) in tests when modifying form labels to include visual indicators like asterisks, ensuring tests remain robust to minor UI text changes.
+
+## 2024-07-01 - View Switcher & Calendar Buttons Accessibility
+**Learning:** Found multiple `<button>` elements in UI components (`components/events/events-client-page.tsx`, `components/events/event-calendar-view.tsx`) that relied purely on icons (or short context text like 'Today' without broader context) to convey action, but lacked `aria-label` attributes. This breaks screen reader accessibility as the purpose is not explicitly defined.
+**Action:** When auditing or implementing icon-heavy or context-specific buttons (like view toggles or calendar actions), always explicitly define an `aria-label` (e.g., `aria-label="List view"`) to ensure assistive technologies can correctly identify the interactive element.
