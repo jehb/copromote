@@ -1,3 +1,6 @@
 ## 2024-05-18 - Required Field Indicators in Forms
 **Learning:** This app frequently relies on the `required` HTML attribute for form validation (e.g., in `ContactForm`), but occasionally lacks clear visual indicators (like an asterisk) on the corresponding `<Label>`. Testing revealed that the tests query elements via `getByLabelText('Field Name')`, which breaks if the visual indicator changes the exact text content (e.g., `'First Name'` vs `'First Name *'`).
 **Action:** Always use a regular expression (e.g., `getByLabelText(/First Name/i)`) in tests when modifying form labels to include visual indicators like asterisks, ensuring tests remain robust to minor UI text changes.
+## 2024-07-02 - Required Field Indicators in Forms
+**Learning:** Found additional forms (`EventForm` and `OrganizationForm`) missing explicit visual indicators (like `*`) on required fields, though they had the `required` HTML attribute. This is a common pattern in the app. Also verified that Jest tests heavily rely on exact `getByLabelText('Label Name')` which break easily on such UI tweaks.
+**Action:** Consistently enforce regular expressions for `getByLabelText` (e.g., `getByLabelText(/Event Title/i)`) across form testing files. When adding required fields, visually indicate them using `<span className="text-red-500">*</span>` appended to the `<Label>`.

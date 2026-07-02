@@ -116,7 +116,7 @@ describe('EventForm', () => {
 
         expect(screen.getByText('Basic Information')).toBeInTheDocument()
         expect(screen.getByRole('button', { name: /create event/i })).toBeInTheDocument()
-        expect(screen.getByLabelText('Event Title')).toHaveValue('')
+        expect(screen.getByLabelText(/Event Title/i)).toHaveValue('')
     })
 
     it('handles contact search and selection', async () => {
@@ -338,12 +338,12 @@ describe('EventForm', () => {
         )
 
         const user = userEvent.setup()
-        await user.type(screen.getByLabelText('Event Title'), 'New Event')
+        await user.type(screen.getByLabelText(/Event Title/i), 'New Event')
         
-        const startTimeInput = screen.getByLabelText('Start Time')
+        const startTimeInput = screen.getByLabelText(/Start Time/i)
         fireEvent.change(startTimeInput, { target: { value: '2023-10-10T10:00' } })
         
-        const endTimeInput = screen.getByLabelText('End Time')
+        const endTimeInput = screen.getByLabelText(/End Time/i)
         fireEvent.change(endTimeInput, { target: { value: '2023-10-10T12:00' } })
 
         const form = screen.getByRole('button', { name: /create event/i }).closest('form')
