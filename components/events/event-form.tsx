@@ -175,7 +175,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Event Title</Label>
+                                <Label htmlFor="title">Event Title <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="title"
                                     name="title"
@@ -203,7 +203,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="startTime">Start Time</Label>
+                                <Label htmlFor="startTime">Start Time <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="startTime"
                                     name="startTime"
@@ -214,7 +214,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="endTime">End Time</Label>
+                                <Label htmlFor="endTime">End Time <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="endTime"
                                     name="endTime"
@@ -227,7 +227,7 @@ export function EventForm({ event, locations, users, contacts, organizations, ev
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="locationId">Venue / Location</Label>
+                            <Label htmlFor="locationId">Venue / Location <span className="text-red-500">*</span></Label>
                             <Select name="locationId" defaultValue={event?.locationId} required>
                                 <SelectTrigger className="bg-slate-50/50 border-slate-200">
                                     <SelectValue placeholder="Select a location" />
